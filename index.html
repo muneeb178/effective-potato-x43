@@ -59,7 +59,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .tab{flex:1;padding:8px 0;font-weight:600;font-size:16px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px;position:relative}
 .tab.on{color:var(--text)}
 .tabs{position:relative}
-.tabind{position:absolute;left:0;bottom:-3px;width:50%;height:3px;background:var(--text);will-change:transform}
+.tabind{position:absolute;left:0;bottom:-3px;width:50%;height:3px;background:var(--text);will-change:transform;transition:transform .34s cubic-bezier(.22,.9,.24,1)}
+#tabs.t2 .tabind{transform:translateX(100%)}
 #s-search .tabind{transform:none}
 .tab{transition:color .25s}
 .tabclip{flex:1;position:relative;min-height:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
@@ -139,9 +140,11 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .sf{padding:0 4px 0 14px}
 .sf input{flex:1;min-width:0;width:100%;background:none;border:0;color:var(--text);font:inherit;font-size:16px;font-weight:500;padding:9px 0;outline:none}
 .sf input::placeholder{color:var(--muted);font-weight:400}
-.fhl{position:absolute;left:16px;right:16px;top:0;height:38px;border-radius:10px;background:var(--surface-2);z-index:1;pointer-events:none;
-  transition:transform .26s cubic-bezier(.22,.9,.24,1);will-change:transform;box-shadow:0 0 0 1px #ffffff14}
-.sf>*{position:relative;z-index:2}
+.sf{transition:min-height .28s cubic-bezier(.22,.9,.24,1),background-color .28s}
+.sf input{transition:font-size .28s cubic-bezier(.22,.9,.24,1)}
+.sf.act{background:var(--surface-2);min-height:50px}
+.sf.act input{font-size:19px}
+#s-search .fields{contain:layout}
 .sf .loc{transition:opacity .2s}
 .sf .loc{display:grid;opacity:0;pointer-events:none}.sf.act .loc{opacity:1;pointer-events:auto}
 #opts{background:#000;margin-top:10px}
@@ -197,8 +200,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .xfer{width:22px;height:22px;border-radius:6px;background:#f2f4f5;color:#121417;display:grid;place-items:center;transform:translate(-50%,-50%);box-shadow:0 2px 8px #0008}
 .tad{padding:16px 0 0}
 .tad.rest{display:none}
-.dadwrap{position:absolute;left:0;right:0;top:0;z-index:690;transform:translateY(-102%);transition:transform .42s cubic-bezier(.16,1,.3,1);will-change:transform;pointer-events:none;box-shadow:0 8px 20px #0000}
-.dadwrap.on{transform:none;pointer-events:auto;box-shadow:0 8px 20px #0008}
+.dhdr{position:relative;z-index:5;background:var(--bg)}
+.dbody{position:absolute;left:0;right:0;top:var(--hdr,54px);height:calc(100% - var(--hdr,54px) + var(--adh,121px));display:flex;flex-direction:column;
+  transition:transform .4s cubic-bezier(.22,.9,.24,1);will-change:transform}
+.dbody.adhide{transform:translateY(calc(-1 * var(--adh,121px)))}
+.dad{flex:none}
+.dmapctl{z-index:620}
+.dbody:not(.adhide) ~ .dmapctl,.dbody:not(.adhide) ~ .dfoot{transform:none}
 .credit{background:#000a;color:#c8ced4;font:500 10px var(--font);padding:2px 6px;border-radius:4px;margin:4px!important;border:0}
 #dmap{position:absolute;inset:0;z-index:0}
 .tpscroll{position:absolute;inset:0;z-index:600;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;pointer-events:none;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
@@ -292,7 +300,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
   <div class="homebody">
     <div class="tabs" role="tablist" id="tabs"><span class="tabind"></span>
       <button class="tab on" role="tab" aria-selected="true" id="tab-trip">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V10l4-2v13M9 21V5l5-2v18M14 21V9l5 2v10"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1.2v2.1"/><path d="M10.7 5.1 12 3.3l1.3 1.8Z"/><path d="M10.2 5.1h3.6"/><path d="M10.8 5.1 10.1 16.6h3.8l-.7-11.5"/><path d="M9.5 9.6h5"/><path d="M5.6 21.6c1.6-2 2.8-3.6 4.5-5h3.8c1.7 1.4 2.9 3 4.5 5"/><path d="M3.8 21.6h16.4"/></svg>
         Lahore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
       </button>
       <button class="tab" role="tab" aria-selected="false" id="tab-lines">
@@ -334,10 +342,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     <div class="hright"><span class="pill tnum" id="s-clock"></span><span class="iconbtn" aria-hidden="true"></span></div>
   </div>
   <div class="tabs" role="presentation"><span class="tabind"></span>
-    <button class="tab on" tabindex="-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V10l4-2v13M9 21V5l5-2v18M14 21V9l5 2v10"/></svg>Lahore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+    <button class="tab on" tabindex="-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1.2v2.1"/><path d="M10.7 5.1 12 3.3l1.3 1.8Z"/><path d="M10.2 5.1h3.6"/><path d="M10.8 5.1 10.1 16.6h3.8l-.7-11.5"/><path d="M9.5 9.6h5"/><path d="M5.6 21.6c1.6-2 2.8-3.6 4.5-5h3.8c1.7 1.4 2.9 3 4.5 5"/><path d="M3.8 21.6h16.4"/></svg>Lahore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
     <button class="tab" id="s-tab-lines" tabindex="-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 10h14M8 21l2-4M16 21l-2-4"/></svg>Lines</button>
   </div>
-  <div class="fields"><span class="fhl" id="fhl"></span>
+  <div class="fields">
     <div class="field sf" id="sf-from"><span class="dot"></span><input id="q-from" placeholder="From where?" autocomplete="off" enterkeyhint="search"><button class="iconbtn loc" id="loc-btn" aria-label="Use my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
     <div class="field sf" id="sf-to"><span class="dot b"></span><input id="q-to" placeholder="Where to?" autocomplete="off" enterkeyhint="search"><button class="iconbtn loc" id="loc-btn2" aria-label="Use my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
   </div>
@@ -363,24 +371,25 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 
 <!-- TRIP DETAIL -->
 <section class="screen" id="s-detail">
-  <div class="hdr">
+  <div class="hdr dhdr" id="dhdr">
     <button class="iconbtn" id="det-back" aria-label="Back"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
     <span class="pill tnum" id="det-fare"></span>
   </div>
-  <div class="dsum" id="dsum"></div>
-  <div class="dsplit">
-    <div class="dadwrap" id="dadwrap"><div><div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div></div></div>
-
+  <div class="dbody" id="dbody">
+    <div class="dad" id="dad"><div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div></div>
+    <div class="dsum" id="dsum"></div>
+    <div class="dsplit">
     <div id="dmap"></div>
-    <div class="mapctl" style="z-index:500"><button id="dlocate" aria-label="Show my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
     <div class="peek" id="peek"></div>
     <div class="tpscroll" id="tpscroll"><div class="tpspace"></div><div class="tpanel" id="tpanel"><div class="tscroll" id="detail"></div></div></div>
+    </div>
+  </div>
+    <div class="mapctl dmapctl" id="dmapctl"><button id="dlocate" aria-label="Show my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
     <div class="dfoot">
       <button class="fbtn w" id="d-alarm" aria-label="Departure reminder"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M5 3 2 6M19 3l3 3"/></svg></button>
       <button class="fbtn w" id="d-nav"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 2 10 10-10 10L2 12Z"/><path d="M9 14v-3h5M12 8l3 3-3 3"/></svg>Navigate</button>
       <button class="fbtn y" id="d-fare"></button>
     </div>
-  </div>
 </section>
 
 <!-- MAP (network + pick a point) -->
@@ -590,7 +599,7 @@ function onlineSearch(q){
     }catch(e){if(my!==searchSeq)return;const el=$("o-status");if(el)el.textContent="No connection for address search. Stations still work.";}
   },350);
 }
-function activate(w){state.picking=w;$("sf-from").classList.toggle("act",w==="from");$("sf-to").classList.toggle("act",w==="to");const f=$("sf-from"),t=$("sf-to");$("fhl").style.height=f.offsetHeight+"px";$("fhl").style.transform=`translateY(${w==="to"?t.offsetTop-f.offsetTop:0}px)`;onlineSearch("");}
+function activate(w){state.picking=w;$("sf-from").classList.toggle("act",w==="from");$("sf-to").classList.toggle("act",w==="to");onlineSearch("");}
 ["from","to"].forEach(w=>{const inp=$("q-"+w);
   inp.addEventListener("focus",()=>{if(state.picking!==w)activate(w);setTimeout(()=>inp.select(),0);});
   inp.addEventListener("input",()=>onlineSearch(inp.value));
@@ -714,7 +723,7 @@ function renderDetail(){
   h+=`<div class="tad"><div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div></div>`;
   $("detail").innerHTML=h;$("detail").scrollTop=0;if(window.watchBottomAd)watchBottomAd();
 }
-function openDetail(k){$("dadwrap").classList.remove("on");state.trip=state.result[k];renderDetail();setPanel(false,false);initDmap();
+function openDetail(k){const sd=$("s-detail");sd.style.setProperty("--hdr",$("dhdr").offsetHeight+"px");sd.style.setProperty("--adh",$("dad").offsetHeight+"px");$("dbody").classList.remove("adhide");adState.lock=Date.now()+500;state.trip=state.result[k];renderDetail();setPanel(false,false);initDmap();
   dmap.invalidateSize({pan:false});drawInto(dlayer,"trip");fitTrip();show("s-detail");}
 const tps=$("tpscroll");
 function tpMax(){return tps.scrollWidth-tps.clientWidth;}
@@ -732,11 +741,11 @@ let botObs=null;function watchBottomAd(){const sc=$("detail"),t=sc.querySelector
   botObs=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting){seen=true;adState.botSeenAt=Date.now();}
     else if(seen&&e.boundingClientRect.top>e.rootBounds.bottom){seen=false;t.classList.add("rest");setTimeout(()=>t.classList.remove("rest"),AD_REST);}}},{root:sc,threshold:0.6});botObs.observe(t);}
 const AD_REST=15000;const adState={topSeenAt:-1e9,lock:0,botSeenAt:-1e9};
-function topAd(on){const w=$("dadwrap"),now=Date.now();if(on===w.classList.contains("on"))return;
-  if(on&&now-adState.topSeenAt<AD_REST)return;w.classList.toggle("on",on);adState.lock=now+700;if(!on)adState.topSeenAt=now;}
+function topAd(on){const b=$("dbody"),now=Date.now();if(on===!b.classList.contains("adhide"))return;
+  if(on&&now-adState.topSeenAt<AD_REST)return;b.classList.toggle("adhide",!on);adState.lock=now+450;if(!on)adState.topSeenAt=now;}
 (function(){let last=0,ty=null;const sc=$("detail");
   sc.addEventListener("scroll",()=>{const top=sc.scrollTop,d=top-last;last=top;if(Date.now()<adState.lock)return; // ignore the jolt our own resize causes
-    if(d<-16)topAd(true);else if(d>30)topAd(false);},{passive:true});
+    if(d<-16)topAd(true);else if(d>8)topAd(false);},{passive:true});
   sc.addEventListener("touchstart",e=>{ty=e.touches[0].clientY;},{passive:true});
   sc.addEventListener("touchmove",e=>{if(ty===null||Date.now()<adState.lock)return;const dy=e.touches[0].clientY-ty;
     if(sc.scrollTop<=0&&dy>40){topAd(true);ty=null;}},{passive:true});
@@ -921,7 +930,7 @@ addEventListener("popstate",()=>{if(skipPop){skipPop=false;return;}backEntry=fal
 document.querySelector("#nav button").onclick=()=>setTab("trip");
 (function(){ // the underline follows the native swipe; the tab state follows where it settles
   const c=document.querySelector(".tabclip"),ind=document.querySelector("#tabs .tabind");let raf=0,st=0;
-  c.addEventListener("scroll",()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;const f=c.scrollLeft/Math.max(1,c.clientWidth);ind.style.transform=`translateX(${f*100}%)`;});
+  c.addEventListener("scroll",()=>{const half=c.scrollLeft>c.clientWidth/2;if(half!==$("tabs").classList.contains("t2")){$("tabs").classList.toggle("t2",half);$("tab-trip").classList.toggle("on",!half);$("tab-lines").classList.toggle("on",half);}
     clearTimeout(st);st=setTimeout(()=>{const two=c.scrollLeft>c.clientWidth/2;if(two!==$("tabtrack").classList.contains("t2")){setTab0(two?"lines":"trip",true);if(window.syncBack)syncBack();}},90);},{passive:true});})();
 
 renderHist();requestAnimationFrame(()=>setHs(false));syncHome();
