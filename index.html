@@ -466,8 +466,8 @@ for(const a of LINES.OL.stops)for(const b of LINES.MB.stops){const m=walkM(a,b);
 
 function fareFor(lineId,i,j){const L=LINES[lineId];if(lineId==="MB")return MB_FARE;const km=Math.abs(L.cumKm[j]-L.cumKm[i]);for(const[max,f]of OL_FARE)if(km<=max)return f;return 45;}
 function rideMin(lineId,i,j){const L=LINES[lineId];return Math.max(2,Math.round(Math.abs(L.cumMin[j]-L.cumMin[i])));}
-function nextDep(L,t){ // minutes since midnight; departures on a fixed grid from opening
-  if(t<L.open)return L.open; const k=Math.ceil((t-L.open)/L.headway);return L.open+k*L.headway;}
+function nextDep(L,t,off=0){ // minutes since midnight; trains leave the terminus every headway from opening, reaching this station off minutes later
+  const b=L.open+off;if(t<b)return b; const k=Math.ceil((t-b)/L.headway);return b+k*L.headway;}
 
 // ---------------------------------------------------------------- ROUTER
 const MAX_ACCESS_WALK=2600; // m (walk-distance incl. detour)
@@ -508,7 +508,7 @@ function timeLegs(legsIn,startMin){
   const legs=cloneLegs(legsIn);let t=startMin,fare=0,firstDep=null;
   for(const lg of legs){
     if(lg.type==="walk"){lg.start=t;lg.min=lg.m<40?0:walkMin(lg.m);t+=lg.min;lg.end=t;}
-    else{const L=LINES[lg.line];t+=ACCESS_MIN;const dep=nextDep(L,t);if(dep+lg.min>L.close)return null;
+    else{const L=LINES[lg.line];t+=ACCESS_MIN;const off=Math.round(lg.dir>0?L.cumMin[lg.from.i]:L.cumMin[L.stops.length-1]-L.cumMin[lg.from.i]);const dep=nextDep(L,t,off);if(dep>L.close+off)return null; /* first/last trains leave the terminus at opening/closing time and reach this station off minutes later */
       lg.wait=dep-t;lg.dep=dep;lg.arr=dep+lg.min;t=lg.arr+1;fare+=lg.fare;if(firstDep===null)firstDep=dep;}
   }
   const rides=legs.filter(l=>l.type==="ride");
@@ -657,8 +657,8 @@ function runSearch(){
   saveHist(A,B);
   const now=nowMin();let start=state.when??now;state.future=state.when!==null&&state.when>now+1;
   const closeAll=Math.max(LINES.OL.close,LINES.MB.close);let banner="";
-  if(start>=closeAll-10||start<LINES.OL.open-30){banner=`Metro and Orange Line run 06:00 to 22:00. Showing the first trips in the morning.`;start=LINES.OL.open-15;state.future=true;}
-  const list=plan(A,B,start);state.result=list;
+  if(start<LINES.OL.open-30){banner=`Metro and Orange Line run from 06:00. Showing the first trips this morning.`;start=LINES.OL.open-15;state.future=true;}
+  let list=plan(A,B,start);if(!list.some(r=>r.rides.length)&&start>=17*60){const m=plan(A,B,LINES.OL.open-15);if(m.some(r=>r.rides.length)){list=m;start=LINES.OL.open-15;state.future=true;banner="The last Metrobus and Orange Line trips for tonight have left. Showing the first trips tomorrow morning (from 06:00).";}}state.result=list;
   $("r-from").textContent=A.name;$("r-to").textContent=B.name;
   $("cards").innerHTML=`<div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div>`+(banner?`<div class="banner">${banner}</div>`:"")+(list.length?list.map((r,k)=>cardHTML(r,k,now,state.future)).join(""):`<p class="note" style="font-size:15px">No Metrobus or Orange Line trip fits this journey yet. Both points need to be within about 2.5 km of a station. Speedo and e-bus routes will widen this.</p>`)+
     `<p class="proto">Times are estimates from published frequencies. No live tracking yet.</p><div style="height:24px"></div>`;
