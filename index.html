@@ -650,8 +650,6 @@ function renderDetail(){
     if(l.type==="walk"){if(!l.min)return;
       const label=l.transfer?`Change: walk ${Math.round(l.m)} m to the ${LINES[l.to.line].name}`:`Walk ${Math.round(l.m)} m`;
       h+=row(walkIcon+`<span class="vdots"></span>`,`<div class="walk"><span>${label}</span><span>${l.min} min</span></div>${l.transfer&&(l.from.under||l.to.under)?`<div class="sub">Anarkali is underground: go up to street level, then up to the Metrobus platform.</div>`:""}`);
-      if(l.transfer){const nx=r.legs[idx+1];const w=nx&&nx.wait!=null?nx.wait+ACCESS_MIN:0;sep=true;
-        if(w>=1)h+=row(`<span class="circ" style="background:var(--surface-2);color:#fff">${SVG.seat}</span>`,`<div class="walk"><span>Wait for transfer</span><span>${w} min</span></div>`);sep=true;}
     }else{
       const L=LINES[l.line];sep=true;
       const stairs=l.from.under?"Go down to the platform (underground station).":"Take the stairs or escalator up to the platform.";
