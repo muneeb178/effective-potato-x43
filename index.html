@@ -214,9 +214,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .dad .adband{transition:opacity .55s ease .1s}
 .dbody.adhide .dad .adband{opacity:0}
 #s-detail .dfoot{display:flex}
-#s-detail .dfoot .fbtn{transform:translateY(170%);transition:transform .34s cubic-bezier(.2,.9,.3,1)}
-#s-detail .dfoot .fbtn:nth-child(2){transition-delay:.07s}#s-detail .dfoot .fbtn:nth-child(3){transition-delay:.14s}
-#s-detail.open.ft .dfoot .fbtn{transform:none}
+#s-detail .dfoot{transform:translateY(calc(100% + 24px));opacity:0;transition:transform .45s cubic-bezier(.2,.8,.25,1),opacity .3s ease;will-change:transform,opacity}
+#s-detail.open.ft .dfoot{transform:none;opacity:1}
 .dad{flex:none}
 .dmapctl{z-index:620}
 
@@ -671,7 +670,7 @@ function runSearch(){
   if(start<LINES.OL.open-30){banner=`Metro and Orange Line run from 06:00. Showing the first trips this morning.`;start=LINES.OL.open-15;state.future=true;}
   let list=plan(A,B,start);if(!list.some(r=>r.rides.length)&&start>=17*60){const m=plan(A,B,LINES.OL.open-15);if(m.some(r=>r.rides.length)){list=m;start=LINES.OL.open-15;state.future=true;banner="The last Metrobus and Orange Line trips for tonight have left. Showing the first trips tomorrow morning (from 06:00).";}}state.result=list;
   $("r-from").textContent=A.name;$("r-to").textContent=B.name;
-  if(list.some(r=>r.rides.length))list=allDepartures(plan.best,plan.walk,start,start+480);state.result=list;state.shown=0;state.now=now;
+  if(list.some(r=>r.rides.length))list=allDepartures(plan.best,plan.walk,start,start+120);state.result=list;state.shown=0;state.now=now;
   $("cards").innerHTML=`<div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div>`+(banner?`<div class="banner">${banner}</div>`:"")+(list.length?`<div id="cardlist"></div>`:`<p class="note" style="font-size:15px">No Metrobus or Orange Line trip fits this journey yet. Both points need to be within about 2.5 km of a station. Speedo and e-bus routes will widen this.</p>`)+
     `<p class="proto">Times are estimates from published frequencies. No live tracking yet.</p><div style="height:24px"></div>`;
   moreCards(16);$("cards").scrollTop=0;
@@ -748,7 +747,7 @@ function renderDetail(){
 }
 function openDetail(k,card){const sd=$("s-detail");sd.style.setProperty("--hdr",$("dhdr").offsetHeight+"px");sd.style.setProperty("--adh",$("dad").offsetHeight+"px");$("dbody").classList.add("adhide");sd.classList.remove("ft");clearTimeout(openDetail.t1);clearTimeout(openDetail.t2);clearTimeout(openDetail.t3);adState.lock=Date.now()+1500;state.trip=state.result[k];renderDetail();setPanel(false,false);initDmap();
   dmap.invalidateSize({pan:false});drawInto(dlayer,"trip");fitTrip();
-  if(card){const r=$("s-results");show("s-detail",false,true);r.classList.add("under");sd.animate([{opacity:0},{opacity:1}],{duration:220,easing:"ease-out"}).onfinish=()=>r.classList.remove("under");morphCard(card);}else show("s-detail");
+  if(card){const r=$("s-results");show("s-detail",false,true);r.classList.add("under");r.animate([{opacity:1},{opacity:0}],{duration:240,fill:"forwards"}).onfinish=a=>{r.classList.remove("under");a.target.cancel?a.target.cancel():0;};sd.animate([{opacity:0},{opacity:1}],{duration:240,easing:"ease-out"});morphCard(card);}else show("s-detail");
   openDetail.t1=setTimeout(()=>setPanel(true),1100);                        // timeline glides in over the map
   openDetail.t2=setTimeout(()=>sd.classList.add("ft"),1450);                // buttons rise
   openDetail.t3=setTimeout(()=>{$("dbody").classList.remove("adhide");adState.lock=Date.now()+900;},2050);} // ad drops in, pushing content down
@@ -917,20 +916,22 @@ function renderLines(){
 renderLines();
 $("lines").onclick=e=>{const t=e.target.closest(".ltog");if(!t)return;const c=t.closest(".lcard"),b=c.querySelector(".lbody");
   const open=!c.classList.contains("open");if(open)c.classList.add("open");foldRows(b,open,null,()=>{if(!open)c.classList.remove("open");});};
-function foldRows(el,open,tog,done){ // compositor-only: content below glides by transform, rows fade; nothing re-lays out per frame
-  const box=el.closest(".tscroll,#lines")||el.parentElement;const E="cubic-bezier(.25,.8,.3,1)";
+function foldRows(el,open,tog,done){ // clip reveal + GPU glide on one shared curve: rows are uncovered exactly as the content below moves
+  const box=el.closest(".tscroll,#lines")||el.parentElement,card=el.closest(".lcard"),clip=card||el,R=card?" round 14px":"";
+  const E="cubic-bezier(.3,.75,.25,1)",D=420;
   const below=[];for(let n=el;n&&n!==box;n=n.parentElement){let x=n.nextElementSibling;while(x){below.push(x);x=x.nextElementSibling;}}
-  [el,...below].forEach(n=>n.getAnimations().forEach(a=>a.cancel()));[...el.children].forEach(r=>r.getAnimations().forEach(a=>a.cancel()));
+  [clip,el,...below].forEach(n=>n.getAnimations().forEach(a=>a.cancel()));
   if(tog)tog.classList.toggle("open",open);
   if(open){el.hidden=false;const h=el.offsetHeight;
-    below.forEach(n=>n.animate([{transform:`translateY(${-h}px)`},{transform:"none"}],{duration:420,easing:E}));
-    [...el.children].forEach((r,i)=>r.animate([{opacity:0,transform:"translateY(-10px)"},{opacity:1,transform:"none"}],{duration:300,delay:60+i*16,easing:E,fill:"backwards"}));
-    setTimeout(()=>done&&done(),430);
+    clip.animate([{clipPath:`inset(0 0 ${h}px 0${R})`},{clipPath:`inset(0 0 0px 0${R})`}],{duration:D,easing:E});
+    below.forEach(n=>n.animate([{transform:`translateY(${-h}px)`},{transform:"none"}],{duration:D,easing:E}));
+    el.animate([{opacity:.2},{opacity:1}],{duration:D,easing:"ease-out"});
+    setTimeout(()=>done&&done(),D+10);
   }else{const h=el.offsetHeight;
-    [...el.children].forEach(r=>r.animate([{opacity:1},{opacity:0}],{duration:160,fill:"forwards"}));
-    const a=below.map(n=>n.animate([{transform:"none"},{transform:`translateY(${-h}px)`}],{duration:340,easing:E,fill:"forwards"}));
-    const fin=()=>{el.hidden=true;below.forEach(n=>n.getAnimations().forEach(x=>x.cancel()));[...el.children].forEach(r=>r.getAnimations().forEach(x=>x.cancel()));done&&done();};
-    if(a.length)a[0].onfinish=fin;else setTimeout(fin,200);}}
+    const a=clip.animate([{clipPath:`inset(0 0 0px 0${R})`},{clipPath:`inset(0 0 ${h}px 0${R})`}],{duration:D-60,easing:E,fill:"forwards"});
+    below.forEach(n=>n.animate([{transform:"none"},{transform:`translateY(${-h}px)`}],{duration:D-60,easing:E,fill:"forwards"}));
+    el.animate([{opacity:1},{opacity:.2}],{duration:D-60,fill:"forwards"});
+    a.onfinish=()=>{el.hidden=true;[clip,el,...below].forEach(n=>n.getAnimations().forEach(x=>x.cancel()));done&&done();};}}
 function setTab(t){setTab0(t);if(window.syncBack)syncBack();}
 function setTab0(t,fromScroll){const two=t==="lines";$("tabs").classList.toggle("t2",two);$("tabtrack").classList.toggle("t2",two);
   if(!fromScroll){const c=document.querySelector(".tabclip");c.scrollTo({left:two?c.clientWidth:0,behavior:$("s-home").classList.contains("on")?"smooth":"auto"});}
