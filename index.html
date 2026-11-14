@@ -65,7 +65,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .tabclip{flex:1;position:relative;min-height:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
 .tabclip::-webkit-scrollbar{display:none}
 .tabtrack{display:flex;width:200%;height:100%}
-.tabpane{width:50%;height:100%;display:flex;flex-direction:column;min-height:0;scroll-snap-align:start;scroll-snap-stop:always}
+.tabpane{width:50%;height:100%;display:flex;flex-direction:column;min-height:0;position:relative;scroll-snap-align:start;scroll-snap-stop:always}
 #lines{overflow-y:auto;padding:0 0 90px}
 .lcard{margin:0 12px 10px;background:var(--surface);border-radius:14px;overflow:hidden;flex:none}
 .lhead{display:flex;gap:12px;align-items:flex-start;padding:13px 14px 10px}
@@ -97,7 +97,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .row{display:flex;justify-content:space-between;align-items:center;padding:8px 16px 10px;flex:none}
 .chip{position:relative;background:var(--surface);border-radius:999px;padding:4px 13px;font-weight:500;font-size:15px;display:flex;gap:8px;align-items:center}
 #when-in{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
-.showbtn{position:absolute;left:14px;right:14px;bottom:70px;z-index:21;background:#11a36b;color:#fff;border-radius:12px;padding:11px 18px;font-size:16px;font-weight:600;display:flex;justify-content:center;align-items:center;box-shadow:0 4px 18px #0009}
+.showbtn{position:absolute;left:14px;right:14px;bottom:12px;z-index:21;background:#11a36b;color:#fff;border-radius:12px;padding:11px 18px;font-size:16px;font-weight:600;display:flex;justify-content:center;align-items:center;box-shadow:0 4px 18px #0009}
 .showbtn svg{position:absolute;right:18px}
 .go{background:var(--accent);color:#06200f;font-weight:700;border-radius:999px;padding:11px 20px;font-size:17px}
 
@@ -109,9 +109,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .homebody{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 
 /* routes history bottom sheet */
-.hsscroll{position:absolute;left:0;right:0;bottom:64px;height:300px;z-index:20;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;pointer-events:none;scrollbar-width:none;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .2s}
+.hsscroll{position:absolute;left:0;right:0;bottom:0;height:300px;z-index:20;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .2s}
 .hsscroll::-webkit-scrollbar{display:none}
-.hsscroll.away{transform:translateY(110%);opacity:0}
 .hsspace{height:172px;scroll-snap-align:start}
 .hsheet{position:relative;height:100%;background:var(--surface);border-radius:16px 16px 0 0;display:flex;flex-direction:column;box-shadow:0 -4px 12px #0007;pointer-events:auto;scroll-snap-align:end}
 .hsheet[hidden]{display:none}
@@ -140,10 +139,11 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .sf{padding:0 4px 0 14px}
 .sf input{flex:1;min-width:0;width:100%;background:none;border:0;color:var(--text);font:inherit;font-size:16px;font-weight:500;padding:9px 0;outline:none}
 .sf input::placeholder{color:var(--muted);font-weight:400}
-.sf{transition:background .15s}
-.sf.act{background:var(--surface-2);min-height:48px}
-.sf.act input{font-size:19px}
-.sf .loc{display:none}.sf.act .loc{display:grid}
+.fhl{position:absolute;left:16px;right:16px;top:0;height:38px;border-radius:10px;background:var(--surface-2);z-index:1;pointer-events:none;
+  transition:transform .26s cubic-bezier(.22,.9,.24,1);will-change:transform;box-shadow:0 0 0 1px #ffffff14}
+.sf>*{position:relative;z-index:2}
+.sf .loc{transition:opacity .2s}
+.sf .loc{display:grid;opacity:0;pointer-events:none}.sf.act .loc{opacity:1;pointer-events:auto}
 #opts{background:#000;margin-top:10px}
 #opts.fade{animation:ofade .18s ease-out}
 @keyframes ofade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -197,11 +197,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .xfer{width:22px;height:22px;border-radius:6px;background:#f2f4f5;color:#121417;display:grid;place-items:center;transform:translate(-50%,-50%);box-shadow:0 2px 8px #0008}
 .tad{padding:16px 0 0}
 .tad.rest{display:none}
-.dadwrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s cubic-bezier(.2,.8,.2,1);flex:none}
-.dadwrap.on{grid-template-rows:1fr}
-.dadwrap>div{overflow:hidden}
-.dadwrap .adband{transition:opacity .3s,transform .32s cubic-bezier(.2,.8,.2,1);opacity:0;transform:translateY(-30px)}
-.dadwrap.on .adband{opacity:1;transform:none}
+.dadwrap{position:absolute;left:0;right:0;top:0;z-index:690;transform:translateY(-102%);transition:transform .42s cubic-bezier(.16,1,.3,1);will-change:transform;pointer-events:none;box-shadow:0 8px 20px #0000}
+.dadwrap.on{transform:none;pointer-events:auto;box-shadow:0 8px 20px #0008}
 .credit{background:#000a;color:#c8ced4;font:500 10px var(--font);padding:2px 6px;border-radius:4px;margin:4px!important;border:0}
 #dmap{position:absolute;inset:0;z-index:0}
 .tpscroll{position:absolute;inset:0;z-index:600;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;pointer-events:none;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
@@ -314,8 +311,6 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
       <button class="chip" id="opts-btn">Options <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h8M15 8h6M3 16h4M11 16h10"/><circle cx="13" cy="8" r="2"/><circle cx="9" cy="16" r="2"/></svg></button>
     </div>
     <div class="adband" id="ad-home"><div class="lbl">AD</div><div class="adbox">Ad space · 300 × 250</div></div>
-    </div><div class="tabpane" id="lines"></div></div></div>
-  </div>
   <div class="hsscroll" id="hsscroll"><div class="hsspace" id="hsspace"></div><div class="hsheet" id="hsheet" hidden>
     <div class="hs-top" id="hs-top"><div class="grab"></div>
       <div class="hs-title"><h2>Routes history</h2><button class="iconbtn" id="hs-close" aria-label="Close history"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
@@ -323,6 +318,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     <div id="hist"></div>
   </div></div>
   <button class="showbtn" id="go" hidden>Show routes<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+    </div><div class="tabpane" id="lines"></div></div></div>
+  </div>
   <nav class="nav" id="nav">
     <button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 2 12l10 10 10-10Zm1 13v-3H9v3H7v-4a1 1 0 0 1 1-1h5V7l4 4Z"/></svg>Trip</button>
     <button id="nav-lines"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Lines</button>
@@ -340,7 +337,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     <button class="tab on" tabindex="-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V10l4-2v13M9 21V5l5-2v18M14 21V9l5 2v10"/></svg>Lahore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
     <button class="tab" id="s-tab-lines" tabindex="-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 10h14M8 21l2-4M16 21l-2-4"/></svg>Lines</button>
   </div>
-  <div class="fields">
+  <div class="fields"><span class="fhl" id="fhl"></span>
     <div class="field sf" id="sf-from"><span class="dot"></span><input id="q-from" placeholder="From where?" autocomplete="off" enterkeyhint="search"><button class="iconbtn loc" id="loc-btn" aria-label="Use my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
     <div class="field sf" id="sf-to"><span class="dot b"></span><input id="q-to" placeholder="Where to?" autocomplete="off" enterkeyhint="search"><button class="iconbtn loc" id="loc-btn2" aria-label="Use my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
   </div>
@@ -370,9 +367,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     <button class="iconbtn" id="det-back" aria-label="Back"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
     <span class="pill tnum" id="det-fare"></span>
   </div>
-  <div class="dadwrap" id="dadwrap"><div><div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div></div></div>
   <div class="dsum" id="dsum"></div>
   <div class="dsplit">
+    <div class="dadwrap" id="dadwrap"><div><div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div></div></div>
+
     <div id="dmap"></div>
     <div class="mapctl" style="z-index:500"><button id="dlocate" aria-label="Show my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
     <div class="peek" id="peek"></div>
@@ -498,6 +496,7 @@ function plan(A,B,startMin){
   for(const p of best){let r=p;for(let k=0;k<(best.length>1?3:5)&&r;k++){out.push(r);const pre=r.legs[0].min+ACCESS_MIN;r=timeLegs(p.legs,r.firstDep-pre+1);}}
   if(direct<=2200){const m=walkMin(direct);out.push({legs:[{type:"walk",from:A,to:B,m:direct,start:startMin,min:m,end:startMin+m}],start:startMin,end:startMin+m,total:m,fare:0,firstDep:null,rides:[],walkTot:m});}
   out.sort((a,b)=>(a.firstDep??a.start)-(b.firstDep??b.start)||a.end-b.end);
+  plan.best=best;plan.walk=out.find(r=>!r.rides.length)||null;
   return out;
 }
 function cloneLegs(legs){return legs.map(l=>({...l}));}
@@ -545,7 +544,7 @@ const SVG={
 const modeSvg=line=>line==="OL"?SVG.train:SVG.bus;
 
 function setPoint(which,p){state[which]=p;const el=$(which+"-txt");el.textContent=p.name;el.className="val";syncHome();}
-function syncHome(){const both=!!(state.from&&state.to),any=!!(state.from||state.to);$("home-back").hidden=!any;$("brand").hidden=any;$("go").hidden=!both;$("go").style.bottom=($("nav").offsetHeight+12)+"px";$("swap").hidden=!(state.from||state.to);if(both)$("hsheet").hidden=true;else renderHist();}
+function syncHome(){const both=!!(state.from&&state.to),any=!!(state.from||state.to);$("home-back").hidden=!any;$("brand").hidden=any;$("go").hidden=!both;$("swap").hidden=!(state.from||state.to);if(both)$("hsheet").hidden=true;else renderHist();}
 $("swap").onclick=()=>{const a=state.from,b=state.to;state.from=null;state.to=null;
   ["from","to"].forEach(w=>{$(w+"-txt").textContent=w==="from"?"From where?":"Where to?";$(w+"-txt").className="ph";});
   if(b)setPoint("from",b);if(a)setPoint("to",a);syncHome();};
@@ -591,7 +590,7 @@ function onlineSearch(q){
     }catch(e){if(my!==searchSeq)return;const el=$("o-status");if(el)el.textContent="No connection for address search. Stations still work.";}
   },350);
 }
-function activate(w){state.picking=w;$("sf-from").classList.toggle("act",w==="from");$("sf-to").classList.toggle("act",w==="to");onlineSearch("");}
+function activate(w){state.picking=w;$("sf-from").classList.toggle("act",w==="from");$("sf-to").classList.toggle("act",w==="to");const f=$("sf-from"),t=$("sf-to");$("fhl").style.height=f.offsetHeight+"px";$("fhl").style.transform=`translateY(${w==="to"?t.offsetTop-f.offsetTop:0}px)`;onlineSearch("");}
 ["from","to"].forEach(w=>{const inp=$("q-"+w);
   inp.addEventListener("focus",()=>{if(state.picking!==w)activate(w);setTimeout(()=>inp.select(),0);});
   inp.addEventListener("input",()=>onlineSearch(inp.value));
@@ -628,10 +627,10 @@ function renderHist(){const h=loadHist();$("hsheet").hidden=!!(state.from&&state
 $("hist").onclick=e=>{const b=e.target.closest(".hist");if(!b)return;const h=loadHist()[+b.dataset.h];
   setPoint("from",{name:h[0][0].replace(/ station$/,""),lat:h[0][1],lng:h[0][2]});setPoint("to",{name:h[1][0].replace(/ station$/,""),lat:h[1][1],lng:h[1][2]});runSearch();};
 const hs=$("hsheet"),hsc=$("hsscroll");let hsOpen=false;const PEEK=128;let hsFullC=0;addEventListener("resize",()=>{hsFullC=0;});
-function hsFull(){if(hsFullC)return hsFullC;const scr=$("s-home").getBoundingClientRect(),row=$("home-row").getBoundingClientRect();return hsFullC=Math.max(PEEK,scr.bottom-row.bottom-$("nav").offsetHeight-14);}
+function hsFull(){if(hsFullC)return hsFullC;const pane=$("pane-trip").getBoundingClientRect(),row=$("home-row").getBoundingClientRect();return hsFullC=Math.max(PEEK,pane.bottom-row.bottom-14);}
 let navHC=0;document.fonts&&document.fonts.ready.then(()=>{hsFullC=0;navHC=0;if(!hsOpen)setHs(false);});addEventListener("resize",()=>{navHC=0;});
 function hsMax(){return hsc.scrollHeight-hsc.clientHeight;}
-function sizeHs(){const nav=navHC||(navHC=$("nav").offsetHeight),H=hsFull();hsc.style.bottom=nav+"px";hsc.style.height=H+"px";$("hsspace").style.height=(H-PEEK)+"px";$("go").style.bottom=(nav+12)+"px";}
+function sizeHs(){const H=hsFull();if(sizeHs.h===H)return;sizeHs.h=H;hsc.style.height=H+"px";$("hsspace").style.height=(H-PEEK)+"px";}
 function setHs(open,smooth){sizeHs();hsOpen=open;hs.classList.toggle("open",open);if(!open)$("hist").scrollTop=0;
   const vis=$("s-home").classList.contains("on")&&smooth!==false;hsc.scrollTo({top:open?hsMax():0,behavior:vis?"smooth":"auto"});}
 // native scroll drives the sheet; we only read where it settled
@@ -645,15 +644,26 @@ addEventListener("resize",()=>{if($("s-home").classList.contains("on"))setHs(hsO
 function runSearch(){
   const A=state.from,B=state.to;if(!A||!B)return;
   saveHist(A,B);
-  const now=nowMin();let start=state.when??now;state.future=state.when!==null&&state.when>now+1;
+  const now=nowMin();let start=state.when??now;state.future=state.when!==null&&Math.abs(state.when-now)>1;
   const closeAll=Math.max(LINES.OL.close,LINES.MB.close);let banner="";
   if(start<LINES.OL.open-30){banner=`Metro and Orange Line run from 06:00. Showing the first trips this morning.`;start=LINES.OL.open-15;state.future=true;}
   let list=plan(A,B,start);if(!list.some(r=>r.rides.length)&&start>=17*60){const m=plan(A,B,LINES.OL.open-15);if(m.some(r=>r.rides.length)){list=m;start=LINES.OL.open-15;state.future=true;banner="The last Metrobus and Orange Line trips for tonight have left. Showing the first trips tomorrow morning (from 06:00).";}}state.result=list;
   $("r-from").textContent=A.name;$("r-to").textContent=B.name;
-  $("cards").innerHTML=`<div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div>`+(banner?`<div class="banner">${banner}</div>`:"")+(list.length?list.map((r,k)=>cardHTML(r,k,now,state.future)).join(""):`<p class="note" style="font-size:15px">No Metrobus or Orange Line trip fits this journey yet. Both points need to be within about 2.5 km of a station. Speedo and e-bus routes will widen this.</p>`)+
+  if(list.some(r=>r.rides.length))list=allDepartures(plan.best,plan.walk,start,start+480);state.result=list;state.shown=0;state.now=now;
+  $("cards").innerHTML=`<div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div>`+(banner?`<div class="banner">${banner}</div>`:"")+(list.length?`<div id="cardlist"></div>`:`<p class="note" style="font-size:15px">No Metrobus or Orange Line trip fits this journey yet. Both points need to be within about 2.5 km of a station. Speedo and e-bus routes will widen this.</p>`)+
     `<p class="proto">Times are estimates from published frequencies. No live tracking yet.</p><div style="height:24px"></div>`;
-  $("cards").scrollTop=0;show("s-results");
+  moreCards(16);$("cards").scrollTop=0;show("s-results");
 }
+function allDepartures(best,walk,start,until){ // each good pattern, departure after departure, until "until"
+  const out=[];for(const p of best){let r=timeLegs(p.legs,start);let guard=0;
+    while(r&&r.firstDep!==null&&r.firstDep<=until&&guard++<400){out.push(r);const pre=r.legs[0].min+ACCESS_MIN;r=timeLegs(p.legs,r.firstDep-pre+1);}}
+  out.sort((a,b)=>a.firstDep-b.firstDep||a.end-b.end);
+  const ded=[];for(const r of out){const q=ded[ded.length-1];if(q&&q.firstDep===r.firstDep&&q.end<=r.end&&q.rides.map(x=>x.line).join()===r.rides.map(x=>x.line).join())continue;ded.push(r);}
+  if(walk)ded.unshift(walk);return ded;}
+function moreCards(n=14){const list=state.result,box=$("cardlist");if(!box||state.shown>=list.length)return;
+  const end=Math.min(list.length,state.shown+n);let h="";for(let k=state.shown;k<end;k++)h+=cardHTML(list[k],k,state.now,state.future);
+  box.insertAdjacentHTML("beforeend",h);state.shown=end;}
+$("cards").addEventListener("scroll",()=>{const c=$("cards");if(c.scrollTop+c.clientHeight>c.scrollHeight-900)moreCards();},{passive:true});
 function depHTML(r,now,future){
   if(r.firstDep===null)return`<small>Walk</small><b class="tnum">${r.total}<i>min</i></b>`;
   const inMin=r.firstDep-now;
@@ -875,7 +885,7 @@ function setTab0(t,fromScroll){const two=t==="lines";$("tabs").classList.toggle(
   if(!fromScroll){const c=document.querySelector(".tabclip");c.scrollTo({left:two?c.clientWidth:0,behavior:$("s-home").classList.contains("on")?"smooth":"auto"});}
   $("tab-trip").classList.toggle("on",!two);$("tab-lines").classList.toggle("on",two);$("tab-trip").setAttribute("aria-selected",!two);$("tab-lines").setAttribute("aria-selected",two);
   document.querySelectorAll("#nav button").forEach((b,i)=>b.classList.toggle("on",i===(two?1:0)));
-  hsc.classList.toggle("away",two);$("go").style.opacity=two?0:1;$("go").style.pointerEvents=two?"none":"";}
+  }
 $("tab-trip").onclick=()=>setTab("trip");
 // ---------------------------------------------------------------- BACK: buttons, phone back gesture / browser back, and edge swipe
 const curScreen=()=>document.querySelector(".screen.on").id;
