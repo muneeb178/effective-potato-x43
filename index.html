@@ -37,12 +37,12 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .screen.on,.screen.under,.screen.out-r{visibility:visible}
 .screen.on{pointer-events:auto}
 .screen.under{z-index:1}.screen.on{z-index:2}
-.screen.in-r{z-index:3;animation:inR .28s cubic-bezier(.22,.9,.24,1) both;will-change:transform;backface-visibility:hidden}
-.screen.out-r{z-index:3;animation:outR .24s cubic-bezier(.4,0,.6,1) both;will-change:transform;backface-visibility:hidden}
-.screen.in-l{animation:inL .26s cubic-bezier(.22,.9,.24,1) both;will-change:transform}
-@keyframes inR{from{transform:translateX(100%)}to{transform:none}}
-@keyframes outR{from{transform:none}to{transform:translateX(100%)}}
-@keyframes inL{from{transform:translateX(-22%)}to{transform:none}}
+.screen.in-r{z-index:3;animation:inR .4s cubic-bezier(.25,.8,.3,1) both;will-change:transform,opacity;backface-visibility:hidden}
+.screen.out-r{z-index:3;animation:outR .32s cubic-bezier(.4,0,.6,1) both;will-change:transform,opacity;backface-visibility:hidden}
+.screen.in-l{animation:inL .4s cubic-bezier(.25,.8,.3,1) both;will-change:transform,opacity}
+@keyframes inR{from{transform:translateX(18%);opacity:0}to{transform:none;opacity:1}}
+@keyframes outR{from{transform:none;opacity:1}to{transform:translateX(18%);opacity:0}}
+@keyframes inL{from{transform:translateX(-5%);opacity:.5}to{transform:none;opacity:1}}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .tnum{font-variant-numeric:tabular-nums}
 [hidden]{display:none!important}
@@ -80,7 +80,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .ltog svg{transition:transform .3s}
 .lcard.open .ltog svg{transform:rotate(180deg)}
 .lbody{display:none}
-.lcard.open .lbody{display:block;animation:lfade .2s ease-out}
+.lcard.open .lbody{display:block}
 @keyframes lfade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .lst{display:grid;grid-template-columns:64px 20px 1fr;align-items:center;height:32px;padding:0 14px 0 0;font-size:15px}
 .lst .km{color:var(--muted);text-align:right;padding-right:10px;font-size:13px}
@@ -542,7 +542,7 @@ function show(id,back,instant){if(id==="s-home"){renderHist();if(window.setHs)se
   if(cur){cur.classList.remove("on");
     if(!instant&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
       if(back){cur.classList.add("out-r");nx.classList.add("in-l");}else{cur.classList.add("under");nx.classList.add("in-r");}
-      clearTimeout(show.t);show.t=setTimeout(()=>document.querySelectorAll(".screen").forEach(x=>x.classList.remove("under","out-r","in-r","in-l")),320);}}
+      clearTimeout(show.t);show.t=setTimeout(()=>document.querySelectorAll(".screen").forEach(x=>x.classList.remove("under","out-r","in-r","in-l")),430);}}
   if(window.syncBack)setTimeout(syncBack,0);
 }
 function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),2800);}
@@ -694,7 +694,13 @@ function legsChips(r){
   return `<span class="t-g tnum">${fmt(l.dep)}</span><span>${l.min} min</span><span class="t-b tnum">${fmt(l.arr)}</span>`;}).filter(Boolean).join("");}
 function sumHTML(r,now,future){return `<div class="dep">${depHTML(r,now,future)}</div><div><div class="crt"><div class="badges">${badgesHTML(r)}</div><span class="tot tnum">${r.total} min</span></div><div class="legs tnum">${legsChips(r)}</div>`;}
 function cardHTML(r,k,now,future){return `<button class="card" data-k="${k}">${sumHTML(r,now,future)}</div></button>`;}
-$("cards").onclick=e=>{const c=e.target.closest(".card");if(!c)return;openDetail(+c.dataset.k);};
+$("cards").onclick=e=>{const c=e.target.closest(".card");if(!c)return;openDetail(+c.dataset.k,c);};
+function morphCard(card){const ph=$("phone").getBoundingClientRect(),a=card.getBoundingClientRect(),b=$("dsum").getBoundingClientRect();
+  const g=card.cloneNode(true);g.style.cssText=`position:absolute;margin:0;left:${a.left-ph.left}px;top:${a.top-ph.top}px;width:${a.width}px;height:${a.height}px;z-index:3000;pointer-events:none;will-change:transform,opacity;transform-origin:0 0`;
+  $("phone").appendChild(g);const sx=b.width/a.width,dy=b.top-a.top,dx=b.left-a.left;
+  const an=g.animate([{transform:"none",background:"#1f2226",opacity:1,easing:"cubic-bezier(.3,.7,.2,1)"},{transform:`translate(${dx}px,${dy}px) scale(${sx},${sx})`,background:"#141619",offset:.78,opacity:1},{transform:`translate(${dx}px,${dy}px) scale(${sx},${sx})`,background:"#141619",opacity:0}],{duration:560});
+  an.onfinish=()=>g.remove();
+  $("dsum").animate([{opacity:0},{opacity:0,offset:.74},{opacity:1}],{duration:600});}
 $("res-back").onclick=()=>goBack();
 $("r-edit").onclick=()=>openSearch("to");
 
@@ -731,11 +737,12 @@ function renderDetail(){
   h+=`<div class="tad"><div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div></div>`;
   $("detail").innerHTML=h;$("detail").scrollTop=0;if(window.watchBottomAd)watchBottomAd();
 }
-function openDetail(k){const sd=$("s-detail");sd.style.setProperty("--hdr",$("dhdr").offsetHeight+"px");sd.style.setProperty("--adh",$("dad").offsetHeight+"px");$("dbody").classList.add("adhide");sd.classList.remove("ft");clearTimeout(openDetail.t1);clearTimeout(openDetail.t2);clearTimeout(openDetail.t3);adState.lock=Date.now()+1500;state.trip=state.result[k];renderDetail();setPanel(false,false);initDmap();
-  dmap.invalidateSize({pan:false});drawInto(dlayer,"trip");fitTrip();show("s-detail");
-  openDetail.t1=setTimeout(()=>setPanel(true),520);                        // timeline glides in over the map
-  openDetail.t2=setTimeout(()=>sd.classList.add("ft"),820);                // buttons rise
-  openDetail.t3=setTimeout(()=>{$("dbody").classList.remove("adhide");adState.lock=Date.now()+600;},1250);} // ad drops in, pushing content down
+function openDetail(k,card){const sd=$("s-detail");sd.style.setProperty("--hdr",$("dhdr").offsetHeight+"px");sd.style.setProperty("--adh",$("dad").offsetHeight+"px");$("dbody").classList.add("adhide");sd.classList.remove("ft");clearTimeout(openDetail.t1);clearTimeout(openDetail.t2);clearTimeout(openDetail.t3);adState.lock=Date.now()+1500;state.trip=state.result[k];renderDetail();setPanel(false,false);initDmap();
+  dmap.invalidateSize({pan:false});drawInto(dlayer,"trip");fitTrip();
+  if(card){const r=$("s-results");show("s-detail",false,true);r.classList.add("under");sd.animate([{opacity:0},{opacity:1}],{duration:380,easing:"ease-out"}).onfinish=()=>r.classList.remove("under");morphCard(card);}else show("s-detail");
+  openDetail.t1=setTimeout(()=>setPanel(true),650);                        // timeline glides in over the map
+  openDetail.t2=setTimeout(()=>sd.classList.add("ft"),950);                // buttons rise
+  openDetail.t3=setTimeout(()=>{$("dbody").classList.remove("adhide");adState.lock=Date.now()+600;},1450);} // ad drops in, pushing content down
 const tps=$("tpscroll");
 function tpMax(){return tps.scrollWidth-tps.clientWidth;}
 function setPanel(open,smooth){$("s-detail").classList.toggle("open",open);
@@ -744,7 +751,7 @@ function setPanel(open,smooth){$("s-detail").classList.toggle("open",open);
     if(open!==d.classList.contains("open")){d.classList.toggle("open",open);syncBack();}},{passive:true});
   $("tpanel").addEventListener("click",e=>{const open=$("s-detail").classList.contains("open");
     if(!open){setPanel(true);return;}
-    const t=e.target.closest(".tog");if(t){const el=$("midrows-"+t.dataset.tog);el.hidden=!el.hidden;t.classList.toggle("open",!el.hidden);}});})();
+    const t=e.target.closest(".tog");if(t){const el=$("midrows-"+t.dataset.tog);foldRows(el,el.hidden,t);}});})();
 $("peek").onclick=()=>setPanel(false);
 // Trip-screen ads. Top: slides in when you pull the timeline down, stays until you throw it up. Bottom: after the end of the trip.
 // Each ad, once seen, rests for AD_REST ms before it can show again.
@@ -899,7 +906,18 @@ function renderLines(){
     <div class="lbody"><div>${L.stops.map(st=>`<div class="lst"><span class="km tnum">${L.cumKm[st.i].toFixed(1)} km</span><span class="rail"><i></i></span><span class="x"><span>${st.name}</span>${st.under?'<span class="sub" style="margin:0">underground</span>':""}${(L.id==="OL"&&st.name==="Anarkali")||(L.id==="MB"&&st.name==="MAO College")?'<span class="badge '+(L.id==="OL"?"mb":"ol")+'" style="font-size:10px;padding:1px 5px">'+(L.id==="OL"?"MB":"OL")+'</span>':""}</span></div>`).join("")}<div style="height:8px"></div></div></div>
   </div>`).join("");}
 renderLines();
-$("lines").onclick=e=>{const t=e.target.closest(".ltog");if(t)t.closest(".lcard").classList.toggle("open");};
+$("lines").onclick=e=>{const t=e.target.closest(".ltog");if(!t)return;const c=t.closest(".lcard"),b=c.querySelector(".lbody");
+  const open=!c.classList.contains("open");if(open)c.classList.add("open");foldRows(b,open,null,()=>{if(!open)c.classList.remove("open");});};
+function foldRows(el,open,tog,done){ // height eases open; rows drift in one after another; line pieces grow from the split
+  el.getAnimations({subtree:true}).forEach(a=>a.cancel());const E="cubic-bezier(.25,.8,.3,1)";
+  if(tog)tog.classList.toggle("open",open);
+  if(open){el.hidden=false;const h=el.scrollHeight;el.style.overflow="hidden";
+    el.animate([{height:"0px"},{height:h+"px"}],{duration:380,easing:E}).onfinish=()=>{el.style.overflow="";done&&done();};
+    [...el.children].forEach((r,i)=>{r.animate([{opacity:0,transform:"translateY(-8px)"},{opacity:1,transform:"none"}],{duration:300,delay:40+i*22,easing:E,fill:"backwards"});
+      r.querySelectorAll(".vbar,.rail").forEach(v=>v.animate([{transform:"scaleY(.25)"},{transform:"none"}],{duration:360,delay:i*22,easing:E,fill:"backwards"}));});
+  }else{const h=el.offsetHeight;el.style.overflow="hidden";
+    [...el.children].forEach(r=>r.animate([{opacity:1},{opacity:0}],{duration:180,fill:"forwards"}));
+    el.animate([{height:h+"px"},{height:"0px"}],{duration:300,easing:E}).onfinish=()=>{el.hidden=true;el.style.overflow="";el.getAnimations({subtree:true}).forEach(a=>a.cancel());done&&done();};}}
 function setTab(t){setTab0(t);if(window.syncBack)syncBack();}
 function setTab0(t,fromScroll){const two=t==="lines";$("tabs").classList.toggle("t2",two);$("tabtrack").classList.toggle("t2",two);
   if(!fromScroll){const c=document.querySelector(".tabclip");c.scrollTo({left:two?c.clientWidth:0,behavior:$("s-home").classList.contains("on")?"smooth":"auto"});}
