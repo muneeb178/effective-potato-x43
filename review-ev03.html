@@ -20,7 +20,7 @@ const G={"RS->DC": [{"seq": 1, "en": "Railway Station", "ur": "ریلوے اسٹ
 try{const s=JSON.parse(localStorage.getItem("ev03fix")||"{}");for(const d in s)s[d].forEach((p,i)=>{if(p&&G[d][i])Object.assign(G[d][i],p)})}catch(e){}
 const save=()=>{try{const s={};for(const d in G)s[d]=G[d].map(x=>x.c=="OK"?{lat:x.lat,lng:x.lng,c:"OK"}:null);localStorage.setItem("ev03fix",JSON.stringify(s))}catch(e){}};
 const map=L.map("map").setView([31.505,74.318],13);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{maxZoom:20,attribution:"© OSM © CARTO"}).addTo(map);
+L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:"© Esri, OSM"}).addTo(map);
 let layer=L.layerGroup().addTo(map),line;
 const col={H:"#2ec27e",M:"#f5a524",L:"#ff3d47",OK:"#3b82f6"};
 function draw(){layer.clearLayers();const S=G[D];
