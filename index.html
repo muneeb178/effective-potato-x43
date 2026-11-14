@@ -195,9 +195,12 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .lbl-hide .perm{display:none}
 .xfer{width:22px;height:22px;border-radius:6px;background:#f2f4f5;color:#121417;display:grid;place-items:center;transform:translate(-50%,-50%);box-shadow:0 2px 8px #0008}
 .tad{padding:16px 0 0}
+.tad.rest{display:none}
 .dadwrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s cubic-bezier(.2,.8,.2,1);flex:none}
 .dadwrap.on{grid-template-rows:1fr}
 .dadwrap>div{overflow:hidden}
+.dadwrap .adband{transition:opacity .3s,transform .32s cubic-bezier(.2,.8,.2,1);opacity:0;transform:translateY(-30px)}
+.dadwrap.on .adband{opacity:1;transform:none}
 .credit{background:#000a;color:#c8ced4;font:500 10px var(--font);padding:2px 6px;border-radius:4px;margin:4px!important;border:0}
 #dmap{position:absolute;inset:0;z-index:0}
 .tpanel{position:absolute;top:0;bottom:0;left:46px;right:0;background:var(--panel);z-index:600;box-shadow:-8px 0 20px #0007;touch-action:pan-y;
@@ -530,7 +533,7 @@ setInterval(tickClock,15000);tickClock();
 const SVG={
   walk:'<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="13" cy="4" r="2"/><path d="M13.5 7.5 10 9l-1.5 4.5 1.8.6L11.4 11l1 3.6L9 21h2.2l2.9-5.4 1.7 5.4H18l-2.4-7-1-4.2 1.6 2.3 2.8.9.4-1.8-2.2-.7Z"/></svg>',
   bus:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 10h16M7 21v-3M17 21v-3"/><circle cx="8" cy="14" r="1" fill="currentColor"/><circle cx="16" cy="14" r="1" fill="currentColor"/></svg>',
-  train:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 10h14M8 21l2-4M16 21l-2-4"/><circle cx="9" cy="13.5" r="1" fill="currentColor"/><circle cx="15" cy="13.5" r="1" fill="currentColor"/></svg>',
+  train:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.8h8M12 1.8 10 5h4z"/><path d="M7.5 5h9a2.5 2.5 0 0 1 2.5 2.5V16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7.5A2.5 2.5 0 0 1 7.5 5Z"/><path d="M7 8.5h10v3.5H7z"/><circle cx="8.6" cy="15" r=".9" fill="currentColor"/><circle cx="15.4" cy="15" r=".9" fill="currentColor"/><path d="m8.5 18-2 3.5M15.5 18l2 3.5M7.6 20.5h8.8"/></svg>',
   pin:'<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.3 7 13 7 13s7-7.7 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>',
   clock:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>',
   seat:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="4" r="2"/><path d="M9 7v6h6l2 7M9 13l-2.5 7M5 9l4-2 3 3"/></svg>',
@@ -701,7 +704,7 @@ function renderDetail(){
   });
   h+=row(`<span class="time o tnum">${fmt(r.end)}</span>`,`<div class="sname">${esc(state.to.name)}</div><div class="sub">Arrive${r.fare?` · fare Rs ${r.fare}${r.rides.length>1?" (two tickets)":""}`:""}</div>`);
   h+=`<div class="tad"><div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div></div>`;
-  $("detail").innerHTML=h;$("detail").scrollTop=0;
+  $("detail").innerHTML=h;$("detail").scrollTop=0;if(window.watchBottomAd)watchBottomAd();
 }
 function openDetail(k){$("dadwrap").classList.remove("on");state.trip=state.result[k];renderDetail();setPanel(false);show("s-detail");initDmap();
   setTimeout(()=>{dmap.invalidateSize();drawInto(dlayer,"trip");fitTrip();},60);}
@@ -721,12 +724,21 @@ function setPanel(open){const tp=$("tpanel");tp.style.transform="";$("s-detail")
     if(!open){setPanel(true);return;}
     const t=e.target.closest(".tog");if(t){const el=$("midrows-"+t.dataset.tog);el.hidden=!el.hidden;t.classList.toggle("open",!el.hidden);}});})();
 $("peek").onclick=()=>setPanel(false);
-(function(){let last=0,ty=null;const sc=$("detail"),w=$("dadwrap");
-  sc.addEventListener("scroll",()=>{const top=sc.scrollTop,d=top-last;last=top;
-    if(d<-14)w.classList.add("on");else if(d>8)w.classList.remove("on");},{passive:true});
+// Trip-screen ads. Top: slides in when you pull the timeline down, stays until you throw it up. Bottom: after the end of the trip.
+// Each ad, once seen, rests for AD_REST ms before it can show again.
+let botObs=null;function watchBottomAd(){const sc=$("detail"),t=sc.querySelector(".tad");if(!t)return;if(botObs)botObs.disconnect();let seen=false;
+  botObs=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting){seen=true;adState.botSeenAt=Date.now();}
+    else if(seen&&e.boundingClientRect.top>e.rootBounds.bottom){seen=false;t.classList.add("rest");setTimeout(()=>t.classList.remove("rest"),AD_REST);}}},{root:sc,threshold:0.6});botObs.observe(t);}
+const AD_REST=15000;const adState={topSeenAt:-1e9,lock:0,botSeenAt:-1e9};
+function topAd(on){const w=$("dadwrap"),now=Date.now();if(on===w.classList.contains("on"))return;
+  if(on&&now-adState.topSeenAt<AD_REST)return;w.classList.toggle("on",on);adState.lock=now+700;if(!on)adState.topSeenAt=now;}
+(function(){let last=0,ty=null;const sc=$("detail");
+  sc.addEventListener("scroll",()=>{const top=sc.scrollTop,d=top-last;last=top;if(Date.now()<adState.lock)return; // ignore the jolt our own resize causes
+    if(d<-16)topAd(true);else if(d>30)topAd(false);},{passive:true});
   sc.addEventListener("touchstart",e=>{ty=e.touches[0].clientY;},{passive:true});
-  sc.addEventListener("touchmove",e=>{if(ty===null)return;const dy=e.touches[0].clientY-ty;
-    if(sc.scrollTop<=0&&dy>40){w.classList.add("on");ty=null;}},{passive:true});})();
+  sc.addEventListener("touchmove",e=>{if(ty===null||Date.now()<adState.lock)return;const dy=e.touches[0].clientY-ty;
+    if(sc.scrollTop<=0&&dy>40){topAd(true);ty=null;}},{passive:true});
+})();
 $("det-back").onclick=()=>goBack();
 $("d-alarm").onclick=()=>toast("Departure reminders are coming soon.");
 $("d-fare").onclick=()=>toast(state.trip&&state.trip.fare?"Buy a token or use your Metro card at the station. Metrobus Rs 30 flat, Orange Line Rs 25–45 by distance.":"No ticket needed. It's a short walk.");
