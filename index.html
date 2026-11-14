@@ -932,8 +932,11 @@ function foldRows(el,open,tog,done){ // drawer: rows slide out from under the li
     const a=all.map(n=>n.animate([{transform:`translateY(${-h}px)`},{transform:"none"}],{duration:D,easing:E}));
     a[0].onfinish=()=>{el.style.overflow="";done&&done();};
   }else{const h=el.offsetHeight;
+    // if the list is scrolled near its end, shortening it would make the view jump at the end; ease the scroll there instead
+    const need=box.scrollTop+box.clientHeight-(box.scrollHeight-h);
+    if(need>0){const t0=box.scrollTop,T=performance.now();const step=now=>{const k=Math.min(1,(now-T)/(D-40)),e=1-Math.pow(1-k,3);box.scrollTop=t0-need*e;if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
     const a=all.map(n=>n.animate([{transform:"none"},{transform:`translateY(${-h}px)`}],{duration:D-40,easing:E,fill:"forwards"}));
-    a[0].onfinish=()=>{el.hidden=true;el.style.overflow="";all.forEach(n=>n.getAnimations().forEach(x=>x.cancel()));done&&done();};}}
+    a[0].onfinish=()=>{const keep=box.scrollTop;el.hidden=true;el.style.overflow="";all.forEach(n=>n.getAnimations().forEach(x=>x.cancel()));if(need<=0)box.scrollTop=keep;done&&done();};}}
 function setTab(t){setTab0(t);if(window.syncBack)syncBack();}
 function setTab0(t,fromScroll){const two=t==="lines";$("tabs").classList.toggle("t2",two);$("tabtrack").classList.toggle("t2",two);
   if(!fromScroll){const c=document.querySelector(".tabclip");c.scrollTo({left:two?c.clientWidth:0,behavior:$("s-home").classList.contains("on")?"smooth":"auto"});}
