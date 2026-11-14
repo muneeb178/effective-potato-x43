@@ -30,7 +30,7 @@
 html,body{height:100%;background:#0b0c0e;color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
 button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.phone{position:relative;max-width:440px;height:100%;margin:0 auto;background:var(--bg);overflow:hidden}
+.phone{position:relative;max-width:440px;height:100%;margin:0 auto;background:var(--bg);overflow:hidden;overflow:clip}
 .screen{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg)}
 .screen.on,.screen.under,.screen.out-r{display:flex}
 .screen.under{z-index:1}.screen.on{z-index:2}
@@ -124,10 +124,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 #hist{flex:1;overflow-y:auto;padding-bottom:20px}
 .hsheet:not(.open) #hist{overflow:hidden}
 .hsheet:not(.open) .hday{display:none}
-.hday{color:var(--muted);font-size:14px;padding:14px 20px 2px}
-.hist{display:block;width:100%;text-align:left;padding:7px 20px}
+.hday{color:var(--muted);font-size:14px;padding:18px 20px 2px}
+.hist{display:block;width:100%;text-align:left;padding:12px 20px 14px}
 .hist .l{display:flex;align-items:center;gap:11px;font-size:15px;font-weight:500;line-height:1.3}
-.hist .arr{color:var(--muted);font-size:14px;padding:1px 0 1px 3px}
+.hist .arr{color:var(--muted);font-size:14px;padding:5px 0 5px 3px;line-height:1}
 
 /* bottom nav */
 .nav{display:flex;border-top:1px solid var(--line);background:var(--bg);padding:6px 0 calc(5px + env(safe-area-inset-bottom));flex:none;position:relative;z-index:25}
@@ -505,8 +505,9 @@ const $=id=>document.getElementById(id);
 const state={from:null,to:null,picking:"from",result:null,trip:null,mapMode:"network",when:null,future:false,lastPos:null,pickPt:null};
 const fmt=m=>{m=((Math.round(m)%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");};
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes();};
+const brit=t=>String(t).replace(/Defense/g,"Defence").replace(/\bCant\b/g,"Cantt");
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function show(id,back,instant){const nx=$(id),cur=document.querySelector(".screen.on");if(cur===nx)return;
+function show(id,back,instant){$("phone").scrollLeft=0;$("phone").scrollTop=0;const nx=$(id),cur=document.querySelector(".screen.on");if(cur===nx)return;
   document.querySelectorAll(".screen").forEach(x=>x.classList.remove("under","out-r","in-r","in-l"));
   nx.classList.add("on");
   if(cur){cur.classList.remove("on");
@@ -567,7 +568,7 @@ function onlineSearch(q){
   searchTimer=setTimeout(async()=>{
     try{const u=`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&lat=31.52&lon=74.33&limit=10&bbox=74.05,31.25,74.65,31.80`;
       const j=await(await fetch(u)).json();if(my!==searchSeq)return;
-      onlineHits=(j.features||[]).map(f=>{const p=f.properties,c=f.geometry.coordinates;
+      onlineHits=(j.features||[]).map(f=>{const p=f.properties,c=f.geometry.coordinates;for(const k of ["name","street","district","locality","city"])if(p[k])p[k]=brit(p[k]);
         const sub=[p.street&&(p.housenumber?p.housenumber+" ":"")+p.street,p.district||p.locality,p.city].filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i).join(", ");
         return{name:p.name||[p.housenumber,p.street].filter(Boolean).join(" ")||"Unnamed place",sub:sub||(p.osm_value||"Place"),lat:c[1],lng:c[0],kind:"pl"};});
       renderOpts(q);if(!onlineHits.length){const el=$("o-status");if(el)el.textContent="Not on OpenStreetMap yet. Use “Select from map” to pin it exactly.";}
@@ -581,10 +582,10 @@ function activate(w){state.picking=w;$("sf-from").classList.toggle("act",w==="fr
   inp.addEventListener("keydown",e=>{if(e.key==="Enter"){const b=$("opts").querySelector(".opt");if(b)b.click();}});});
 function maybeLocate(){ // silently refresh position for distances, only if already allowed
   try{navigator.permissions&&navigator.permissions.query({name:"geolocation"}).then(r=>{if(r.state==="granted")navigator.geolocation.getCurrentPosition(p=>{state.lastPos={lat:p.coords.latitude,lng:p.coords.longitude};const inp=$("q-"+state.picking);onlineSearch(inp===document.activeElement&&inp.value!==(state[state.picking]?.name||"")?inp.value:"");},()=>{},{maximumAge:60000,timeout:8000});}).catch(()=>{});}catch(e){}}
-function openSearch(w){$("q-from").value=state.from?.name||"";$("q-to").value=state.to?.name||"";show("s-search");activate(w);setTimeout(()=>{const i=$("q-"+w);i.focus();i.select();},60);maybeLocate();}
+function openSearch(w){$("q-from").value=state.from?.name||"";$("q-to").value=state.to?.name||"";show("s-search");activate(w);setTimeout(()=>{const i=$("q-"+w);i.focus({preventScroll:true});i.select();$("phone").scrollLeft=0;},330);maybeLocate();}
 function choose(p){const w=state.picking;setPoint(w,p);$("q-"+w).value=p.name;
   const other=w==="from"?"to":"from";
-  if(!state[other]){activate(other);$("q-"+other).focus();return;}
+  if(!state[other]){activate(other);$("q-"+other).focus({preventScroll:true});return;}
   runSearch();}
 $("f-from").onclick=()=>openSearch("from");$("f-to").onclick=()=>openSearch("to");
 $("search-back").onclick=()=>show("s-home",true);
@@ -609,7 +610,7 @@ function renderHist(){const h=loadHist();$("hsheet").hidden=!!(state.from&&state
 $("hist").onclick=e=>{const b=e.target.closest(".hist");if(!b)return;const h=loadHist()[+b.dataset.h];
   setPoint("from",{name:h[0][0].replace(/ station$/,""),lat:h[0][1],lng:h[0][2]});setPoint("to",{name:h[1][0].replace(/ station$/,""),lat:h[1][1],lng:h[1][2]});runSearch();};
 const hs=$("hsheet");let hsOpen=false;const PEEK=128;
-function hsFull(){const scr=$("s-home").getBoundingClientRect(),row=$("home-row").getBoundingClientRect();return Math.max(PEEK,scr.bottom-row.bottom-$("nav").offsetHeight);}
+function hsFull(){const scr=$("s-home").getBoundingClientRect(),row=$("home-row").getBoundingClientRect();return Math.max(PEEK,scr.bottom-row.bottom-$("nav").offsetHeight-14);}
 function hsY(open){return open?0:hsFull()-PEEK;}
 function setHs(open){hsOpen=open;const nav=$("nav").offsetHeight;hs.style.bottom=nav+"px";$("go").style.bottom=(nav+12)+"px";
   hs.style.height=hsFull()+"px";hs.classList.toggle("open",open);hs.style.transform=`translateY(${hsY(open)}px)`;if(!open)$("hist").scrollTop=0;}
@@ -721,7 +722,10 @@ const ll=p=>[p.lat,p.lng];
 let styleP=null;
 function engStyle(){ // OpenFreeMap dark style, labels forced to English → Latin transliteration → local
   if(!styleP)styleP=fetch("https://tiles.openfreemap.org/styles/dark").then(r=>r.json()).then(st=>{
-    const tf=["coalesce",["get","name:en"],["get","name_en"],["get","name:latin"],["get","name"]];
+    const N=["coalesce",["get","name:en"],["get","name_en"],["get","name:latin"],["get","name"]];
+    const fixDef=v=>["case",["in","Defense",v],["concat",["slice",v,0,["index-of","Defense",v]],"Defence",["slice",v,["+",["index-of","Defense",v],7]]],v];
+    const tf=["let","a",["to-string",N],["let","b",fixDef(["var","a"]),
+      ["case",["all",[">=",["length",["var","b"]],5],["==",["slice",["var","b"],["-",["length",["var","b"]],5]]," Cant"]],["concat",["var","b"],"t"],["var","b"]]]];
     st.layers.forEach(l=>{if(l.layout&&l.layout["text-field"]&&l.id.indexOf("shield")<0&&l.id.indexOf("housenumber")<0)l.layout["text-field"]=tf;});return st;});
   return styleP;}
 function esriBase(m){const E="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/";
