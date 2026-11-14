@@ -142,7 +142,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 #opts{background:#000;margin-top:10px}
 .opt{display:flex;gap:14px;align-items:center;width:100%;text-align:left;padding:10px 8px 10px 16px;border-bottom:2px solid #000;background:var(--surface)}
 .oico{width:34px;height:34px;border-radius:50%;border:2.5px solid #e6e9ec;display:grid;place-items:center;flex:none;color:#e6e9ec}
-.oico.st{border-radius:11px;font-weight:800;font-size:13px}
+.oico.stn{border-radius:11px;font-weight:800;font-size:13px}
 .otx{flex:1;min-width:0}
 .opt .t{font-size:16px;font-weight:600;line-height:1.25}
 .opt .s{font-size:13px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -190,7 +190,11 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .rchip svg{width:16px;height:16px}
 .xfer{width:30px;height:30px;border-radius:8px;background:#f2f4f5;color:#121417;display:grid;place-items:center;transform:translate(-50%,-50%);box-shadow:0 2px 8px #0008}
 .tad{padding:16px 0 0}
-#dmap{position:absolute;inset:0}
+.dadwrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s cubic-bezier(.2,.8,.2,1);flex:none}
+.dadwrap.on{grid-template-rows:1fr}
+.dadwrap>div{overflow:hidden}
+.credit{background:#000a;color:#c8ced4;font:500 10px var(--font);padding:2px 6px;border-radius:4px;margin:4px!important;border:0}
+#dmap{position:absolute;inset:0;z-index:0}
 .tpanel{position:absolute;top:0;bottom:0;left:46px;right:0;background:var(--panel);z-index:600;box-shadow:-8px 0 20px #0007;touch-action:pan-y;
   transform:translateX(calc(100% - 92px));transition:transform .32s cubic-bezier(.2,.8,.2,1);will-change:transform}
 .tpanel.drag{transition:none}
@@ -213,7 +217,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .time.g{background:var(--accent);color:#06200f}
 .time.bl{background:var(--blue);color:#021623}
 .time.o::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;border:3px solid #fff;margin-right:6px;vertical-align:-1px}
-.vbar{width:6px;flex:1;min-height:20px;border-radius:3px}
+.vbar{width:6px;flex:1;min-height:20px;border-radius:0}
+.ring{width:16px;height:16px;border-radius:50%;border:4px solid;background:var(--panel);margin-top:-2px;flex:none}
+.tog svg{transition:transform .25s}
+.tog.open svg{transform:rotate(180deg)}
 .vdots{flex:1;min-height:34px;width:6px;background:radial-gradient(circle,#7d848b 2.6px,transparent 3px) center/6px 14px repeat-y}
 .circ{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;flex:none;margin:6px 0}
 .sname{font-size:17px;font-weight:700;line-height:1.25}
@@ -350,6 +357,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     <button class="iconbtn" id="det-back" aria-label="Back"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
     <span class="pill tnum" id="det-fare"></span>
   </div>
+  <div class="dadwrap" id="dadwrap"><div><div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div></div></div>
   <div class="dsum" id="dsum"></div>
   <div class="dsplit">
     <div id="dmap"></div>
@@ -536,7 +544,7 @@ const ALL=[...STATIONS.map(s=>({name:s.name+" station",lat:s.lat,lng:s.lng,kind:
 let onlineHits=[],recentList=[],searchSeq=0,searchTimer=null;
 function kmTxt(x){if(!state.lastPos)return"";const d=dist(state.lastPos,x);return d<1000?Math.round(d)+" m":(d/1000).toFixed(1)+" km";}
 function optHTML(x,i,src){
-  const icon=x.kind==="st"?`<span class="oico st" style="border-color:${LINES[x.line].color};color:${LINES[x.line].color}">${LINES[x.line].short}</span>`:x.kind==="rc"?`<span class="oico">${SVG.clock}</span>`:`<span class="oico">${SVG.pin}</span>`;
+  const icon=x.kind==="st"?`<span class="oico stn" style="border-color:${LINES[x.line].color};color:${LINES[x.line].color}">${LINES[x.line].short}</span>`:x.kind==="rc"?`<span class="oico">${SVG.clock}</span>`:`<span class="oico">${SVG.pin}</span>`;
   const km=kmTxt(x);
   return `<button class="opt" data-src="${src}" data-i="${i}">${icon}<div class="otx"><div class="t">${esc(x.name)}</div><div class="s">${km?`<span class="km">${km}</span> • `:""}${esc(x.sub)}</div></div><span class="fill" aria-label="Put in the search box">${SVG.fill}</span></button>`;}
 function renderOpts(q){
@@ -668,10 +676,10 @@ function renderDetail(){
         `<div class="sname">${esc(l.from.name)}</div><div class="sub">${stairs}</div>
          <div class="ride"><span class="badge ${L.cls}">${L.short}</span><span>→ ${esc(l.headsign.toUpperCase())}</span><span class="dur tnum">${l.min} min</span></div>
          <div class="freq">Departures every about ${L.headway} min</div>
-         <button class="tog" data-tog="${idx}"><span>${l.stops.length-1} stop${l.stops.length>2?"s":""}</span><span>⌄</span></button>`);
+         <button class="tog" data-tog="${idx}"><span>${l.stops.length-1} stop${l.stops.length>2?"s":""}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>`);
       h+=`<div id="midrows-${idx}" hidden>`+l.stops.slice(1,-1).map((s,n)=>{const t=l.dep+Math.round(Math.abs(L.cumMin[s.i]-L.cumMin[l.from.i]));
         return `<div class="pm"><div class="c"><span class="vbar" style="background:${L.color}"></span><span class="mt tnum">${fmt(t)}</span><span class="vbar" style="background:${L.color}"></span></div><div class="b"><span class="n">${n+1}.</span><span>${esc(s.name)}</span></div></div>`;}).join("")+`</div>`;
-      h+=row(`<span class="vbar" style="background:${L.color};max-height:26px"></span><span class="time bl tnum">${fmt(l.arr)}</span>`,`<div class="sname">${l.stops.length-1}. ${esc(l.to.name)}</div><div class="sub">Get off here${l.to.under?" · underground station":""}.</div>`);
+      h+=row(`<span class="vbar" style="background:${L.color};max-height:22px;flex:none;height:22px"></span><span class="ring" style="border-color:${L.color}"></span><span class="time bl tnum" style="margin-top:6px">${fmt(l.arr)}</span>`,`<div class="sname">${l.stops.length-1}. ${esc(l.to.name)}</div><div class="sub">Get off here${l.to.under?" · underground station":""}.</div>`);
       sep=true;
     }
   });
@@ -679,7 +687,7 @@ function renderDetail(){
   h+=`<div class="tad"><div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div></div>`;
   $("detail").innerHTML=h;$("detail").scrollTop=0;
 }
-function openDetail(k){state.trip=state.result[k];renderDetail();setPanel(false);show("s-detail");initDmap();
+function openDetail(k){$("dadwrap").classList.remove("on");state.trip=state.result[k];renderDetail();setPanel(false);show("s-detail");initDmap();
   setTimeout(()=>{dmap.invalidateSize();drawInto(dlayer,"trip");fitTrip();},60);}
 function setPanel(open){const tp=$("tpanel");tp.style.transform="";$("s-detail").classList.toggle("open",open);}
 (function(){const tp=$("tpanel");let x0=null,y0=0,moved=false,drag=false,base=0,closedX=0,tx=0,vel=0,lx=0,lt=0;
@@ -695,8 +703,12 @@ function setPanel(open){const tp=$("tpanel");tp.style.transform="";$("s-detail")
   tp.addEventListener("pointerup",end);tp.addEventListener("pointercancel",end);
   tp.addEventListener("click",e=>{if(moved)return;const open=$("s-detail").classList.contains("open");
     if(!open){setPanel(true);return;}
-    const t=e.target.closest(".tog");if(t){const el=$("midrows-"+t.dataset.tog);el.hidden=!el.hidden;t.lastElementChild.textContent=el.hidden?"⌄":"⌃";}});})();
+    const t=e.target.closest(".tog");if(t){const el=$("midrows-"+t.dataset.tog);el.hidden=!el.hidden;t.classList.toggle("open",!el.hidden);}});})();
 $("peek").onclick=()=>setPanel(false);
+(function(){let last=0;const sc=$("detail"),w=$("dadwrap");
+  sc.addEventListener("scroll",()=>{const top=sc.scrollTop,d=top-last;last=top;
+    if(top<=0){w.classList.remove("on");return;}
+    if(d>22)w.classList.add("on");else if(d<-10)w.classList.remove("on");},{passive:true});})();
 $("det-back").onclick=()=>{if($("s-detail").classList.contains("open"))setPanel(false);else show("s-results",true);};
 $("d-alarm").onclick=()=>toast("Departure reminders are coming soon.");
 $("d-fare").onclick=()=>toast(state.trip&&state.trip.fare?"Buy a token or use your Metro card at the station. Metrobus Rs 30 flat, Orange Line Rs 25–45 by distance.":"No ticket needed. It's a short walk.");
@@ -716,10 +728,11 @@ function esriBase(m){const E="https://server.arcgisonline.com/ArcGIS/rest/servic
   L.tileLayer(E+"World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,maxNativeZoom:16}).addTo(m);
   L.tileLayer(E+"World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,maxNativeZoom:16}).addTo(m);}
 function makeMap(id){const m=L.map(id,{zoomControl:false,attributionControl:false,maxZoom:19}).setView([31.52,74.33],12);
-  L.control.attribution({position:"topleft",prefix:false}).addAttribution('&copy; <a href="https://openfreemap.org">OpenFreeMap</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>').addTo(m);
+  const cr=L.control({position:"topleft"});cr.onAdd=()=>{const d=L.DomUtil.create("button","credit");d.textContent="© OpenStreetMap";L.DomEvent.disableClickPropagation(d);
+    d.onclick=()=>toast("Map data © OpenStreetMap contributors · map style © OpenMapTiles · tiles by OpenFreeMap");return d;};cr.addTo(m);
   let ok=false;
   try{if(window.maplibregl&&L.maplibreGL&&!!document.createElement("canvas").getContext("webgl")){
-      engStyle().then(st=>{L.maplibreGL({style:st,interactive:false}).addTo(m);m.getPane("overlayPane").style.zIndex=450;}).catch(()=>esriBase(m));ok=true;}}catch(e){}
+      engStyle().then(st=>{L.maplibreGL({style:st,interactive:false,attributionControl:false}).addTo(m);m.getPane("overlayPane").style.zIndex=450;}).catch(()=>esriBase(m));ok=true;}}catch(e){}
   if(!ok)esriBase(m);
   dblTap(m);return m;}
 function dblTap(m){ // double-tap to zoom in on phones (iOS Safari doesn't send dblclick reliably)
