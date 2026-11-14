@@ -521,6 +521,7 @@ function show(id,back,instant){if(id!=="s-search"&&document.activeElement&&docum
     if(!instant&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
       if(back){cur.classList.add("out-r");nx.classList.add("in-l");}else{cur.classList.add("under");nx.classList.add("in-r");}
       clearTimeout(show.t);show.t=setTimeout(()=>document.querySelectorAll(".screen").forEach(x=>x.classList.remove("under","out-r","in-r","in-l")),320);}}
+  if(window.syncBack)setTimeout(syncBack,0);
   if(id==="s-home")requestAnimationFrame(()=>{renderHist();setHs(false);});}
 function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),2800);}
 function tickClock(){const t=fmt(nowMin());["clock","res-clock","s-clock"].forEach(i=>$(i).textContent=t);}
@@ -597,7 +598,7 @@ function choose(p){const w=state.picking;setPoint(w,p);$("q-"+w).value=p.name;
   if(!state[other]){activate(other);$("q-"+other).focus({preventScroll:true});return;}
   runSearch();}
 $("f-from").onclick=()=>openSearch("from");$("f-to").onclick=()=>openSearch("to");
-$("search-back").onclick=()=>show("s-home",true);
+$("search-back").onclick=()=>goBack();
 $("opts").onclick=e=>{const b=e.target.closest(".opt");if(!b)return;
   const x=b.dataset.src==="o"?onlineHits[+b.dataset.i]:b.dataset.src==="r"?recentList[+b.dataset.i]:ALL[+b.dataset.i];
   if(e.target.closest(".fill")){const inp=$("q-"+state.picking);inp.value=x.name.replace(/ station$/,"");inp.focus();onlineSearch(inp.value);return;}
@@ -666,7 +667,7 @@ function legsChips(r){
 function sumHTML(r,now,future){return `<div class="dep">${depHTML(r,now,future)}</div><div><div class="crt"><div class="badges">${badgesHTML(r)}</div><span class="tot tnum">${r.total} min</span></div><div class="legs tnum">${legsChips(r)}</div>`;}
 function cardHTML(r,k,now,future){return `<button class="card" data-k="${k}">${sumHTML(r,now,future)}</div></button>`;}
 $("cards").onclick=e=>{const c=e.target.closest(".card");if(!c)return;openDetail(+c.dataset.k);};
-$("res-back").onclick=()=>show("s-home",true);
+$("res-back").onclick=()=>goBack();
 $("r-edit").onclick=()=>openSearch("to");
 
 // ---------------------------------------------------------------- TRIP DETAIL
@@ -704,7 +705,7 @@ function renderDetail(){
 }
 function openDetail(k){$("dadwrap").classList.remove("on");state.trip=state.result[k];renderDetail();setPanel(false);show("s-detail");initDmap();
   setTimeout(()=>{dmap.invalidateSize();drawInto(dlayer,"trip");fitTrip();},60);}
-function setPanel(open){const tp=$("tpanel");tp.style.transform="";$("s-detail").classList.toggle("open",open);}
+function setPanel(open){const tp=$("tpanel");tp.style.transform="";$("s-detail").classList.toggle("open",open);syncBack();}
 (function(){const tp=$("tpanel");let x0=null,y0=0,moved=false,drag=false,base=0,closedX=0,tx=0,vel=0,lx=0,lt=0;
   tp.addEventListener("pointerdown",e=>{x0=e.clientX;y0=e.clientY;moved=false;drag=false;vel=0;lx=e.clientX;lt=performance.now();
     closedX=tp.offsetWidth-92;base=$("s-detail").classList.contains("open")?0:closedX;tx=base;});
@@ -726,7 +727,7 @@ $("peek").onclick=()=>setPanel(false);
   sc.addEventListener("touchstart",e=>{ty=e.touches[0].clientY;},{passive:true});
   sc.addEventListener("touchmove",e=>{if(ty===null)return;const dy=e.touches[0].clientY-ty;
     if(sc.scrollTop<=0&&dy>40){w.classList.add("on");ty=null;}},{passive:true});})();
-$("det-back").onclick=()=>{if($("s-detail").classList.contains("open"))setPanel(false);else show("s-results",true);};
+$("det-back").onclick=()=>goBack();
 $("d-alarm").onclick=()=>toast("Departure reminders are coming soon.");
 $("d-fare").onclick=()=>toast(state.trip&&state.trip.fare?"Buy a token or use your Metro card at the station. Metrobus Rs 30 flat, Orange Line Rs 25–45 by distance.":"No ticket needed. It's a short walk.");
 $("d-nav").onclick=()=>{setPanel(false);locateMe((p,msg)=>{if(!p){toast(msg);return;}if(duser)duser.remove();duser=L.circleMarker(ll(p),{radius:9,color:"#fff",weight:3,fillColor:"#1f9ee0",fillOpacity:1}).addTo(dmap);dmap.setView(ll(p),16);});};
@@ -810,7 +811,7 @@ function openMap(mode){state.mapMode=mode;show("s-map",false,mode==="network");i
     else{const ref=state[state.picking]||state[state.picking==="from"?"to":"from"]||state.lastPos;if(ref)lmap.setView(ll(ref),15);else lmap.setView([31.52,74.33],13);}
   },60);}
 $("nav-map").onclick=()=>openMap("network");
-$("map-back").onclick=()=>show(state.mapMode==="pick"?"s-search":"s-home",true);
+$("map-back").onclick=()=>goBack();
 $("n2-trip").onclick=()=>{show("s-home",false,true);setTab("trip");};
 $("n2-lines").onclick=()=>{show("s-home",false,true);setTab("lines");};
 async function reverseName(p){
@@ -842,11 +843,43 @@ function renderLines(){
   </div>`).join("");}
 renderLines();
 $("lines").onclick=e=>{const t=e.target.closest(".ltog");if(t)t.closest(".lcard").classList.toggle("open");};
-function setTab(t){const two=t==="lines";$("tabs").classList.toggle("t2",two);$("tabtrack").classList.toggle("t2",two);
+function setTab(t){setTab0(t);if(window.syncBack)syncBack();}
+function setTab0(t){const two=t==="lines";$("tabs").classList.toggle("t2",two);$("tabtrack").classList.toggle("t2",two);
   $("tab-trip").classList.toggle("on",!two);$("tab-lines").classList.toggle("on",two);$("tab-trip").setAttribute("aria-selected",!two);$("tab-lines").setAttribute("aria-selected",two);
   document.querySelectorAll("#nav button").forEach((b,i)=>b.classList.toggle("on",i===(two?1:0)));
   hs.classList.toggle("away",two);$("go").style.opacity=two?0:1;$("go").style.pointerEvents=two?"none":"";}
-$("tab-trip").onclick=()=>setTab("trip");$("tab-lines").onclick=$("nav-lines").onclick=()=>setTab("lines");
+$("tab-trip").onclick=()=>setTab("trip");
+// ---------------------------------------------------------------- BACK: buttons, phone back gesture / browser back, and edge swipe
+const curScreen=()=>document.querySelector(".screen.on").id;
+const atRoot=()=>curScreen()==="s-home"&&!$("tabtrack").classList.contains("t2");
+function backTarget(){const c=curScreen();
+  if(c==="s-search"||c==="s-results")return"s-home";
+  if(c==="s-detail")return $("s-detail").classList.contains("open")?null:"s-results";
+  if(c==="s-map")return state.mapMode==="pick"?"s-search":"s-home";return null;}
+function goBack(instant){const c=curScreen();
+  if(c==="s-detail"&&$("s-detail").classList.contains("open")){setPanel(false);return;}
+  if(c==="s-home"){if($("tabtrack").classList.contains("t2"))setTab("trip");syncBack();return;}
+  const t=backTarget();if(t){show(t,true,instant);if(t==="s-home"&&c==="s-map")setTab("trip");}}
+// one spare browser-history entry while you're inside the app, so Safari's / Android's back swipe steps back inside the app
+let backEntry=false,skipPop=false;
+function syncBack(){const root=atRoot()&&!$("s-detail").classList.contains("open");
+  if(!root&&!backEntry){history.pushState({lt:1},"");backEntry=true;}
+  else if(root&&backEntry){backEntry=false;skipPop=true;history.back();}}
+window.syncBack=syncBack;
+addEventListener("popstate",()=>{if(skipPop){skipPop=false;return;}backEntry=false;goBack();syncBack();});
+// home-screen app (no browser bar): our own swipe from the left edge
+(function(){const standalone=navigator.standalone===true||matchMedia("(display-mode: standalone)").matches;if(!standalone)return;
+  const ph=$("phone");let x0=null,y0=0,dx=0,drag=false,cur=null,tgt=null;
+  ph.addEventListener("touchstart",e=>{if(e.touches.length!==1||atRoot())return;const r=ph.getBoundingClientRect(),t=e.touches[0];
+    if(t.clientX-r.left>26)return;x0=t.clientX;y0=t.clientY;dx=0;drag=false;},{passive:true});
+  ph.addEventListener("touchmove",e=>{if(x0===null)return;const t=e.touches[0];dx=t.clientX-x0;const dy=t.clientY-y0;
+    if(!drag){if(Math.abs(dy)>Math.abs(dx)&&Math.abs(dy)>10){x0=null;return;}if(dx>10){drag=true;cur=$(curScreen());const id=backTarget();tgt=id?$(id):null;
+      if(tgt){tgt.classList.add("under");cur.style.zIndex=3;}}}
+    if(drag&&tgt){e.preventDefault();cur.style.transition="none";cur.style.transform=`translateX(${Math.max(0,dx)}px)`;}},{passive:false});
+  ph.addEventListener("touchend",()=>{if(x0===null)return;x0=null;if(!drag)return;drag=false;const w=ph.clientWidth;
+    if(!tgt){if(dx>70)goBack();return;}
+    const done=dx>w*0.33;cur.style.transition="transform .2s ease-out";cur.style.transform=done?"translateX(100%)":"translateX(0)";
+    setTimeout(()=>{cur.style.transition="";cur.style.transform="";cur.style.zIndex="";tgt.classList.remove("under");if(done)goBack(true);},210);},{passive:true});})();$("tab-lines").onclick=$("nav-lines").onclick=()=>setTab("lines");
 (function(){ // swipe the home area left/right to switch Lahore ↔ Lines
   const clip=document.querySelector(".tabclip"),tr=$("tabtrack");let x0=null,y0=0,drag=false,dx=0;
   clip.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse")return;x0=e.clientX;y0=e.clientY;drag=false;dx=0;});
