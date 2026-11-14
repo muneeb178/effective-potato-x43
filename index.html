@@ -31,7 +31,7 @@ html,body{height:100%;background:#0b0c0e;color:var(--text);font-family:var(--fon
 button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .phone{position:relative;max-width:440px;height:100%;margin:0 auto;background:var(--bg);overflow:hidden;overflow:clip}
-.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);visibility:hidden;pointer-events:none;contain:layout paint}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);visibility:hidden;pointer-events:none;contain:layout paint;will-change:transform;transform:translateZ(0)}
 .screen.on,.screen.under,.screen.out-r{visibility:visible}
 .screen.on{pointer-events:auto}
 .screen.under{z-index:1}.screen.on{z-index:2}
@@ -630,10 +630,11 @@ function renderHist(){const h=loadHist();$("hsheet").hidden=!!(state.from&&state
   $("hist").innerHTML=out;}
 $("hist").onclick=e=>{if(Date.now()-hsDragged<350)return;const b=e.target.closest(".hist");if(!b)return;const h=loadHist()[+b.dataset.h];
   setPoint("from",{name:h[0][0].replace(/ station$/,""),lat:h[0][1],lng:h[0][2]});setPoint("to",{name:h[1][0].replace(/ station$/,""),lat:h[1][1],lng:h[1][2]});runSearch();};
-const hs=$("hsheet");let hsOpen=false;const PEEK=128;
-function hsFull(){const scr=$("s-home").getBoundingClientRect(),row=$("home-row").getBoundingClientRect();return Math.max(PEEK,scr.bottom-row.bottom-$("nav").offsetHeight-14);}
+const hs=$("hsheet");let hsOpen=false;const PEEK=128;let hsFullC=0;addEventListener("resize",()=>{hsFullC=0;});
+function hsFull(){if(hsFullC)return hsFullC;const scr=$("s-home").getBoundingClientRect(),row=$("home-row").getBoundingClientRect();return hsFullC=Math.max(PEEK,scr.bottom-row.bottom-$("nav").offsetHeight-14);}
 function hsY(open){return open?0:hsFull()-PEEK;}
-function setHs(open){hsOpen=open;const nav=$("nav").offsetHeight;hs.style.bottom=nav+"px";$("go").style.bottom=(nav+12)+"px";
+let navHC=0;document.fonts&&document.fonts.ready.then(()=>{hsFullC=0;navHC=0;if(!hsOpen)setHs(false);});addEventListener("resize",()=>{navHC=0;});
+function setHs(open){hsOpen=open;const nav=navHC||(navHC=$("nav").offsetHeight);hs.style.bottom=nav+"px";$("go").style.bottom=(nav+12)+"px";
   hs.style.height=hsFull()+"px";hs.classList.toggle("open",open);hs.style.transform=`translateY(${hsY(open)}px)`;if(!open)$("hist").scrollTop=0;}
 let hsDragged=0;
 (function(){let y0=null,base=0,moved=false,lastY=0,lastT=0,vel=0,pid=null,mx=0,raf=0,ny=0;
@@ -790,7 +791,7 @@ function engStyle(){ // OpenFreeMap dark style, labels forced to English → Lat
 function esriBase(m){const E="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/";
   L.tileLayer(E+"World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,maxNativeZoom:16}).addTo(m);
   L.tileLayer(E+"World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,maxNativeZoom:16}).addTo(m);}
-function makeMap(id){const m=L.map(id,{zoomControl:false,attributionControl:false,maxZoom:19,zoomSnap:0,zoomDelta:1,wheelPxPerZoomLevel:90}).setView([31.52,74.33],12);
+function makeMap(id){const m=L.map(id,{zoomControl:false,attributionControl:false,maxZoom:19,zoomSnap:0,zoomDelta:1,wheelPxPerZoomLevel:90,preferCanvas:true,renderer:L.canvas({padding:0.3,tolerance:6})}).setView([31.52,74.33],12);
   const cr=L.control({position:"topleft"});cr.onAdd=()=>{const d=L.DomUtil.create("button","credit");d.textContent="© OpenStreetMap";L.DomEvent.disableClickPropagation(d);
     d.onclick=()=>toast("Map data © OpenStreetMap contributors · map style © OpenMapTiles · tiles by OpenFreeMap");return d;};cr.addTo(m);
   let ok=false;
