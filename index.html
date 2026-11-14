@@ -193,6 +193,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .t-g{background:var(--accent);color:#06200f;font-weight:600;border-radius:999px;padding:1px 6px}
 .t-b{background:var(--blue);color:#021623;font-weight:600;border-radius:999px;padding:1px 6px}
 .cmeta{font-size:12px;color:var(--muted);margin-top:7px}
+.spin{position:absolute;left:50%;top:46%;width:30px;height:30px;margin:-15px;border-radius:50%;border:3px solid #ffffff26;border-top-color:#e6e9ec;animation:spin .8s linear infinite;z-index:5}
+@keyframes spin{to{transform:rotate(360deg)}}
 .banner{margin:12px;padding:12px 14px;border-radius:12px;background:#3a2a10;color:#ffd391;font-size:14px;line-height:1.45}
 .proto{font-size:12px;color:var(--muted);text-align:center;padding:6px 16px 0}
 
@@ -207,15 +209,17 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .tad.rest{display:none}
 .dhdr{position:relative;z-index:5;background:var(--bg)}
 .dbody{position:absolute;left:0;right:0;top:var(--hdr,54px);height:calc(100% - var(--hdr,54px) + var(--adh,121px));display:flex;flex-direction:column;
-  transition:transform .4s cubic-bezier(.22,.9,.24,1);will-change:transform}
+  transition:transform .6s cubic-bezier(.2,.8,.25,1);will-change:transform}
 .dbody.adhide{transform:translateY(calc(-1 * var(--adh,121px)))}
-.dad .adband{transition:opacity .35s ease .05s}
+.dad .adband{transition:opacity .55s ease .1s}
 .dbody.adhide .dad .adband{opacity:0}
-#s-detail .dfoot{display:flex;transform:translateY(140%);transition:transform .32s cubic-bezier(.22,.9,.24,1)}
-#s-detail.open.ft .dfoot{transform:none}
+#s-detail .dfoot{display:flex}
+#s-detail .dfoot .fbtn{transform:translateY(170%);transition:transform .34s cubic-bezier(.2,.9,.3,1)}
+#s-detail .dfoot .fbtn:nth-child(2){transition-delay:.07s}#s-detail .dfoot .fbtn:nth-child(3){transition-delay:.14s}
+#s-detail.open.ft .dfoot .fbtn{transform:none}
 .dad{flex:none}
 .dmapctl{z-index:620}
-.dbody:not(.adhide) ~ .dmapctl,.dbody:not(.adhide) ~ .dfoot{transform:none}
+
 .credit{background:#000a;color:#c8ced4;font:500 10px var(--font);padding:2px 6px;border-radius:4px;margin:4px!important;border:0}
 #dmap{position:absolute;inset:0;z-index:0}
 .tpscroll{position:absolute;inset:0;z-index:600;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;pointer-events:none;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
@@ -374,6 +378,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     </button>
     <button class="iconbtn round" id="r-opts" aria-label="Route options"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M3 8h8M15 8h6M3 16h4M11 16h10"/><circle cx="13" cy="8" r="2"/><circle cx="9" cy="16" r="2"/></svg></button>
   </div>
+  <div class="spin" id="rspin" hidden></div>
   <div class="scroll" id="cards"></div>
 </section>
 
@@ -669,7 +674,11 @@ function runSearch(){
   if(list.some(r=>r.rides.length))list=allDepartures(plan.best,plan.walk,start,start+480);state.result=list;state.shown=0;state.now=now;
   $("cards").innerHTML=`<div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div>`+(banner?`<div class="banner">${banner}</div>`:"")+(list.length?`<div id="cardlist"></div>`:`<p class="note" style="font-size:15px">No Metrobus or Orange Line trip fits this journey yet. Both points need to be within about 2.5 km of a station. Speedo and e-bus routes will widen this.</p>`)+
     `<p class="proto">Times are estimates from published frequencies. No live tracking yet.</p><div style="height:24px"></div>`;
-  moreCards(16);$("cards").scrollTop=0;show("s-results");
+  moreCards(16);$("cards").scrollTop=0;
+  const R=$("s-results"),clist=$("cardlist");show("s-results",false,true);R.animate([{opacity:0},{opacity:1}],{duration:220,easing:"ease-out"});
+  if(clist){const rest=[...$("cards").children].slice(1);rest.forEach(n=>n.style.visibility="hidden");$("rspin").hidden=false;clearTimeout(runSearch.t);
+    runSearch.t=setTimeout(()=>{$("rspin").hidden=true;rest.forEach(n=>n.style.visibility="");const bn=$("cards").querySelector(".banner");if(bn)bn.animate([{opacity:0},{opacity:1}],{duration:300});
+      [...clist.children].slice(0,8).forEach((c,i)=>c.animate([{opacity:0,transform:"translateY(14px)"},{opacity:1,transform:"none"}],{duration:380,delay:i*45,easing:"cubic-bezier(.2,.8,.25,1)",fill:"backwards"}));},520);}
 }
 function allDepartures(best,walk,start,until){ // each good pattern, departure after departure, until "until"
   const out=[];for(const p of best){let r=timeLegs(p.legs,start);let guard=0;
@@ -698,9 +707,9 @@ $("cards").onclick=e=>{const c=e.target.closest(".card");if(!c)return;openDetail
 function morphCard(card){const ph=$("phone").getBoundingClientRect(),a=card.getBoundingClientRect(),b=$("dsum").getBoundingClientRect();
   const g=card.cloneNode(true);g.style.cssText=`position:absolute;margin:0;left:${a.left-ph.left}px;top:${a.top-ph.top}px;width:${a.width}px;height:${a.height}px;z-index:3000;pointer-events:none;will-change:transform,opacity;transform-origin:0 0`;
   $("phone").appendChild(g);const sx=b.width/a.width,dy=b.top-a.top,dx=b.left-a.left;
-  const an=g.animate([{transform:"none",background:"#1f2226",opacity:1,easing:"cubic-bezier(.3,.7,.2,1)"},{transform:`translate(${dx}px,${dy}px) scale(${sx},${sx})`,background:"#141619",offset:.78,opacity:1},{transform:`translate(${dx}px,${dy}px) scale(${sx},${sx})`,background:"#141619",opacity:0}],{duration:560});
+  const an=g.animate([{transform:"none",background:"#1f2226",opacity:1,easing:"cubic-bezier(.3,.7,.2,1)"},{transform:`translate(${dx}px,${dy}px) scale(${sx},${sx})`,background:"#141619",offset:.78,opacity:1},{transform:`translate(${dx}px,${dy}px) scale(${sx},${sx})`,background:"#141619",opacity:0}],{duration:340});
   an.onfinish=()=>g.remove();
-  $("dsum").animate([{opacity:0},{opacity:0,offset:.74},{opacity:1}],{duration:600});}
+  $("dsum").animate([{opacity:0},{opacity:0,offset:.7},{opacity:1}],{duration:380});}
 $("res-back").onclick=()=>goBack();
 $("r-edit").onclick=()=>openSearch("to");
 
@@ -739,10 +748,10 @@ function renderDetail(){
 }
 function openDetail(k,card){const sd=$("s-detail");sd.style.setProperty("--hdr",$("dhdr").offsetHeight+"px");sd.style.setProperty("--adh",$("dad").offsetHeight+"px");$("dbody").classList.add("adhide");sd.classList.remove("ft");clearTimeout(openDetail.t1);clearTimeout(openDetail.t2);clearTimeout(openDetail.t3);adState.lock=Date.now()+1500;state.trip=state.result[k];renderDetail();setPanel(false,false);initDmap();
   dmap.invalidateSize({pan:false});drawInto(dlayer,"trip");fitTrip();
-  if(card){const r=$("s-results");show("s-detail",false,true);r.classList.add("under");sd.animate([{opacity:0},{opacity:1}],{duration:380,easing:"ease-out"}).onfinish=()=>r.classList.remove("under");morphCard(card);}else show("s-detail");
-  openDetail.t1=setTimeout(()=>setPanel(true),650);                        // timeline glides in over the map
-  openDetail.t2=setTimeout(()=>sd.classList.add("ft"),950);                // buttons rise
-  openDetail.t3=setTimeout(()=>{$("dbody").classList.remove("adhide");adState.lock=Date.now()+600;},1450);} // ad drops in, pushing content down
+  if(card){const r=$("s-results");show("s-detail",false,true);r.classList.add("under");sd.animate([{opacity:0},{opacity:1}],{duration:220,easing:"ease-out"}).onfinish=()=>r.classList.remove("under");morphCard(card);}else show("s-detail");
+  openDetail.t1=setTimeout(()=>setPanel(true),1100);                        // timeline glides in over the map
+  openDetail.t2=setTimeout(()=>sd.classList.add("ft"),1450);                // buttons rise
+  openDetail.t3=setTimeout(()=>{$("dbody").classList.remove("adhide");adState.lock=Date.now()+900;},2050);} // ad drops in, pushing content down
 const tps=$("tpscroll");
 function tpMax(){return tps.scrollWidth-tps.clientWidth;}
 function setPanel(open,smooth){$("s-detail").classList.toggle("open",open);
@@ -908,16 +917,20 @@ function renderLines(){
 renderLines();
 $("lines").onclick=e=>{const t=e.target.closest(".ltog");if(!t)return;const c=t.closest(".lcard"),b=c.querySelector(".lbody");
   const open=!c.classList.contains("open");if(open)c.classList.add("open");foldRows(b,open,null,()=>{if(!open)c.classList.remove("open");});};
-function foldRows(el,open,tog,done){ // height eases open; rows drift in one after another; line pieces grow from the split
-  el.getAnimations({subtree:true}).forEach(a=>a.cancel());const E="cubic-bezier(.25,.8,.3,1)";
+function foldRows(el,open,tog,done){ // compositor-only: content below glides by transform, rows fade; nothing re-lays out per frame
+  const box=el.closest(".tscroll,#lines")||el.parentElement;const E="cubic-bezier(.25,.8,.3,1)";
+  const below=[];for(let n=el;n&&n!==box;n=n.parentElement){let x=n.nextElementSibling;while(x){below.push(x);x=x.nextElementSibling;}}
+  [el,...below].forEach(n=>n.getAnimations().forEach(a=>a.cancel()));[...el.children].forEach(r=>r.getAnimations().forEach(a=>a.cancel()));
   if(tog)tog.classList.toggle("open",open);
-  if(open){el.hidden=false;const h=el.scrollHeight;el.style.overflow="hidden";
-    el.animate([{height:"0px"},{height:h+"px"}],{duration:380,easing:E}).onfinish=()=>{el.style.overflow="";done&&done();};
-    [...el.children].forEach((r,i)=>{r.animate([{opacity:0,transform:"translateY(-8px)"},{opacity:1,transform:"none"}],{duration:300,delay:40+i*22,easing:E,fill:"backwards"});
-      r.querySelectorAll(".vbar,.rail").forEach(v=>v.animate([{transform:"scaleY(.25)"},{transform:"none"}],{duration:360,delay:i*22,easing:E,fill:"backwards"}));});
-  }else{const h=el.offsetHeight;el.style.overflow="hidden";
-    [...el.children].forEach(r=>r.animate([{opacity:1},{opacity:0}],{duration:180,fill:"forwards"}));
-    el.animate([{height:h+"px"},{height:"0px"}],{duration:300,easing:E}).onfinish=()=>{el.hidden=true;el.style.overflow="";el.getAnimations({subtree:true}).forEach(a=>a.cancel());done&&done();};}}
+  if(open){el.hidden=false;const h=el.offsetHeight;
+    below.forEach(n=>n.animate([{transform:`translateY(${-h}px)`},{transform:"none"}],{duration:420,easing:E}));
+    [...el.children].forEach((r,i)=>r.animate([{opacity:0,transform:"translateY(-10px)"},{opacity:1,transform:"none"}],{duration:300,delay:60+i*16,easing:E,fill:"backwards"}));
+    setTimeout(()=>done&&done(),430);
+  }else{const h=el.offsetHeight;
+    [...el.children].forEach(r=>r.animate([{opacity:1},{opacity:0}],{duration:160,fill:"forwards"}));
+    const a=below.map(n=>n.animate([{transform:"none"},{transform:`translateY(${-h}px)`}],{duration:340,easing:E,fill:"forwards"}));
+    const fin=()=>{el.hidden=true;below.forEach(n=>n.getAnimations().forEach(x=>x.cancel()));[...el.children].forEach(r=>r.getAnimations().forEach(x=>x.cancel()));done&&done();};
+    if(a.length)a[0].onfinish=fin;else setTimeout(fin,200);}}
 function setTab(t){setTab0(t);if(window.syncBack)syncBack();}
 function setTab0(t,fromScroll){const two=t==="lines";$("tabs").classList.toggle("t2",two);$("tabtrack").classList.toggle("t2",two);
   if(!fromScroll){const c=document.querySelector(".tabclip");c.scrollTo({left:two?c.clientWidth:0,behavior:$("s-home").classList.contains("on")?"smooth":"auto"});}
