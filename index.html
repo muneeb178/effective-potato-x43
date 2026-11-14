@@ -114,6 +114,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .hsheet.drag{transition:none}
 .hsheet.away{transform:translateY(110%)!important;opacity:0;pointer-events:none}
 .showbtn{transition:opacity .2s}
+.hsheet:not(.open){touch-action:none}
 .hs-top{touch-action:none;cursor:grab;padding:8px 0 2px;flex:none}
 .grab{width:40px;height:4px;border-radius:3px;background:#4a5056;margin:2px auto 6px}
 .hs-title{display:flex;justify-content:space-between;align-items:center;padding:0 10px 0 20px}
@@ -138,7 +139,11 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .sf{padding:0 4px 0 14px}
 .sf input{flex:1;min-width:0;width:100%;background:none;border:0;color:var(--text);font:inherit;font-size:16px;font-weight:500;padding:9px 0;outline:none}
 .sf input::placeholder{color:var(--muted);font-weight:400}
-.sf.act{background:var(--surface-2)}
+.sf{transition:min-height .2s ease,background .2s}
+.sf input{transition:font-size .2s ease}
+.sf.act{background:var(--surface-2);min-height:54px}
+.sf.act input{font-size:19px}
+.sf .loc{display:none}.sf.act .loc{display:grid}
 #opts{background:#000;margin-top:10px}
 .opt{display:flex;gap:14px;align-items:center;width:100%;text-align:left;padding:10px 8px 10px 16px;border-bottom:2px solid #000;background:var(--surface)}
 .oico{width:34px;height:34px;border-radius:50%;border:2.5px solid #e6e9ec;display:grid;place-items:center;flex:none;color:#e6e9ec}
@@ -274,7 +279,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 <!-- HOME -->
 <section class="screen on" id="s-home">
   <div class="hdr">
-    <div class="brand">
+    <button class="iconbtn" id="home-back" aria-label="Clear trip" hidden><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
+    <div class="brand" id="brand">
       <svg width="26" height="26" viewBox="0 0 30 30" aria-hidden="true"><circle cx="7" cy="22" r="3.5" fill="none" stroke="#fff" stroke-width="1.9"/><circle cx="23" cy="7" r="3.5" fill="none" stroke="#fff" stroke-width="1.9"/><path d="M9.5 19.5 C14 15, 16 14, 20.5 9.5" stroke="#1fc77e" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
       <span>Lahore Transit</span>
     </div>
@@ -328,8 +334,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     <span class="pill tnum" id="s-clock"></span>
   </div>
   <div class="fields">
-    <div class="field sf" id="sf-from"><span class="dot"></span><input id="q-from" placeholder="From where?" autocomplete="off" enterkeyhint="search"><button class="iconbtn" id="loc-btn" aria-label="Use my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
-    <div class="field sf" id="sf-to"><span class="dot b"></span><input id="q-to" placeholder="Where to?" autocomplete="off" enterkeyhint="search"></div>
+    <div class="field sf" id="sf-from"><span class="dot"></span><input id="q-from" placeholder="From where?" autocomplete="off" enterkeyhint="search"><button class="iconbtn loc" id="loc-btn" aria-label="Use my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
+    <div class="field sf" id="sf-to"><span class="dot b"></span><input id="q-to" placeholder="Where to?" autocomplete="off" enterkeyhint="search"><button class="iconbtn loc" id="loc-btn2" aria-label="Use my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
   </div>
   <div class="scroll" id="opts"></div>
   <button class="selmap" id="selmap"><svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a7 7 0 0 0-7 7c0 5.3 7 13 7 13s7-7.7 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>Select from map</button>
@@ -531,7 +537,7 @@ const SVG={
 const modeSvg=line=>line==="OL"?SVG.train:SVG.bus;
 
 function setPoint(which,p){state[which]=p;const el=$(which+"-txt");el.textContent=p.name;el.className="val";syncHome();}
-function syncHome(){const both=!!(state.from&&state.to);$("go").hidden=!both;$("go").style.bottom=($("nav").offsetHeight+12)+"px";$("swap").hidden=!(state.from||state.to);if(both)$("hsheet").hidden=true;else renderHist();}
+function syncHome(){const both=!!(state.from&&state.to),any=!!(state.from||state.to);$("home-back").hidden=!any;$("brand").hidden=any;$("go").hidden=!both;$("go").style.bottom=($("nav").offsetHeight+12)+"px";$("swap").hidden=!(state.from||state.to);if(both)$("hsheet").hidden=true;else renderHist();}
 $("swap").onclick=()=>{const a=state.from,b=state.to;state.from=null;state.to=null;
   ["from","to"].forEach(w=>{$(w+"-txt").textContent=w==="from"?"From where?":"Where to?";$(w+"-txt").className="ph";});
   if(b)setPoint("from",b);if(a)setPoint("to",a);syncHome();};
@@ -539,6 +545,8 @@ $("when-in").onchange=e=>{const v=e.target.value;if(!v){state.when=null;$("when"
 $("opts-btn").onclick=$("r-opts").onclick=()=>toast("Route options (fewer changes, less walking) are coming soon.");
 $("profile").onclick=()=>toast("Accounts come later.");
 $("go").onclick=()=>runSearch();
+$("home-back").onclick=()=>{state.from=null;state.to=null;state.when=null;$("when").textContent="Now";$("when-in").value="";
+  ["from","to"].forEach(w=>{$(w+"-txt").textContent=w==="from"?"From where?":"Where to?";$(w+"-txt").className="ph";});syncHome();setHs(false);};
 
 // ---------------------------------------------------------------- SEARCH
 const ALL=[...STATIONS.map(s=>({name:s.name+" station",lat:s.lat,lng:s.lng,kind:"st",line:s.line,sub:LINES[s.line].name+(s.under?" · underground":"")})),...PLACES.map(([n,lat,lng])=>({name:n,lat,lng,kind:"pl",sub:"Lahore"}))];
@@ -593,7 +601,7 @@ $("opts").onclick=e=>{const b=e.target.closest(".opt");if(!b)return;
   const x=b.dataset.src==="o"?onlineHits[+b.dataset.i]:b.dataset.src==="r"?recentList[+b.dataset.i]:ALL[+b.dataset.i];
   if(e.target.closest(".fill")){const inp=$("q-"+state.picking);inp.value=x.name.replace(/ station$/,"");inp.focus();onlineSearch(inp.value);return;}
   choose({name:x.name.replace(/ station$/,""),lat:x.lat,lng:x.lng});};
-$("loc-btn").onclick=()=>{state.picking="from";$("sf-from").classList.add("act");$("sf-to").classList.remove("act");toast("Finding you…");
+$("loc-btn").onclick=$("loc-btn2").onclick=e=>{state.picking=e.currentTarget.id==="loc-btn"?"from":"to";toast("Finding you…");
   locateMe((p,msg)=>{if(!p){toast(msg);return;}state.lastPos={lat:p.lat,lng:p.lng};choose(p);});};
 $("selmap").onclick=()=>openMap("pick");
 
@@ -607,21 +615,26 @@ function renderHist(){const h=loadHist();$("hsheet").hidden=!!(state.from&&state
   h.forEach((x,i)=>{const d=x[2]?dayLabel(x[2]):"Earlier";if(d!==last){out+=`<div class="hday">${d}</div>`;last=d;}
     out+=`<button class="hist" data-h="${i}"><div class="l"><span class="dot"></span>${esc(x[0][0].replace(/ station$/,""))}</div><div class="arr">↓</div><div class="l"><span class="dot b"></span>${esc(x[1][0].replace(/ station$/,""))}</div></button>`;});
   $("hist").innerHTML=out;}
-$("hist").onclick=e=>{const b=e.target.closest(".hist");if(!b)return;const h=loadHist()[+b.dataset.h];
+$("hist").onclick=e=>{if(Date.now()-hsDragged<350)return;const b=e.target.closest(".hist");if(!b)return;const h=loadHist()[+b.dataset.h];
   setPoint("from",{name:h[0][0].replace(/ station$/,""),lat:h[0][1],lng:h[0][2]});setPoint("to",{name:h[1][0].replace(/ station$/,""),lat:h[1][1],lng:h[1][2]});runSearch();};
 const hs=$("hsheet");let hsOpen=false;const PEEK=128;
 function hsFull(){const scr=$("s-home").getBoundingClientRect(),row=$("home-row").getBoundingClientRect();return Math.max(PEEK,scr.bottom-row.bottom-$("nav").offsetHeight-14);}
 function hsY(open){return open?0:hsFull()-PEEK;}
 function setHs(open){hsOpen=open;const nav=$("nav").offsetHeight;hs.style.bottom=nav+"px";$("go").style.bottom=(nav+12)+"px";
   hs.style.height=hsFull()+"px";hs.classList.toggle("open",open);hs.style.transform=`translateY(${hsY(open)}px)`;if(!open)$("hist").scrollTop=0;}
-(function(){let y0=null,base=0,moved=false,lastY=0,lastT=0,vel=0;const top=$("hs-top");
-  top.addEventListener("pointerdown",e=>{if(e.target.closest("#hs-close"))return;y0=e.clientY;base=hsY(hsOpen);moved=false;vel=0;lastY=e.clientY;lastT=performance.now();hs.classList.add("drag");top.setPointerCapture(e.pointerId);});
-  top.addEventListener("pointermove",e=>{if(y0===null)return;const dy=e.clientY-y0;if(Math.abs(dy)>4)moved=true;
-    const now=performance.now();vel=(e.clientY-lastY)/Math.max(1,now-lastT);lastY=e.clientY;lastT=now;
+let hsDragged=0;
+(function(){let y0=null,base=0,moved=false,lastY=0,lastT=0,vel=0,pid=null;
+  hs.addEventListener("pointerdown",e=>{if(e.target.closest("#hs-close"))return;
+    if(hsOpen&&!e.target.closest("#hs-top"))return; // open: list scrolls, drag by the header
+    y0=e.clientY;base=hsY(hsOpen);moved=false;vel=0;lastY=e.clientY;lastT=performance.now();pid=e.pointerId;});
+  hs.addEventListener("pointermove",e=>{if(y0===null)return;const dy=e.clientY-y0;
+    if(!moved&&Math.abs(dy)>6){moved=true;hs.classList.add("drag");try{hs.setPointerCapture(pid);}catch(_){}}
+    if(!moved)return;const now=performance.now();vel=(e.clientY-lastY)/Math.max(1,now-lastT);lastY=e.clientY;lastT=now;
     const max=hsY(false);let y=base+dy;if(y<0)y=y/3;if(y>max)y=max+(y-max)/3;hs.style.transform=`translateY(${y}px)`;});
-  const end=e=>{if(y0===null)return;const dy=e.clientY-y0;y0=null;hs.classList.remove("drag");if(!moved){setHs(!hsOpen);return;}
-    if(Math.abs(vel)>0.4)setHs(vel<0);else setHs(base+dy<hsY(false)/2);};
-  top.addEventListener("pointerup",end);top.addEventListener("pointercancel",end);})();
+  const end=e=>{if(y0===null)return;const dy=(e.type==="pointercancel"?lastY:e.clientY)-y0;y0=null;hs.classList.remove("drag");
+    if(!moved){if(e.target.closest&&e.target.closest("#hs-top"))setHs(!hsOpen);return;}
+    hsDragged=Date.now();if(Math.abs(vel)>0.35)setHs(vel<0);else setHs(base+dy<hsY(false)/2);};
+  hs.addEventListener("pointerup",end);hs.addEventListener("pointercancel",end);})();
 $("hs-close").onclick=()=>setHs(false);
 addEventListener("resize",()=>{if($("s-home").classList.contains("on"))setHs(hsOpen);});
 
