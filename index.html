@@ -532,7 +532,10 @@ function timeLegs(legsIn,startMin){
       lg.wait=dep-t;lg.dep=dep;lg.arr=dep+lg.min;t=lg.arr+1;fare+=lg.fare;if(firstDep===null)firstDep=dep;}
   }
   const rides=legs.filter(l=>l.type==="ride");
-  return{legs,start:startMin,end:t,total:t-startMin,fare,firstDep,rides,walkTot:legs.filter(l=>l.type==="walk").reduce((a,l)=>a+l.min,0)};
+  // leave home just in time for the first departure: don't count waiting at home as journey time
+  let st=startMin;const f=rides[0];
+  if(f&&f.wait>0&&legs[0]!==f&&legs[1]===f){st=startMin+f.wait;f.wait=0;legs[0].start=st;legs[0].end=st+legs[0].min;}
+  return{legs,start:st,end:t,total:t-st,fare,firstDep,rides,walkTot:legs.filter(l=>l.type==="walk").reduce((a,l)=>a+l.min,0)};
 }
 
 
