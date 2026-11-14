@@ -59,13 +59,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .tab{flex:1;padding:8px 0;font-weight:600;font-size:16px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px;position:relative}
 .tab.on{color:var(--text)}
 .tabs{position:relative}
-.tabind{position:absolute;left:0;bottom:-3px;width:50%;height:3px;background:var(--text);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
-.tabs.t2 .tabind{transform:translateX(100%)}
+.tabind{position:absolute;left:0;bottom:-3px;width:50%;height:3px;background:var(--text);will-change:transform}
+#s-search .tabind{transform:none}
 .tab{transition:color .25s}
-.tabclip{flex:1;overflow:hidden;position:relative;min-height:0}
-.tabtrack{display:flex;width:200%;height:100%;transition:transform .32s cubic-bezier(.2,.8,.2,1);will-change:transform}
-.tabtrack.t2{transform:translateX(-50%)}
-.tabpane{width:50%;height:100%;display:flex;flex-direction:column;min-height:0}
+.tabclip{flex:1;position:relative;min-height:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.tabclip::-webkit-scrollbar{display:none}
+.tabtrack{display:flex;width:200%;height:100%}
+.tabpane{width:50%;height:100%;display:flex;flex-direction:column;min-height:0;scroll-snap-align:start;scroll-snap-stop:always}
 #lines{overflow-y:auto;padding:0 0 90px}
 .lcard{margin:0 12px 10px;background:var(--surface);border-radius:14px;overflow:hidden;flex:none}
 .lhead{display:flex;gap:12px;align-items:flex-start;padding:13px 14px 10px}
@@ -109,14 +109,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .homebody{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 
 /* routes history bottom sheet */
-.hsheet{position:absolute;left:0;right:0;bottom:64px;height:300px;background:var(--surface);border-radius:16px 16px 0 0;z-index:20;display:flex;flex-direction:column;box-shadow:0 -4px 12px #0007;
-  transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .2s;will-change:transform}
+.hsscroll{position:absolute;left:0;right:0;bottom:64px;height:300px;z-index:20;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;pointer-events:none;scrollbar-width:none;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .2s}
+.hsscroll::-webkit-scrollbar{display:none}
+.hsscroll.away{transform:translateY(110%);opacity:0}
+.hsspace{height:172px;scroll-snap-align:start}
+.hsheet{position:relative;height:100%;background:var(--surface);border-radius:16px 16px 0 0;display:flex;flex-direction:column;box-shadow:0 -4px 12px #0007;pointer-events:auto;scroll-snap-align:end}
 .hsheet[hidden]{display:none}
-.hsheet.drag{transition:none}
-.hsheet.away{transform:translateY(110%)!important;opacity:0;pointer-events:none}
 .showbtn{transition:opacity .2s}
-.hsheet:not(.open){touch-action:none}
-.hs-top{touch-action:none;cursor:grab;padding:8px 0 2px;flex:none}
+.hs-top{cursor:pointer;padding:8px 0 2px;flex:none}
 .grab{width:40px;height:4px;border-radius:3px;background:#4a5056;margin:2px auto 6px}
 .hs-title{display:flex;justify-content:space-between;align-items:center;padding:0 10px 0 20px}
 .hs-title h2{font-size:21px;font-weight:700;letter-spacing:-.4px;padding:0 0 4px}
@@ -191,8 +191,6 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 /* trip detail: map left, sliding timeline right */
 .dsum{padding:0 16px 10px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:0 18px;align-items:start;flex:none}
 .dsplit{position:relative;flex:1;overflow:hidden;background:#2a3242;min-height:0}
-.tabclip{touch-action:pan-y}
-.tabtrack.drag{transition:none}
 .rchip{display:inline-flex;align-items:center;gap:3px;padding:1px 5px;border-radius:5px;font-weight:800;font-size:10px;color:#fff;transform:translate(-50%,-50%);white-space:nowrap;box-shadow:0 2px 8px #0008;border:2px solid #0006}
 .rchip svg{display:none}
 .lbl-hide .perm{display:none}
@@ -206,11 +204,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .dadwrap.on .adband{opacity:1;transform:none}
 .credit{background:#000a;color:#c8ced4;font:500 10px var(--font);padding:2px 6px;border-radius:4px;margin:4px!important;border:0}
 #dmap{position:absolute;inset:0;z-index:0}
-.tpanel{position:absolute;top:0;bottom:0;left:46px;right:0;background:var(--panel);z-index:600;box-shadow:-8px 0 20px #0007;touch-action:pan-y;
-  transform:translateX(calc(100% - 92px));transition:transform .32s cubic-bezier(.2,.8,.2,1);will-change:transform}
-.tpanel.drag{transition:none}
-.tpanel,.tpanel *{touch-action:pan-y}
-#s-detail.open .tpanel{transform:none}
+.tpscroll{position:absolute;inset:0;z-index:600;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;pointer-events:none;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.tpscroll::-webkit-scrollbar{display:none}
+.tpspace{flex:none;width:calc(100% - 92px);scroll-snap-align:start}
+.tpanel{position:relative;flex:none;width:calc(100% - 46px);height:100%;background:var(--panel);box-shadow:-8px 0 20px #0007;pointer-events:auto;scroll-snap-align:end}
 .tscroll{height:100%;overflow-y:auto;padding:10px 0 120px}
 .peek{position:absolute;left:0;top:0;bottom:0;width:46px;z-index:650;display:none}
 #s-detail.open .peek{display:block}
@@ -276,7 +273,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 
 .toast{position:absolute;left:50%;bottom:110px;transform:translate(-50%,20px);background:#f2f4f5;color:#121417;padding:11px 16px;border-radius:12px;font-size:14px;font-weight:600;max-width:86%;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:2000}
 .toast.on{opacity:1;transform:translate(-50%,0)}
-@media (prefers-reduced-motion:reduce){.tpanel,.hsheet,.toast,.tabtrack,.tabind,.lbody{transition:none}.screen{animation:none!important}}
+@media (prefers-reduced-motion:reduce){.hsscroll,.toast,.lbody{transition:none}.screen{animation:none!important}}
 </style>
 </head>
 <body>
@@ -319,12 +316,12 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     <div class="adband" id="ad-home"><div class="lbl">AD</div><div class="adbox">Ad space · 300 × 250</div></div>
     </div><div class="tabpane" id="lines"></div></div></div>
   </div>
-  <div class="hsheet" id="hsheet" hidden>
+  <div class="hsscroll" id="hsscroll"><div class="hsspace" id="hsspace"></div><div class="hsheet" id="hsheet" hidden>
     <div class="hs-top" id="hs-top"><div class="grab"></div>
       <div class="hs-title"><h2>Routes history</h2><button class="iconbtn" id="hs-close" aria-label="Close history"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     </div>
     <div id="hist"></div>
-  </div>
+  </div></div>
   <button class="showbtn" id="go" hidden>Show routes<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
   <nav class="nav" id="nav">
     <button class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 2 12l10 10 10-10Zm1 13v-3H9v3H7v-4a1 1 0 0 1 1-1h5V7l4 4Z"/></svg>Trip</button>
@@ -379,7 +376,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     <div id="dmap"></div>
     <div class="mapctl" style="z-index:500"><button id="dlocate" aria-label="Show my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
     <div class="peek" id="peek"></div>
-    <div class="tpanel" id="tpanel"><div class="tscroll" id="detail"></div></div>
+    <div class="tpscroll" id="tpscroll"><div class="tpspace"></div><div class="tpanel" id="tpanel"><div class="tscroll" id="detail"></div></div></div>
     <div class="dfoot">
       <button class="fbtn w" id="d-alarm" aria-label="Departure reminder"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M5 3 2 6M19 3l3 3"/></svg></button>
       <button class="fbtn w" id="d-nav"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 2 10 10-10 10L2 12Z"/><path d="M9 14v-3h5M12 8l3 3-3 3"/></svg>Navigate</button>
@@ -523,7 +520,7 @@ const fmt=m=>{m=((Math.round(m)%1440)+1440)%1440;return String(Math.floor(m/60))
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes();};
 const brit=t=>String(t).replace(/Defense/g,"Defence").replace(/\bCant\b/g,"Cantt");
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function show(id,back,instant){if(id==="s-home"){renderHist();if(window.setHs)setHs(false);}if(id!=="s-search"&&document.activeElement&&document.activeElement.blur)document.activeElement.blur();$("phone").scrollLeft=0;$("phone").scrollTop=0;const nx=$(id),cur=document.querySelector(".screen.on");if(cur===nx)return;
+function show(id,back,instant){if(id==="s-home"){renderHist();if(window.setHs)setHs(false,false);}if(id!=="s-search"&&document.activeElement&&document.activeElement.blur)document.activeElement.blur();$("phone").scrollLeft=0;$("phone").scrollTop=0;const nx=$(id),cur=document.querySelector(".screen.on");if(cur===nx)return;
   document.querySelectorAll(".screen").forEach(x=>x.classList.remove("under","out-r","in-r","in-l"));
   nx.classList.add("on");
   if(cur){cur.classList.remove("on");
@@ -628,27 +625,19 @@ function renderHist(){const h=loadHist();$("hsheet").hidden=!!(state.from&&state
   h.forEach((x,i)=>{const d=x[2]?dayLabel(x[2]):"Earlier";if(d!==last){out+=`<div class="hday">${d}</div>`;last=d;}
     out+=`<button class="hist" data-h="${i}"><div class="l"><span class="dot"></span>${esc(x[0][0].replace(/ station$/,""))}</div><div class="arr">↓</div><div class="l"><span class="dot b"></span>${esc(x[1][0].replace(/ station$/,""))}</div></button>`;});
   $("hist").innerHTML=out;}
-$("hist").onclick=e=>{if(Date.now()-hsDragged<350)return;const b=e.target.closest(".hist");if(!b)return;const h=loadHist()[+b.dataset.h];
+$("hist").onclick=e=>{const b=e.target.closest(".hist");if(!b)return;const h=loadHist()[+b.dataset.h];
   setPoint("from",{name:h[0][0].replace(/ station$/,""),lat:h[0][1],lng:h[0][2]});setPoint("to",{name:h[1][0].replace(/ station$/,""),lat:h[1][1],lng:h[1][2]});runSearch();};
-const hs=$("hsheet");let hsOpen=false;const PEEK=128;let hsFullC=0;addEventListener("resize",()=>{hsFullC=0;});
+const hs=$("hsheet"),hsc=$("hsscroll");let hsOpen=false;const PEEK=128;let hsFullC=0;addEventListener("resize",()=>{hsFullC=0;});
 function hsFull(){if(hsFullC)return hsFullC;const scr=$("s-home").getBoundingClientRect(),row=$("home-row").getBoundingClientRect();return hsFullC=Math.max(PEEK,scr.bottom-row.bottom-$("nav").offsetHeight-14);}
-function hsY(open){return open?0:hsFull()-PEEK;}
 let navHC=0;document.fonts&&document.fonts.ready.then(()=>{hsFullC=0;navHC=0;if(!hsOpen)setHs(false);});addEventListener("resize",()=>{navHC=0;});
-function setHs(open){hsOpen=open;const nav=navHC||(navHC=$("nav").offsetHeight);hs.style.bottom=nav+"px";$("go").style.bottom=(nav+12)+"px";
-  hs.style.height=hsFull()+"px";hs.classList.toggle("open",open);hs.style.transform=`translateY(${hsY(open)}px)`;if(!open)$("hist").scrollTop=0;}
-let hsDragged=0;
-(function(){let y0=null,base=0,moved=false,lastY=0,lastT=0,vel=0,pid=null,mx=0,raf=0,ny=0;
-  hs.addEventListener("pointerdown",e=>{if(e.target.closest("#hs-close"))return;
-    if(hsOpen&&!e.target.closest("#hs-top"))return; // open: list scrolls, drag by the header
-    y0=e.clientY;mx=hsY(false);base=hsOpen?0:mx;moved=false;vel=0;lastY=e.clientY;lastT=performance.now();pid=e.pointerId;});
-  hs.addEventListener("pointermove",e=>{if(y0===null)return;const dy=e.clientY-y0;
-    if(!moved&&Math.abs(dy)>6){moved=true;hs.classList.add("drag");try{hs.setPointerCapture(pid);}catch(_){}}
-    if(!moved)return;const now=performance.now();vel=(e.clientY-lastY)/Math.max(1,now-lastT);lastY=e.clientY;lastT=now;
-    let y=base+dy;if(y<0)y=y/3;if(y>mx)y=mx+(y-mx)/3;ny=y;if(!raf)raf=requestAnimationFrame(()=>{raf=0;hs.style.transform=`translateY(${ny}px)`;});});
-  const end=e=>{if(y0===null)return;cancelAnimationFrame(raf);raf=0;const dy=(e.type==="pointercancel"?lastY:e.clientY)-y0;y0=null;hs.classList.remove("drag");
-    if(!moved){if(e.target.closest&&e.target.closest("#hs-top"))setHs(!hsOpen);return;}
-    hsDragged=Date.now();if(Math.abs(vel)>0.35)setHs(vel<0);else setHs(base+dy<mx/2);};
-  hs.addEventListener("pointerup",end);hs.addEventListener("pointercancel",end);})();
+function hsMax(){return hsc.scrollHeight-hsc.clientHeight;}
+function sizeHs(){const nav=navHC||(navHC=$("nav").offsetHeight),H=hsFull();hsc.style.bottom=nav+"px";hsc.style.height=H+"px";$("hsspace").style.height=(H-PEEK)+"px";$("go").style.bottom=(nav+12)+"px";}
+function setHs(open,smooth){sizeHs();hsOpen=open;hs.classList.toggle("open",open);if(!open)$("hist").scrollTop=0;
+  const vis=$("s-home").classList.contains("on")&&smooth!==false;hsc.scrollTo({top:open?hsMax():0,behavior:vis?"smooth":"auto"});}
+// native scroll drives the sheet; we only read where it settled
+(function(){let t=0;hsc.addEventListener("scroll",()=>{const open=hsc.scrollTop>hsMax()*0.5;
+    if(open!==hs.classList.contains("open")){hs.classList.toggle("open",open);hsOpen=open;if(!open)$("hist").scrollTop=0;}},{passive:true});})();
+$("hs-top").addEventListener("click",e=>{if(e.target.closest("#hs-close"))return;setHs(!hsOpen);});
 $("hs-close").onclick=()=>setHs(false);
 addEventListener("resize",()=>{if($("s-home").classList.contains("on"))setHs(hsOpen);});
 
@@ -715,21 +704,15 @@ function renderDetail(){
   h+=`<div class="tad"><div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div></div>`;
   $("detail").innerHTML=h;$("detail").scrollTop=0;if(window.watchBottomAd)watchBottomAd();
 }
-function openDetail(k){$("dadwrap").classList.remove("on");state.trip=state.result[k];renderDetail();setPanel(false);initDmap();
+function openDetail(k){$("dadwrap").classList.remove("on");state.trip=state.result[k];renderDetail();setPanel(false,false);initDmap();
   dmap.invalidateSize({pan:false});drawInto(dlayer,"trip");fitTrip();show("s-detail");}
-function setPanel(open){const tp=$("tpanel");tp.style.transform="";$("s-detail").classList.toggle("open",open);syncBack();}
-(function(){const tp=$("tpanel");let x0=null,y0=0,moved=false,drag=false,base=0,closedX=0,tx=0,vel=0,lx=0,lt=0;
-  tp.addEventListener("pointerdown",e=>{x0=e.clientX;y0=e.clientY;moved=false;drag=false;vel=0;lx=e.clientX;lt=performance.now();
-    closedX=tp.offsetWidth-92;base=$("s-detail").classList.contains("open")?0:closedX;tx=base;});
-  tp.addEventListener("pointermove",e=>{if(x0===null)return;const dx=e.clientX-x0,dy=e.clientY-y0;
-    if(!drag&&!moved&&Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)){drag=true;tp.classList.add("drag");try{tp.setPointerCapture(e.pointerId);}catch(_){}}
-    if(Math.abs(dx)>8||Math.abs(dy)>8)moved=true;
-    if(!drag)return;const now=performance.now();vel=(e.clientX-lx)/Math.max(1,now-lt);lx=e.clientX;lt=now;
-    tx=Math.min(closedX,Math.max(0,base+dx));tp.style.transform=`translateX(${tx}px)`;});
-  const end=()=>{if(x0===null)return;x0=null;if(!drag)return;drag=false;tp.classList.remove("drag");
-    const open=Math.abs(vel)>0.35?vel<0:tx<closedX/2;tp.style.transform="";$("s-detail").classList.toggle("open",open);};
-  tp.addEventListener("pointerup",end);tp.addEventListener("pointercancel",end);
-  tp.addEventListener("click",e=>{if(moved)return;const open=$("s-detail").classList.contains("open");
+const tps=$("tpscroll");
+function tpMax(){return tps.scrollWidth-tps.clientWidth;}
+function setPanel(open,smooth){$("s-detail").classList.toggle("open",open);
+  tps.scrollTo({left:open?tpMax():0,behavior:smooth===false?"auto":"smooth"});syncBack();}
+(function(){tps.addEventListener("scroll",()=>{const open=tps.scrollLeft>tpMax()*0.5,d=$("s-detail");
+    if(open!==d.classList.contains("open")){d.classList.toggle("open",open);syncBack();}},{passive:true});
+  $("tpanel").addEventListener("click",e=>{const open=$("s-detail").classList.contains("open");
     if(!open){setPanel(true);return;}
     const t=e.target.closest(".tog");if(t){const el=$("midrows-"+t.dataset.tog);el.hidden=!el.hidden;t.classList.toggle("open",!el.hidden);}});})();
 $("peek").onclick=()=>setPanel(false);
@@ -888,10 +871,11 @@ function renderLines(){
 renderLines();
 $("lines").onclick=e=>{const t=e.target.closest(".ltog");if(t)t.closest(".lcard").classList.toggle("open");};
 function setTab(t){setTab0(t);if(window.syncBack)syncBack();}
-function setTab0(t){const two=t==="lines";$("tabs").classList.toggle("t2",two);$("tabtrack").classList.toggle("t2",two);
+function setTab0(t,fromScroll){const two=t==="lines";$("tabs").classList.toggle("t2",two);$("tabtrack").classList.toggle("t2",two);
+  if(!fromScroll){const c=document.querySelector(".tabclip");c.scrollTo({left:two?c.clientWidth:0,behavior:$("s-home").classList.contains("on")?"smooth":"auto"});}
   $("tab-trip").classList.toggle("on",!two);$("tab-lines").classList.toggle("on",two);$("tab-trip").setAttribute("aria-selected",!two);$("tab-lines").setAttribute("aria-selected",two);
   document.querySelectorAll("#nav button").forEach((b,i)=>b.classList.toggle("on",i===(two?1:0)));
-  hs.classList.toggle("away",two);$("go").style.opacity=two?0:1;$("go").style.pointerEvents=two?"none":"";}
+  hsc.classList.toggle("away",two);$("go").style.opacity=two?0:1;$("go").style.pointerEvents=two?"none":"";}
 $("tab-trip").onclick=()=>setTab("trip");
 // ---------------------------------------------------------------- BACK: buttons, phone back gesture / browser back, and edge swipe
 const curScreen=()=>document.querySelector(".screen.on").id;
@@ -924,18 +908,11 @@ addEventListener("popstate",()=>{if(skipPop){skipPop=false;return;}backEntry=fal
     if(!tgt){if(dx>70)goBack();return;}
     const done=dx>w*0.33;cur.style.transition="transform .2s ease-out";cur.style.transform=done?"translateX(100%)":"translateX(0)";
     setTimeout(()=>{cur.style.transition="";cur.style.transform="";cur.style.zIndex="";tgt.classList.remove("under");if(done)goBack(true);},210);},{passive:true});})();$("tab-lines").onclick=$("nav-lines").onclick=()=>setTab("lines");
-(function(){ // swipe the home area left/right to switch Lahore ↔ Lines
-  const clip=document.querySelector(".tabclip"),tr=$("tabtrack");let x0=null,y0=0,drag=false,dx=0;
-  clip.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse")return;x0=e.clientX;y0=e.clientY;drag=false;dx=0;});
-  clip.addEventListener("pointermove",e=>{if(x0===null)return;dx=e.clientX-x0;const dy=e.clientY-y0;
-    if(!drag&&Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.3){drag=true;tr.classList.add("drag");}
-    if(!drag)return;const two=tr.classList.contains("t2");let d=dx;if((!two&&d>0)||(two&&d<0))d=d/4;
-    tr.style.transform=`translateX(calc(${two?-50:0}% + ${d}px))`;});
-  const end=()=>{if(x0===null)return;x0=null;if(!drag)return;drag=false;tr.classList.remove("drag");tr.style.transform="";
-    const two=tr.classList.contains("t2");if(!two&&dx<-60)setTab("lines");else if(two&&dx>60)setTab("trip");};
-  clip.addEventListener("pointerup",end);clip.addEventListener("pointercancel",end);
-  clip.addEventListener("click",e=>{if(Math.abs(dx)>10){e.stopPropagation();e.preventDefault();}},true);})();
 document.querySelector("#nav button").onclick=()=>setTab("trip");
+(function(){ // the underline follows the native swipe; the tab state follows where it settles
+  const c=document.querySelector(".tabclip"),ind=document.querySelector("#tabs .tabind");let raf=0,st=0;
+  c.addEventListener("scroll",()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;const f=c.scrollLeft/Math.max(1,c.clientWidth);ind.style.transform=`translateX(${f*100}%)`;});
+    clearTimeout(st);st=setTimeout(()=>{const two=c.scrollLeft>c.clientWidth/2;if(two!==$("tabtrack").classList.contains("t2")){setTab0(two?"lines":"trip",true);if(window.syncBack)syncBack();}},90);},{passive:true});})();
 
 renderHist();requestAnimationFrame(()=>setHs(false));syncHome();
 setTimeout(()=>{const go=()=>{try{engStyle();initDmap();initMap();}catch(e){}};(window.requestIdleCallback||setTimeout)(go,{timeout:2500});},1200);
