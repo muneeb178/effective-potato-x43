@@ -766,12 +766,14 @@ function recolor(l){const id=l.id.toLowerCase(),p=l.paint=l.paint||{},has=(...w)
     else if(has("park","wood","grass","forest","garden","cemetery","pitch","landcover","nature","scrub","farm"))p["fill-color"]="#245c4c";
     else if(has("building"))p["fill-color"]="#3b4559";
     else if(has("aeroway","airport"))p["fill-color"]="#34405a";
+    else if(has("pier","road_area"))p["fill-color"]="#3a4458";
     else if(has("landuse","residential","industrial","commercial","school","hospital"))p["fill-color"]="#30394b";
     return;}
   if(l.type==="line"){
     if(has("water","river","canal","stream"))p["line-color"]="#2f64ad";
     else if(has("casing"))p["line-color"]="#222a37";
     else if(has("rail","transit"))p["line-color"]="#56617a";
+    else if(has("aeroway","runway","taxiway"))p["line-color"]="#4a556b";
     else if(has("motorway","trunk","primary"))p["line-color"]="#93a0b8";
     else if(has("secondary","tertiary"))p["line-color"]="#7a879e";
     else if(has("road","highway","street","minor","service","path","track","bridge","tunnel","transportation"))p["line-color"]="#5d6880";
@@ -936,6 +938,7 @@ addEventListener("popstate",()=>{if(skipPop){skipPop=false;return;}backEntry=fal
 document.querySelector("#nav button").onclick=()=>setTab("trip");
 
 renderHist();requestAnimationFrame(()=>setHs(false));syncHome();
+setTimeout(()=>{const go=()=>{try{engStyle();initDmap();initMap();}catch(e){}};(window.requestIdleCallback||setTimeout)(go,{timeout:2500});},1200);
 window.__plan=plan;window.__LINES=LINES;window.__T=TRANSFERS;window.__state=state;
 </script>
 </body>
