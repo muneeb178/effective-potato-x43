@@ -3,153 +3,214 @@
 <head>
 <meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#141619">
 <title>Lahore Transit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 :root{
-  /* One visual world: Jakdojade-style night UI. Phone-first column, card list + vertical timeline. */
-  --bg:#141619; --surface:#1f2226; --surface-2:#2a2e33; --line:#33383e;
-  --text:#f2f4f5; --muted:#9aa1a8; --accent:#1fc77e; --blue:#1f9ee0;
-  --ol:#f28c28; --mb:#d6262e; --walk:#c8ced4;
+  /* Jakdojade-style night UI: one phone column, cards on black, vertical timeline. */
+  --bg:#141619; --surface:#1f2226; --surface-2:#2c3035; --line:#33383e; --panel:#191b1e;
+  --text:#f2f4f5; --muted:#9aa1a8; --accent:#1fc77e; --blue:#1f9ee0; --yellow:#ffd43b;
+  --ol:#f28c28; --mb:#d6262e;
   --font:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color-scheme:dark;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#0b0c0e;color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
-button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+html,body{height:100%;background:#0b0c0e;color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+button,label{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.phone{position:relative;max-width:440px;height:100%;margin:0 auto;background:var(--bg);overflow:hidden;display:flex;flex-direction:column}
+.phone{position:relative;max-width:440px;height:100%;margin:0 auto;background:var(--bg);overflow:hidden}
 .screen{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg)}
 .screen.on{display:flex}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .tnum{font-variant-numeric:tabular-nums}
+[hidden]{display:none!important}
+.note{color:var(--muted);font-size:14px;padding:16px 20px;line-height:1.45}
 
 /* header */
-.hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 10px;gap:12px}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px;gap:12px;flex:none}
 .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:21px;letter-spacing:-.2px}
-.pill{background:var(--surface-2);border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px}
-.iconbtn{width:40px;height:40px;border-radius:999px;display:grid;place-items:center}
-.iconbtn:hover{background:var(--surface-2)}
+.pill{background:var(--surface-2);border-radius:999px;padding:8px 15px;font-weight:600;font-size:15px}
+.hright{display:flex;gap:6px;align-items:center}
+.iconbtn{width:42px;height:42px;border-radius:999px;display:grid;place-items:center;flex:none}
+.iconbtn.round{background:var(--surface-2);width:50px;height:50px}
 
 /* tabs */
-.tabs{display:flex;border-bottom:3px solid var(--surface-2);margin:0 0 14px}
-.tab{flex:1;padding:12px 0 12px;font-weight:600;font-size:17px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px;position:relative}
+.tabs{display:flex;border-bottom:3px solid var(--surface-2);margin:0 0 16px;flex:none}
+.tab{flex:1;padding:12px 0;font-weight:600;font-size:18px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px;position:relative}
 .tab.on{color:var(--text)}
 .tab.on::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:var(--text)}
 
-/* search fields */
-.fields{padding:0 16px;display:grid;gap:10px;position:relative}
-.field{display:flex;align-items:center;gap:14px;background:var(--surface);border-radius:12px;padding:15px 16px;text-align:left;width:100%;min-height:54px}
+/* from / to */
+.fields{padding:0 16px;display:grid;grid-template-columns:minmax(0,1fr);gap:10px;position:relative;flex:none}
+.field{display:flex;align-items:center;gap:16px;background:var(--surface);border-radius:12px;padding:15px 18px;text-align:left;width:100%;min-height:56px}
 .field .ph{color:var(--muted);font-size:18px}
-.field .val{font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dot{width:16px;height:16px;border-radius:50%;flex:none;border:4px solid var(--accent);background:var(--bg)}
+.field .val{font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:30px}
+.dot{width:17px;height:17px;border-radius:50%;flex:none;border:4.5px solid var(--accent);background:var(--bg)}
 .dot.b{border-color:var(--blue)}
-.swap{position:absolute;right:28px;top:39px;width:34px;height:34px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;border:2px solid var(--bg)}
-.row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 6px}
-.chip{background:var(--surface);border-radius:999px;padding:10px 16px;font-weight:600;font-size:16px;display:flex;gap:8px;align-items:center}
-.go{background:var(--accent);color:#06200f;font-weight:700;border-radius:999px;padding:11px 20px;font-size:16px}
-.go:disabled{opacity:.35}
+.swap{position:absolute;right:30px;top:41px;width:34px;height:34px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;border:2px solid var(--bg)}
+.row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 16px;flex:none}
+.chip{position:relative;background:var(--surface);border-radius:999px;padding:10px 18px;font-weight:600;font-size:17px;display:flex;gap:8px;align-items:center}
+#when-in{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.go{background:var(--accent);color:#06200f;font-weight:700;border-radius:999px;padding:11px 20px;font-size:17px}
 
-.sheet{margin-top:14px;background:var(--surface);border-radius:18px 18px 0 0;padding:10px 0 24px;flex:1}
-.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:4px auto 10px}
-.sheet h2{font-size:24px;font-weight:700;padding:4px 20px 6px;letter-spacing:-.3px}
-.hist{display:block;width:100%;text-align:left;padding:12px 20px;border-bottom:1px solid var(--line)}
-.hist:hover{background:var(--surface-2)}
-.hist .l{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:500;line-height:1.35}
-.hist .arr{color:var(--muted);font-size:13px;padding-left:4px}
-.note{color:var(--muted);font-size:13px;padding:14px 20px;line-height:1.45}
+/* ad slots: placeholder boxes in standard AdMob sizes */
+.adband{background:#000;border-top:1px solid #26292d;border-bottom:1px solid #26292d;padding:6px 0 10px;text-align:center;flex:none}
+.adband .lbl{font-size:12px;letter-spacing:3px;color:var(--muted);margin-bottom:6px;font-weight:600}
+.adbox{margin:0 auto;width:300px;max-width:calc(100% - 24px);height:250px;border:1px dashed #3a3f45;display:grid;place-items:center;color:#5f666e;font-size:13px;background:repeating-linear-gradient(45deg,#0c0d0f 0 10px,#111316 10px 20px)}
+.adband.slim .adbox{width:320px;height:100px}
+.homebody{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+
+/* routes history bottom sheet */
+.hsheet{position:absolute;left:8px;right:8px;bottom:64px;height:150px;background:var(--surface);border-radius:18px 18px 0 0;z-index:20;display:flex;flex-direction:column;box-shadow:0 -6px 24px #0009;
+  transition:height .28s cubic-bezier(.2,.8,.2,1),left .28s,right .28s,border-radius .28s}
+.hsheet[hidden]{display:none}
+.hsheet.open{left:0;right:0;border-radius:0}
+.hsheet.drag{transition:none}
+.hs-top{touch-action:none;cursor:grab;padding:8px 0 2px;flex:none}
+.grab{width:46px;height:5px;border-radius:3px;background:#4a5056;margin:4px auto 8px}
+.hs-title{display:flex;justify-content:space-between;align-items:center;padding:0 12px 0 22px}
+.hs-title h2{font-size:25px;font-weight:700;letter-spacing:-.4px;padding:0 0 4px}
+#hs-close{display:none}
+.hsheet.open #hs-close{display:grid}
+.hsheet.open .grab{visibility:hidden;height:0;margin:0}
+#hist{flex:1;overflow-y:auto;padding-bottom:20px}
+.hsheet:not(.open) #hist{overflow:hidden}
+.hsheet:not(.open) .hday{display:none}
+.hday{color:var(--muted);font-size:16px;padding:18px 22px 4px}
+.hist{display:block;width:100%;text-align:left;padding:10px 22px}
+.hist .l{display:flex;align-items:center;gap:12px;font-size:17px;font-weight:500;line-height:1.3}
+.hist .arr{color:var(--muted);font-size:14px;padding:1px 0 1px 3px}
 
 /* bottom nav */
-.nav{display:flex;border-top:1px solid var(--line);background:var(--bg);padding:8px 0 14px}
-.nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:13px;color:var(--muted)}
+.nav{display:flex;border-top:1px solid var(--line);background:var(--bg);padding:8px 0 calc(12px + env(safe-area-inset-bottom));flex:none;position:relative;z-index:25}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:14px;color:var(--muted)}
 .nav button.on{color:var(--text)}
 
-/* search screen */
-.sbar{display:flex;gap:10px;align-items:center;padding:14px 12px 10px}
-.sbar input{flex:1;background:var(--surface);border:0;border-radius:12px;padding:15px 16px;color:var(--text);font:inherit;font-size:17px}
-.opt{display:flex;gap:14px;align-items:center;width:100%;text-align:left;padding:13px 18px;border-bottom:1px solid var(--surface-2)}
-.opt:hover{background:var(--surface)}
-.ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;font-size:12px;font-weight:800}
-.opt .t{font-size:16px;font-weight:600}
-.opt .s{font-size:13px;color:var(--muted);margin-top:2px}
+/* search */
+.sf{padding:0 8px 0 18px}
+.sf input{flex:1;min-width:0;width:100%;background:none;border:0;color:var(--text);font:inherit;font-size:18px;font-weight:500;padding:16px 0;outline:none}
+.sf input::placeholder{color:var(--muted);font-weight:400}
+.sf.act{background:var(--surface-2)}
+#opts{background:#000;margin-top:14px}
+.opt{display:flex;gap:16px;align-items:center;width:100%;text-align:left;padding:14px 10px 14px 18px;border-bottom:2px solid #000;background:var(--surface)}
+.oico{width:42px;height:42px;border-radius:50%;border:2.5px solid #e6e9ec;display:grid;place-items:center;flex:none;color:#e6e9ec}
+.oico.st{border-radius:11px;font-weight:800;font-size:13px}
+.otx{flex:1;min-width:0}
+.opt .t{font-size:18px;font-weight:600;line-height:1.25}
+.opt .s{font-size:14px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.km{color:var(--blue)}
+.fill{width:44px;height:44px;display:grid;place-items:center;color:#c8ced4;flex:none;border-radius:50%}
+.sec{color:var(--muted);font-size:13px;padding:16px 18px 8px;background:#000;letter-spacing:.3px}
+.loading{padding:16px 18px;color:var(--muted);font-size:14px;background:var(--surface)}
+.selmap{display:flex;align-items:center;gap:18px;padding:18px 22px calc(18px + env(safe-area-inset-bottom));font-size:18px;font-weight:600;background:var(--surface);border-top:8px solid #000;flex:none;width:100%;text-align:left}
 
 /* results */
-.rhead{display:flex;gap:12px;padding:16px 16px 14px;align-items:center;border-bottom:1px solid var(--line)}
-.rhead .ft{flex:1;display:grid;grid-template-columns:18px 1fr;gap:6px 12px;align-items:center;font-size:17px;font-weight:600;min-width:0}
+.rhead{display:flex;gap:12px;padding:4px 16px 14px;align-items:center;flex:none}
+.rhead .ft{flex:1;display:grid;grid-template-columns:18px 1fr;gap:8px 14px;align-items:center;font-size:18px;font-weight:600;min-width:0;text-align:left}
 .rhead .ft div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rhead .vline{grid-row:1/3;align-self:stretch;display:flex;flex-direction:column;align-items:center}
-.card{display:block;width:calc(100% - 24px);margin:12px;background:var(--surface);border-radius:16px;padding:16px 16px 14px;text-align:left}
-.card:hover{background:#25292e}
-.card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.dep small{display:block;font-size:14px;color:var(--muted);font-weight:500}
-.dep b{font-size:40px;font-weight:800;letter-spacing:-1.5px;line-height:1}
-.dep b i{font-style:normal;font-size:18px;font-weight:700;letter-spacing:0;margin-left:2px}
-.badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-.badge{border-radius:6px;padding:3px 8px;font-weight:800;font-size:14px;color:#fff;display:inline-flex;align-items:center;gap:5px}
+.vline{grid-row:1/3;align-self:stretch;display:flex;flex-direction:column;align-items:center}
+#cards{background:#000}
+.card{display:grid;grid-template-columns:auto 1fr;gap:0 18px;width:calc(100% - 24px);margin:12px;background:var(--surface);border-radius:18px;padding:18px 18px 16px;text-align:left;align-items:start}
+.card:active{background:#262a2f}
+.dep{min-width:86px}
+.dep small{display:block;font-size:15px;color:#d5dade;font-weight:500}
+.dep b{display:block;font-size:46px;font-weight:700;letter-spacing:-2px;line-height:1.05;margin-top:2px}
+.dep b i{font-style:normal;font-size:20px;font-weight:600;letter-spacing:0;margin-left:3px}
+.crt{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:2px}
+.badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.mode{display:inline-flex;align-items:center;gap:6px;color:#e6e9ec}
+.chev{color:var(--muted)}
+.badge{border-radius:7px;padding:3px 8px;font-weight:800;font-size:15px;color:#fff;display:inline-flex;align-items:center}
 .badge.ol{background:var(--ol);color:#2a1400}
 .badge.mb{background:var(--mb)}
-.tot{color:var(--muted);font-size:15px;font-weight:600;text-align:right;margin-top:6px}
-.legs{display:flex;flex-wrap:wrap;align-items:center;gap:6px 7px;margin-top:12px;font-size:14px;color:var(--muted)}
+.tot{color:var(--muted);font-size:17px;font-weight:600;white-space:nowrap}
+.legs{display:flex;flex-wrap:wrap;align-items:center;gap:6px 7px;margin-top:12px;font-size:15px;color:#c3c9ce}
+.wk{display:inline-flex;align-items:center;gap:2px}
 .t-g{background:var(--accent);color:#06200f;font-weight:700;border-radius:999px;padding:2px 9px}
 .t-b{background:var(--blue);color:#021623;font-weight:700;border-radius:999px;padding:2px 9px}
-.fare{display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
-.fare b{color:var(--text)}
+.cmeta{font-size:13px;color:var(--muted);margin-top:9px}
 .banner{margin:12px;padding:12px 14px;border-radius:12px;background:#3a2a10;color:#ffd391;font-size:14px;line-height:1.45}
+.proto{font-size:12px;color:var(--muted);text-align:center;padding:6px 16px 0}
 
-/* detail */
-.dsum{padding:4px 18px 16px;border-bottom:1px solid var(--line)}
-.tl{position:relative;padding:8px 0 30px}
-.st{display:grid;grid-template-columns:86px 1fr;gap:0 12px;padding:0 18px}
+/* trip detail: map left, sliding timeline right */
+.dsum{padding:2px 18px 16px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:0 18px;align-items:start;flex:none}
+.dsplit{position:relative;flex:1;overflow:hidden;background:#1a1d21;min-height:0}
+.dad{display:none}
+#s-detail.open .dad{display:block}
+#dmap{position:absolute;inset:0}
+.tpanel{position:absolute;top:0;bottom:0;left:46px;right:0;background:var(--panel);z-index:600;box-shadow:-8px 0 20px #0007;touch-action:pan-y;
+  transform:translateX(calc(100% - 104px));transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+#s-detail.open .tpanel{transform:none}
+.tscroll{height:100%;overflow-y:auto;padding:10px 0 120px}
+.peek{position:absolute;left:0;top:0;bottom:0;width:46px;z-index:650;display:none}
+#s-detail.open .peek{display:block}
+.dfoot{position:absolute;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));display:none;gap:10px;z-index:700}
+#s-detail.open .dfoot{display:flex}
+.fbtn{border-radius:14px;padding:14px 16px;font-weight:700;font-size:17px;display:flex;gap:8px;align-items:center;justify-content:center;box-shadow:0 4px 16px #0009;white-space:nowrap}
+.fbtn.w{background:#f2f4f5;color:#121417}
+.fbtn.y{background:var(--yellow);color:#1b1600;flex:1}
+.st{display:grid;grid-template-columns:104px 1fr;gap:0 8px;padding:0 16px 0 0}
 .st .c{display:flex;flex-direction:column;align-items:center}
-.st .b{padding:6px 0 14px;min-width:0}
-.time{border-radius:999px;font-weight:700;padding:4px 10px;font-size:15px;background:var(--surface-2)}
+.st .b{padding:8px 0 16px;min-width:0}
+.st.sep .b{border-top:10px solid #000;padding-top:18px}
+.st.sep .c{padding-top:18px}
+.time{border-radius:999px;font-weight:700;padding:4px 11px;font-size:16px;background:var(--surface-2)}
 .time.g{background:var(--accent);color:#06200f}
 .time.bl{background:var(--blue);color:#021623}
+.time.o::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;border:3px solid #fff;margin-right:6px;vertical-align:-1px}
 .vbar{width:6px;flex:1;min-height:20px;border-radius:3px}
-.vdots{flex:1;min-height:30px;width:6px;background:radial-gradient(circle,var(--muted) 2.5px,transparent 3px) center/6px 13px repeat-y}
-.circ{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:none;margin:6px 0}
-.sname{font-size:19px;font-weight:700;line-height:1.25}
-.sub{color:var(--muted);font-size:14px;margin-top:4px;line-height:1.4}
-.ride{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:16px}
+.vdots{flex:1;min-height:34px;width:6px;background:radial-gradient(circle,#7d848b 2.6px,transparent 3px) center/6px 14px repeat-y}
+.circ{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex:none;margin:6px 0}
+.sname{font-size:20px;font-weight:700;line-height:1.25}
+.sub{color:var(--muted);font-size:14px;margin-top:5px;line-height:1.4}
+.ride{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:16px;flex-wrap:wrap}
 .ride .dur{margin-left:auto;color:var(--muted)}
-.freq{font-size:15px;margin-top:8px}
-.tog{display:flex;justify-content:space-between;width:100%;padding:12px 0 4px;margin-top:10px;border-top:1px solid var(--line);font-size:16px;font-weight:600}
+.freq{font-size:16px;margin-top:10px}
+.tog{display:flex;justify-content:space-between;width:100%;padding:14px 0 10px;margin-top:12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:17px;font-weight:600}
+.walk{display:flex;justify-content:space-between;align-items:center;font-size:17px;padding:10px 0}
+.walk span:last-child{color:var(--muted);white-space:nowrap;padding-left:10px}
+.pm{display:grid;grid-template-columns:104px 1fr;gap:0 8px;padding:0 16px 0 0;height:58px}
+.pm .c{display:flex;flex-direction:column;align-items:center;justify-content:space-between}
+.pm .c .vbar{min-height:8px}
+.pm .mt{font-size:16px;font-weight:700;padding:3px 0}
+.pm .b{display:flex;align-items:center;gap:8px;font-size:16px;min-width:0}
+.pm .b .n{color:var(--muted)}
+
+/* lines screen */
 .mid{display:grid;grid-template-columns:86px 1fr;gap:0 12px;padding:0 18px}
 .mid .c{display:flex;justify-content:center}
 .mid .b{display:flex;gap:10px;padding:9px 0;font-size:15px;color:#d5dade}
-.mid .b .tt{color:var(--muted);width:44px;flex:none}
-.walk{display:flex;justify-content:space-between;align-items:center;font-size:16px;padding:12px 0}
-.walk span:last-child{color:var(--muted);white-space:nowrap;padding-left:10px}
-.footer{display:flex;gap:10px;padding:12px 16px 18px;border-top:1px solid var(--line);background:var(--bg)}
-.btn{flex:1;background:#f2f4f5;color:#121417;border-radius:14px;padding:14px;font-weight:700;font-size:16px;display:flex;justify-content:center;gap:8px;align-items:center}
-.btn.dark{background:var(--surface-2);color:var(--text)}
+.mid .b .tt{color:var(--muted);width:50px;flex:none}
 
-/* map */
-.mapwrap{position:relative;flex:1;overflow:hidden;background:#1a1d21;touch-action:none}
-.mapctl{position:absolute;left:14px;bottom:18px;display:grid;gap:10px}
-.mapctl button{width:46px;height:46px;border-radius:50%;background:#26292e;font-size:22px;font-weight:700;box-shadow:0 2px 10px #0007}
-.legend{position:absolute;right:12px;top:12px;background:#000a;border-radius:10px;padding:8px 10px;font-size:12px;display:grid;gap:4px}
+/* maps */
+.mapwrap{position:relative;flex:1;overflow:hidden;background:#1a1d21}
+.mapctl{position:absolute;left:14px;bottom:calc(18px + env(safe-area-inset-bottom));display:grid;gap:12px}
+.mapctl button{width:54px;height:54px;border-radius:50%;background:#1d2024;display:grid;place-items:center;box-shadow:0 2px 12px #0008}
+.legend{position:absolute;right:12px;top:12px;background:#000b;border-radius:10px;padding:8px 10px;font-size:12px;display:grid;gap:4px}
 .legend span{display:flex;align-items:center;gap:6px}
 .legend i{display:inline-block;width:16px;height:4px;border-radius:2px}
-.pickbar{position:absolute;left:12px;right:12px;bottom:18px;background:var(--surface);border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 4px 20px #000a}
+.pickbar{position:absolute;left:12px;right:12px;bottom:calc(18px + env(safe-area-inset-bottom));background:var(--surface);border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 4px 20px #000a}
 .pickbar[hidden]{display:none}
 .pickbar .txt{flex:1;font-size:14px;color:var(--muted)}
-#lmap{position:absolute;inset:0;background:#1a1d21}
-#lmap .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.6)}
+.pickbar .go:disabled{opacity:.35}
+#lmap{position:absolute;inset:0}
+.dark-tiles .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.6)}
 .leaflet-container{font-family:var(--font);background:#1a1d21}
 .leaflet-control-attribution{background:#000a!important;color:#9aa1a8!important;font-size:10px}
 .leaflet-control-attribution a{color:#c8ced4!important}
 .leaflet-tooltip.st-label{background:#141619e6;border:0;color:#e6e9ec;font-weight:600;font-size:12px;padding:2px 6px;border-radius:6px;box-shadow:none}
 .leaflet-tooltip.st-label::before{display:none}
-.pinlbl{background:#f2f4f5;color:#121417;font-weight:700;font-size:13px;padding:3px 9px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-150%);display:inline-block}
-.loading{padding:14px 18px;color:var(--muted);font-size:14px}
-.proto{font-size:11px;color:var(--muted);text-align:center;padding:4px 0 0}
-@media (prefers-reduced-motion:no-preference){.screen.on{animation:fade .16s ease-out}@keyframes fade{from{opacity:.6}to{opacity:1}}}
+.pinlbl{background:#f2f4f5;color:#121417;font-weight:700;font-size:15px;padding:5px 11px;border-radius:9px;white-space:nowrap;transform:translate(-50%,-160%);display:inline-block;box-shadow:0 2px 8px #0007}
+
+.toast{position:absolute;left:50%;bottom:110px;transform:translate(-50%,20px);background:#f2f4f5;color:#121417;padding:11px 16px;border-radius:12px;font-size:14px;font-weight:600;max-width:86%;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:2000}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){.tpanel,.hsheet,.toast{transition:none}}
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </head>
 <body>
 <div class="phone" id="phone">
@@ -161,98 +222,124 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
       <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="7" cy="22" r="3.5" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="23" cy="7" r="3.5" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M9.5 19.5 C14 15, 16 14, 20.5 9.5" stroke="#1fc77e" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>
       <span>Lahore Transit</span>
     </div>
-    <span class="pill tnum" id="clock">--:--</span>
+    <div class="hright">
+      <span class="pill tnum" id="clock">--:--</span>
+      <button class="iconbtn" id="profile" aria-label="Account"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></button>
+    </div>
   </div>
-  <div class="tabs" role="tablist">
-    <button class="tab on" role="tab" aria-selected="true">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 11h16M8 21l2-3M16 21l-2-3"/><circle cx="8" cy="14.5" r="1" fill="currentColor"/><circle cx="16" cy="14.5" r="1" fill="currentColor"/></svg>
-      Lahore
-    </button>
-    <button class="tab" role="tab" aria-selected="false" id="tab-lines">Lines</button>
+  <div class="homebody">
+    <div class="tabs" role="tablist">
+      <button class="tab on" role="tab" aria-selected="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V10l4-2v13M9 21V5l5-2v18M14 21V9l5 2v10"/></svg>
+        Lahore <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <button class="tab" role="tab" aria-selected="false" id="tab-lines">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 10h14M8 21l2-4M16 21l-2-4"/></svg>
+        Lines
+      </button>
+    </div>
+    <div class="fields">
+      <button class="field" id="f-from"><span class="dot"></span><span class="ph" id="from-txt">From where?</span></button>
+      <button class="field" id="f-to"><span class="dot b"></span><span class="ph" id="to-txt">Where to?</span></button>
+      <button class="swap" id="swap" aria-label="Swap start and destination" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></svg></button>
+    </div>
+    <div class="row" id="home-row">
+      <label class="chip tnum"><span id="when">Now</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="m6 9 6 6 6-6"/></svg><input type="time" id="when-in" aria-label="Departure time"></label>
+      <button class="chip" id="opts-btn">Options <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h8M15 8h6M3 16h4M11 16h10"/><circle cx="13" cy="8" r="2"/><circle cx="9" cy="16" r="2"/></svg></button>
+      <button class="go" id="go" hidden>Find routes</button>
+    </div>
+    <div class="adband" id="ad-home"><div class="lbl">AD</div><div class="adbox">Ad space · 300 × 250</div></div>
   </div>
-  <div class="fields">
-    <button class="field" id="f-from"><span class="dot"></span><span class="ph" id="from-txt">From where?</span></button>
-    <button class="field" id="f-to"><span class="dot b"></span><span class="ph" id="to-txt">Where to?</span></button>
-    <button class="swap" id="swap" aria-label="Swap start and destination"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></svg></button>
-  </div>
-  <div class="row">
-    <span class="chip tnum" id="when">Leave now</span>
-    <button class="go" id="go" disabled>Find routes</button>
-  </div>
-  <div class="sheet scroll">
-    <div class="grab"></div>
-    <h2>Recent trips</h2>
+  <div class="hsheet" id="hsheet" hidden>
+    <div class="hs-top" id="hs-top"><div class="grab"></div>
+      <div class="hs-title"><h2>Routes history</h2><button class="iconbtn" id="hs-close" aria-label="Close history"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    </div>
     <div id="hist"></div>
-    <p class="note">Prototype covers the Metrobus (27 stations) and Orange Line (26 stations), with the walking transfer at Anarkali / MAO College. Speedo feeders and e-buses come next.</p>
   </div>
-  <nav class="nav">
-    <button class="on"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 2 12l10 10 10-10Zm1 13v-3H9v3H7v-4a1 1 0 0 1 1-1h5V7l4 4Z"/></svg>Trip</button>
-    <button id="nav-lines"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Lines</button>
-    <button id="nav-map"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2Z"/><path d="M9 4v14M15 6v14"/></svg>Map</button>
+  <nav class="nav" id="nav">
+    <button class="on"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 2 12l10 10 10-10Zm1 13v-3H9v3H7v-4a1 1 0 0 1 1-1h5V7l4 4Z"/></svg>Trip</button>
+    <button id="nav-lines"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Lines</button>
+    <button id="nav-map"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2Z"/><path d="M9 4v14M15 6v14"/></svg>Map</button>
   </nav>
 </section>
 
 <!-- SEARCH -->
 <section class="screen" id="s-search">
-  <div class="sbar">
-    <button class="iconbtn" id="search-back" aria-label="Back"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M15 5 8 12l7 7"/></svg></button>
-    <label for="q" class="visually-hidden" style="position:absolute;left:-9999px">Search</label>
-    <input id="q" autocomplete="off" placeholder="Station, place or address">
+  <div class="hdr">
+    <button class="iconbtn" id="search-back" aria-label="Back"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
+    <span class="pill tnum" id="s-clock"></span>
+  </div>
+  <div class="fields">
+    <div class="field sf" id="sf-from"><span class="dot"></span><input id="q-from" placeholder="From where?" autocomplete="off" enterkeyhint="search"><button class="iconbtn" id="loc-btn" aria-label="Use my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
+    <div class="field sf" id="sf-to"><span class="dot b"></span><input id="q-to" placeholder="Where to?" autocomplete="off" enterkeyhint="search"></div>
   </div>
   <div class="scroll" id="opts"></div>
+  <button class="selmap" id="selmap"><svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a7 7 0 0 0-7 7c0 5.3 7 13 7 13s7-7.7 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>Select from map</button>
 </section>
 
 <!-- RESULTS -->
 <section class="screen" id="s-results">
-  <div class="hdr" style="padding-bottom:4px">
-    <button class="iconbtn" id="res-back" aria-label="Back"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
+  <div class="hdr">
+    <button class="iconbtn" id="res-back" aria-label="Back"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
     <span class="pill tnum" id="res-clock"></span>
   </div>
   <div class="rhead">
-    <div class="ft">
-      <span class="vline"><span class="dot" style="width:18px;height:18px"></span><span style="flex:1;width:3px;background:var(--accent);min-height:14px"></span><span class="dot b" style="width:18px;height:18px"></span></span>
+    <button class="ft" id="r-edit">
+      <span class="vline"><span class="dot" style="width:19px;height:19px"></span><span style="flex:1;width:3px;background:var(--accent);min-height:12px"></span><span class="dot b" style="width:19px;height:19px"></span></span>
       <div id="r-from"></div><div id="r-to"></div>
-    </div>
+    </button>
+    <button class="iconbtn round" id="r-opts" aria-label="Route options"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M3 8h8M15 8h6M3 16h4M11 16h10"/><circle cx="13" cy="8" r="2"/><circle cx="9" cy="16" r="2"/></svg></button>
   </div>
+  <div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div>
   <div class="scroll" id="cards"></div>
 </section>
 
-<!-- DETAIL -->
+<!-- TRIP DETAIL -->
 <section class="screen" id="s-detail">
-  <div class="hdr" style="padding-bottom:4px">
-    <button class="iconbtn" id="det-back" aria-label="Back"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
+  <div class="hdr">
+    <button class="iconbtn" id="det-back" aria-label="Back"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
     <span class="pill tnum" id="det-fare"></span>
   </div>
-  <div class="scroll" id="detail"></div>
-  <div class="footer">
-    <button class="btn dark" id="det-map"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2Z"/><path d="M9 4v14M15 6v14"/></svg>Show on map</button>
-    <button class="btn" id="det-nav"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m12 2 8 10-8 10-8-10Z"/><path d="M10 13v-2h4l-2-2"/></svg>Navigate</button>
+  <div class="adband slim dad"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div>
+  <div class="dsum" id="dsum"></div>
+  <div class="dsplit">
+    <div id="dmap" class="dark-tiles"></div>
+    <div class="mapctl" style="z-index:500"><button id="dlocate" aria-label="Show my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
+    <div class="peek" id="peek"></div>
+    <div class="tpanel" id="tpanel"><div class="tscroll" id="detail"></div></div>
+    <div class="dfoot">
+      <button class="fbtn w" id="d-alarm" aria-label="Departure reminder"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M5 3 2 6M19 3l3 3"/></svg></button>
+      <button class="fbtn w" id="d-nav"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m12 2 10 10-10 10L2 12Z"/><path d="M9 14v-3h5M12 8l3 3-3 3"/></svg>Navigate</button>
+      <button class="fbtn y" id="d-fare"></button>
+    </div>
   </div>
 </section>
 
-<!-- MAP -->
+<!-- MAP (network + pick a point) -->
 <section class="screen" id="s-map">
-  <div class="hdr" style="padding-bottom:8px">
-    <button class="iconbtn" id="map-back" aria-label="Back"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
+  <div class="hdr">
+    <button class="iconbtn" id="map-back" aria-label="Back"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
     <span style="font-weight:700;font-size:18px" id="map-title">Network map</span>
-    <span style="width:40px"></span>
+    <span style="width:42px"></span>
   </div>
-  <div class="mapwrap" id="mapwrap">
-    <div id="lmap"></div>
-    <div class="legend" style="z-index:500"><span><i style="background:var(--ol)"></i>Orange Line</span><span><i style="background:var(--mb)"></i>Metrobus</span><span><i style="background:repeating-linear-gradient(90deg,#c8ced4 0 3px,transparent 3px 6px)"></i>Walk</span></div>
-    <div class="mapctl" id="mapctl" style="z-index:500"><button id="locate" aria-label="Show my location"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
+  <div class="mapwrap">
+    <div id="lmap" class="dark-tiles"></div>
+    <div class="legend" id="legend" style="z-index:500"><span><i style="background:var(--ol)"></i>Orange Line</span><span><i style="background:var(--mb)"></i>Metrobus</span></div>
+    <div class="mapctl" id="mapctl" style="z-index:500"><button id="locate" aria-label="Show my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
     <div class="pickbar" id="pickbar" hidden style="z-index:500"><span class="txt" id="pick-txt">Tap the map to set the point</span><button class="go" id="pick-ok" disabled>Use this point</button></div>
   </div>
 </section>
 
 <!-- LINES -->
 <section class="screen" id="s-lines">
-  <div class="hdr" style="padding-bottom:8px">
-    <button class="iconbtn" id="lines-back" aria-label="Back"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
-    <span style="font-weight:700;font-size:18px">Lines</span><span style="width:40px"></span>
+  <div class="hdr">
+    <button class="iconbtn" id="lines-back" aria-label="Back"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
+    <span style="font-weight:700;font-size:18px">Lines</span><span style="width:42px"></span>
   </div>
   <div class="scroll" id="lines"></div>
 </section>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 </div>
 
 <script>
@@ -347,31 +434,59 @@ function timeLegs(legsIn,startMin){
   return{legs,start:startMin,end:t,total:t-startMin,fare,firstDep,rides,walkTot:legs.filter(l=>l.type==="walk").reduce((a,l)=>a+l.min,0)};
 }
 
+
 // ---------------------------------------------------------------- UI STATE
 const $=id=>document.getElementById(id);
-const state={from:null,to:null,picking:null,result:null,trip:null,mapMode:"network"};
+const state={from:null,to:null,picking:"from",result:null,trip:null,mapMode:"network",when:null,future:false,lastPos:null,pickPt:null};
 const fmt=m=>{m=((Math.round(m)%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");};
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes();};
-function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));}
-function tickClock(){$("clock").textContent=fmt(nowMin());$("res-clock").textContent=fmt(nowMin());}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));
+  if(id==="s-home")requestAnimationFrame(()=>{renderHist();setHs(false);});}
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),2800);}
+function tickClock(){const t=fmt(nowMin());["clock","res-clock","s-clock"].forEach(i=>$(i).textContent=t);}
 setInterval(tickClock,15000);tickClock();
 
-const ICON_STATION=l=>`<span class="ico" style="background:${LINES[l].color};color:${l==="OL"?"#2a1400":"#fff"}">${LINES[l].short}</span>`;
-const ICON_PLACE=`<span class="ico" style="background:var(--surface-2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa1a8" stroke-width="2"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg></span>`;
+const SVG={
+  walk:'<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="13" cy="4" r="2"/><path d="M13.5 7.5 10 9l-1.5 4.5 1.8.6L11.4 11l1 3.6L9 21h2.2l2.9-5.4 1.7 5.4H18l-2.4-7-1-4.2 1.6 2.3 2.8.9.4-1.8-2.2-.7Z"/></svg>',
+  bus:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 10h16M7 21v-3M17 21v-3"/><circle cx="8" cy="14" r="1" fill="currentColor"/><circle cx="16" cy="14" r="1" fill="currentColor"/></svg>',
+  train:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 10h14M8 21l2-4M16 21l-2-4"/><circle cx="9" cy="13.5" r="1" fill="currentColor"/><circle cx="15" cy="13.5" r="1" fill="currentColor"/></svg>',
+  pin:'<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.3 7 13 7 13s7-7.7 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>',
+  clock:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>',
+  fill:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 18 6 6M6 14V6h8"/></svg>'
+};
+const modeSvg=line=>line==="OL"?SVG.train:SVG.bus;
 
-function setPoint(which,p){state[which]=p;const el=$(which+"-txt");el.textContent=p.name;el.className="val";$("go").disabled=!(state.from&&state.to);}
+function setPoint(which,p){state[which]=p;const el=$(which+"-txt");el.textContent=p.name;el.className="val";syncHome();}
+function syncHome(){const both=!!(state.from&&state.to);$("go").hidden=!both;$("opts-btn").hidden=both;$("swap").hidden=!(state.from||state.to);}
+$("swap").onclick=()=>{const a=state.from,b=state.to;state.from=null;state.to=null;
+  ["from","to"].forEach(w=>{$(w+"-txt").textContent=w==="from"?"From where?":"Where to?";$(w+"-txt").className="ph";});
+  if(b)setPoint("from",b);if(a)setPoint("to",a);syncHome();};
+$("when-in").onchange=e=>{const v=e.target.value;if(!v){state.when=null;$("when").textContent="Now";return;}const[h,m]=v.split(":").map(Number);state.when=h*60+m;$("when").textContent=v;};
+$("opts-btn").onclick=$("r-opts").onclick=()=>toast("Route options (fewer changes, less walking) are coming soon.");
+$("profile").onclick=()=>toast("Accounts come later.");
+$("go").onclick=()=>runSearch();
 
-// search
-const ALL=[...STATIONS.map(s=>({name:s.name+" station",lat:s.lat,lng:s.lng,kind:"st",line:s.line,sub:LINES[s.line].name+(s.under?" · underground":"")})),...PLACES.map(([n,lat,lng])=>({name:n,lat,lng,kind:"pl",sub:"Place"}))];
-let onlineHits=[],searchSeq=0,searchTimer=null;
-function optHTML(x,i,src){return `<button class="opt" data-src="${src}" data-i="${i}">${x.kind==="st"?ICON_STATION(x.line):ICON_PLACE}<div><div class="t">${x.name}</div><div class="s">${x.sub}</div></div></button>`;}
+// ---------------------------------------------------------------- SEARCH
+const ALL=[...STATIONS.map(s=>({name:s.name+" station",lat:s.lat,lng:s.lng,kind:"st",line:s.line,sub:LINES[s.line].name+(s.under?" · underground":"")})),...PLACES.map(([n,lat,lng])=>({name:n,lat,lng,kind:"pl",sub:"Lahore"}))];
+let onlineHits=[],recentList=[],searchSeq=0,searchTimer=null;
+function kmTxt(x){if(!state.lastPos)return"";const d=dist(state.lastPos,x);return d<1000?Math.round(d)+" m":(d/1000).toFixed(1)+" km";}
+function optHTML(x,i,src){
+  const icon=x.kind==="st"?`<span class="oico st" style="border-color:${LINES[x.line].color};color:${LINES[x.line].color}">${LINES[x.line].short}</span>`:x.kind==="rc"?`<span class="oico">${SVG.clock}</span>`:`<span class="oico">${SVG.pin}</span>`;
+  const km=kmTxt(x);
+  return `<button class="opt" data-src="${src}" data-i="${i}">${icon}<div class="otx"><div class="t">${esc(x.name)}</div><div class="s">${km?`<span class="km">${km}</span> • `:""}${esc(x.sub)}</div></div><span class="fill" aria-label="Put in the search box">${SVG.fill}</span></button>`;}
 function renderOpts(q){
-  q=q.trim().toLowerCase();
-  const top=`<button class="opt" data-gps="1"><span class="ico" style="background:var(--surface-2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1f9ee0" stroke-width="2.2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="#1f9ee0"/></svg></span><div><div class="t">Use my location</div><div class="s" id="gps-msg">Your phone's GPS</div></div></button>
-  <button class="opt" data-map="1"><span class="ico" style="background:var(--surface-2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1fc77e" stroke-width="2"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2Z"/></svg></span><div><div class="t">Choose on map</div><div class="s">Tap any street, home or shop</div></div></button>`;
-  let local=q?ALL.filter(x=>x.name.toLowerCase().includes(q)||x.sub.toLowerCase().includes(q)).sort((a,b)=>a.name.toLowerCase().indexOf(q)-b.name.toLowerCase().indexOf(q)).slice(0,8):ALL.filter(x=>x.kind==="pl").slice(0,10);
-  let h=top+(q?"":`<div class="note" style="padding:14px 18px 6px">Popular places</div>`)+local.map(x=>optHTML(x,ALL.indexOf(x),"l")).join("");
-  if(q.length>=3){h+=`<div class="note" style="padding:14px 18px 6px">Places and addresses (OpenStreetMap)</div>`+(onlineHits.length?onlineHits.map((x,i)=>optHTML(x,i,"o")).join(""):`<div class="loading" id="o-status">Searching…</div>`);}
+  q=q.trim().toLowerCase();let h="";
+  if(!q){
+    const seen=new Set();recentList=[];
+    for(const e of loadHist())for(const p of [e[0],e[1]]){if(seen.has(p[0])||recentList.length>=5)continue;seen.add(p[0]);recentList.push({name:p[0].replace(/ station$/,""),lat:p[1],lng:p[2],kind:"rc",sub:"Recent"});}
+    if(recentList.length)h+=`<div class="sec">RECENT</div>`+recentList.map((x,i)=>optHTML(x,i,"r")).join("");
+    h+=`<div class="sec">POPULAR PLACES</div>`+ALL.filter(x=>x.kind==="pl").slice(0,10).map(x=>optHTML(x,ALL.indexOf(x),"l")).join("");
+  }else{
+    const local=ALL.filter(x=>x.name.toLowerCase().includes(q)||x.sub.toLowerCase().includes(q)).sort((a,b)=>a.name.toLowerCase().indexOf(q)-b.name.toLowerCase().indexOf(q)).slice(0,6);
+    h+=local.map(x=>optHTML(x,ALL.indexOf(x),"l")).join("");
+    if(q.length>=3)h+=`<div class="sec">ADDRESSES AND PLACES</div>`+(onlineHits.length?onlineHits.map((x,i)=>optHTML(x,i,"o")).join(""):`<div class="loading" id="o-status">Searching…</div>`);
+  }
   $("opts").innerHTML=h;
 }
 function onlineSearch(q){
@@ -383,172 +498,199 @@ function onlineSearch(q){
       onlineHits=(j.features||[]).map(f=>{const p=f.properties,c=f.geometry.coordinates;
         const sub=[p.street&&(p.housenumber?p.housenumber+" ":"")+p.street,p.district||p.locality,p.city].filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i).join(", ");
         return{name:p.name||[p.housenumber,p.street].filter(Boolean).join(" ")||"Unnamed place",sub:sub||(p.osm_value||"Place"),lat:c[1],lng:c[0],kind:"pl"};});
-      renderOpts(q);if(!onlineHits.length){const el=$("o-status");if(el)el.textContent="Not on OpenStreetMap yet. Use “Choose on map” to pin it exactly.";}
-    }catch(e){if(my!==searchSeq)return;const el=$("o-status");if(el)el.textContent="No internet connection for place search. Stations still work.";}
+      renderOpts(q);if(!onlineHits.length){const el=$("o-status");if(el)el.textContent="Not on OpenStreetMap yet. Use “Select from map” to pin it exactly.";}
+    }catch(e){if(my!==searchSeq)return;const el=$("o-status");if(el)el.textContent="No connection for address search. Stations still work.";}
   },350);
 }
-function openSearch(which){state.picking=which;$("q").value="";onlineHits=[];$("q").placeholder=which==="from"?"From where?":"Where to?";renderOpts("");show("s-search");setTimeout(()=>$("q").focus(),50);}
+function activate(w){state.picking=w;$("sf-from").classList.toggle("act",w==="from");$("sf-to").classList.toggle("act",w==="to");onlineSearch("");}
+["from","to"].forEach(w=>{const inp=$("q-"+w);
+  inp.addEventListener("focus",()=>{if(state.picking!==w)activate(w);setTimeout(()=>inp.select(),0);});
+  inp.addEventListener("input",()=>onlineSearch(inp.value));
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter"){const b=$("opts").querySelector(".opt");if(b)b.click();}});});
+function maybeLocate(){ // silently refresh position for distances, only if already allowed
+  try{navigator.permissions&&navigator.permissions.query({name:"geolocation"}).then(r=>{if(r.state==="granted")navigator.geolocation.getCurrentPosition(p=>{state.lastPos={lat:p.coords.latitude,lng:p.coords.longitude};const inp=$("q-"+state.picking);onlineSearch(inp===document.activeElement&&inp.value!==(state[state.picking]?.name||"")?inp.value:"");},()=>{},{maximumAge:60000,timeout:8000});}).catch(()=>{});}catch(e){}}
+function openSearch(w){$("q-from").value=state.from?.name||"";$("q-to").value=state.to?.name||"";show("s-search");activate(w);setTimeout(()=>{const i=$("q-"+w);i.focus();i.select();},60);maybeLocate();}
+function choose(p){const w=state.picking;setPoint(w,p);$("q-"+w).value=p.name;
+  const other=w==="from"?"to":"from";
+  if(!state[other]){activate(other);$("q-"+other).focus();return;}
+  runSearch();}
 $("f-from").onclick=()=>openSearch("from");$("f-to").onclick=()=>openSearch("to");
-$("q").oninput=e=>onlineSearch(e.target.value);
 $("search-back").onclick=()=>show("s-home");
 $("opts").onclick=e=>{const b=e.target.closest(".opt");if(!b)return;
-  if(b.dataset.map){openMap("pick");return;}
-  if(b.dataset.gps){const m=$("gps-msg");if(m)m.textContent="Finding you…";locateMe((p,msg)=>{if(!p){if(m)m.textContent=msg;return;}setPoint(state.picking,p);show("s-home");});return;}
-  const x=b.dataset.src==="o"?onlineHits[+b.dataset.i]:ALL[+b.dataset.i];
-  setPoint(state.picking,{name:x.name.replace(/ station$/,""),lat:x.lat,lng:x.lng});show("s-home");};
-$("swap").onclick=()=>{const a=state.from,b=state.to;state.from=null;state.to=null;
-  ["from","to"].forEach(w=>{$(w+"-txt").textContent=w==="from"?"From where?":"Where to?";$(w+"-txt").className="ph";});
-  if(b)setPoint("from",b);if(a)setPoint("to",a);$("go").disabled=!(state.from&&state.to);};
+  const x=b.dataset.src==="o"?onlineHits[+b.dataset.i]:b.dataset.src==="r"?recentList[+b.dataset.i]:ALL[+b.dataset.i];
+  if(e.target.closest(".fill")){const inp=$("q-"+state.picking);inp.value=x.name.replace(/ station$/,"");inp.focus();onlineSearch(inp.value);return;}
+  choose({name:x.name.replace(/ station$/,""),lat:x.lat,lng:x.lng});};
+$("loc-btn").onclick=()=>{state.picking="from";$("sf-from").classList.add("act");$("sf-to").classList.remove("act");toast("Finding you…");
+  locateMe((p,msg)=>{if(!p){toast(msg);return;}state.lastPos={lat:p.lat,lng:p.lng};choose(p);});};
+$("selmap").onclick=()=>openMap("pick");
 
-// history (per-viewer convenience only)
-const SEED_HIST=[];
-function loadHist(){try{const h=JSON.parse(localStorage.getItem("lt_hist")||"null");if(Array.isArray(h)&&h.length)return h;}catch(e){}return SEED_HIST;}
-function saveHist(a,b){try{let h=loadHist().filter(x=>!(x[0][0]===a.name&&x[1][0]===b.name));h.unshift([[a.name,a.lat,a.lng],[b.name,b.lat,b.lng]]);localStorage.setItem("lt_hist",JSON.stringify(h.slice(0,8)));}catch(e){}}
-function renderHist(){const h=loadHist();if(!h.length){$("hist").innerHTML=`<p class="note">No trips yet. Your searches will show up here.</p>`;return;}$("hist").innerHTML=h.map((h,i)=>`<button class="hist" data-h="${i}"><div class="l"><span class="dot"></span>${h[0][0].replace(/ station$/,"")}</div><div class="arr">↓</div><div class="l"><span class="dot b"></span>${h[1][0].replace(/ station$/,"")}</div></button>`).join("");}
+// ---------------------------------------------------------------- HISTORY SHEET
+function loadHist(){try{const h=JSON.parse(localStorage.getItem("lt_hist")||"null");if(Array.isArray(h))return h;}catch(e){}return[];}
+function saveHist(a,b){try{let h=loadHist().filter(x=>!(x[0][0]===a.name&&x[1][0]===b.name));h.unshift([[a.name,a.lat,a.lng],[b.name,b.lat,b.lng],Date.now()]);localStorage.setItem("lt_hist",JSON.stringify(h.slice(0,25)));}catch(e){}}
+function dayLabel(ts){const d=new Date(ts),t=new Date();const s=d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+  if(d.toDateString()===t.toDateString())return"Today, "+s;const y=new Date(t);y.setDate(t.getDate()-1);if(d.toDateString()===y.toDateString())return"Yesterday, "+s;
+  return d.toLocaleDateString("en-GB",{weekday:"short"})+" "+s;}
+function renderHist(){const h=loadHist();$("hsheet").hidden=!h.length;if(!h.length)return;let last="",out="";
+  h.forEach((x,i)=>{const d=x[2]?dayLabel(x[2]):"Earlier";if(d!==last){out+=`<div class="hday">${d}</div>`;last=d;}
+    out+=`<button class="hist" data-h="${i}"><div class="l"><span class="dot"></span>${esc(x[0][0].replace(/ station$/,""))}</div><div class="arr">↓</div><div class="l"><span class="dot b"></span>${esc(x[1][0].replace(/ station$/,""))}</div></button>`;});
+  $("hist").innerHTML=out;}
 $("hist").onclick=e=>{const b=e.target.closest(".hist");if(!b)return;const h=loadHist()[+b.dataset.h];
   setPoint("from",{name:h[0][0].replace(/ station$/,""),lat:h[0][1],lng:h[0][2]});setPoint("to",{name:h[1][0].replace(/ station$/,""),lat:h[1][1],lng:h[1][2]});runSearch();};
-renderHist();
+const hs=$("hsheet");let hsOpen=false;const PEEK=150;
+function hsFull(){const scr=$("s-home").getBoundingClientRect(),row=$("home-row").getBoundingClientRect();return Math.max(PEEK,scr.bottom-row.bottom-$("nav").offsetHeight);}
+function setHs(open){hsOpen=open;hs.style.bottom=$("nav").offsetHeight+"px";hs.classList.toggle("open",open);hs.style.height=(open?hsFull():PEEK)+"px";if(!open)$("hist").scrollTop=0;}
+(function(){let y0=null,h0=0,moved=false;const top=$("hs-top");
+  top.addEventListener("pointerdown",e=>{if(e.target.closest("#hs-close"))return;y0=e.clientY;h0=hs.offsetHeight;moved=false;hs.classList.add("drag");top.setPointerCapture(e.pointerId);});
+  top.addEventListener("pointermove",e=>{if(y0===null)return;const dy=e.clientY-y0;if(Math.abs(dy)>5)moved=true;hs.style.height=Math.min(hsFull(),Math.max(PEEK-40,h0-dy))+"px";});
+  const end=()=>{if(y0===null)return;y0=null;hs.classList.remove("drag");if(!moved){setHs(!hsOpen);return;}setHs(hs.offsetHeight>(PEEK+hsFull())/2);};
+  top.addEventListener("pointerup",end);top.addEventListener("pointercancel",end);})();
+$("hs-close").onclick=()=>setHs(false);
+addEventListener("resize",()=>{if($("s-home").classList.contains("on"))setHs(hsOpen);});
 
-// results
+// ---------------------------------------------------------------- RESULTS
 function runSearch(){
   const A=state.from,B=state.to;if(!A||!B)return;
-  saveHist(A,B);renderHist();
-  let start=nowMin();
-  const closeAll=Math.max(LINES.OL.close,LINES.MB.close);
-  let banner="";
-  if(start>=closeAll-10||start<LINES.OL.open-30){banner=`Metro and Orange Line run 06:00 to 22:00. Showing the first trips tomorrow morning.`;start=LINES.OL.open-15;}
-  const list=plan(A,B,start);
-  state.result=list;state.start=start;
+  saveHist(A,B);
+  const now=nowMin();let start=state.when??now;state.future=state.when!==null&&state.when>now+1;
+  const closeAll=Math.max(LINES.OL.close,LINES.MB.close);let banner="";
+  if(start>=closeAll-10||start<LINES.OL.open-30){banner=`Metro and Orange Line run 06:00 to 22:00. Showing the first trips in the morning.`;start=LINES.OL.open-15;state.future=true;}
+  const list=plan(A,B,start);state.result=list;
   $("r-from").textContent=A.name;$("r-to").textContent=B.name;
-  const now=nowMin();
-  $("cards").innerHTML=(banner?`<div class="banner">${banner}</div>`:"")+(list.length?list.map((r,k)=>cardHTML(r,k,now,!!banner)).join(""):`<p class="note" style="font-size:15px">No Metrobus or Orange Line trip fits this journey yet. Both points need to be within about 2.5 km of a station. Speedo and e-bus routes will widen this.</p>`)+
-   `<p class="proto">Times are estimates: published frequencies, no live tracking yet.</p><div style="height:20px"></div>`;
-  show("s-results");
+  $("cards").innerHTML=(banner?`<div class="banner">${banner}</div>`:"")+(list.length?list.map((r,k)=>cardHTML(r,k,now,state.future)).join(""):`<p class="note" style="font-size:15px">No Metrobus or Orange Line trip fits this journey yet. Both points need to be within about 2.5 km of a station. Speedo and e-bus routes will widen this.</p>`)+
+    `<p class="proto">Times are estimates from published frequencies. No live tracking yet.</p><div style="height:24px"></div>`;
+  $("cards").scrollTop=0;show("s-results");
 }
+function depHTML(r,now,future){
+  if(r.firstDep===null)return`<small>Walk</small><b class="tnum">${r.total}<i>min</i></b>`;
+  const inMin=r.firstDep-now;
+  return(!future&&inMin<=59)?`<small>Departs in:</small><b class="tnum">${Math.max(0,inMin)}<i>min</i></b>`:`<small>Departs at</small><b class="tnum">${fmt(r.firstDep)}</b>`;}
+function badgesHTML(r){return r.rides.length?r.rides.map(x=>`<span class="mode">${modeSvg(x.line)}<span class="badge ${LINES[x.line].cls}">${LINES[x.line].short}</span></span>`).join('<span class="chev">›</span>'):`<span class="mode">${SVG.walk}</span>`;}
 function legsChips(r){return r.legs.map(l=>{
-  if(l.type==="walk")return l.min?`<span>🚶 ${l.min} min</span>`:"";
+  if(l.type==="walk")return l.min?`<span class="wk">${SVG.walk}${l.min} min</span>`:"";
   return `<span class="t-g tnum">${fmt(l.dep)}</span><span>${l.min} min</span><span class="t-b tnum">${fmt(l.arr)}</span>`;}).filter(Boolean).join("");}
-function cardHTML(r,k,now,future){
-  let dep;
-  if(r.firstDep===null)dep=`<small>Walk</small><b>${r.total}<i>min</i></b>`;
-  else{const inMin=r.firstDep-now;dep=(!future&&inMin<=59)?`<small>Departs in:</small><b class="tnum">${Math.max(0,inMin)}<i>min</i></b>`:`<small>Departs at</small><b class="tnum">${fmt(r.firstDep)}</b>`;}
-  const badges=r.rides.length?r.rides.map(x=>`<span class="badge ${LINES[x.line].cls}">${LINES[x.line].short}</span>`).join('<span style="color:var(--muted)">›</span>'):`<span class="badge" style="background:var(--surface-2)">Walk</span>`;
-  return `<button class="card" data-k="${k}"><div class="top"><div class="dep">${dep}</div><div><div class="badges">${badges}</div><div class="tot tnum">${r.total} min</div></div></div>
-  <div class="legs tnum">${legsChips(r)}</div>
-  <div class="fare"><span>Arrive <b class="tnum">${fmt(r.end)}</b>${r.rides.length>1?" · 1 change":""}</span><span>Fare <b class="tnum">Rs ${r.fare}</b></span></div></button>`;}
-$("cards").onclick=e=>{const c=e.target.closest(".card");if(!c)return;state.trip=state.result[+c.dataset.k];renderDetail();show("s-detail");};
-$("go").onclick=runSearch;
+function sumHTML(r,now,future){return `<div class="dep">${depHTML(r,now,future)}</div><div><div class="crt"><div class="badges">${badgesHTML(r)}</div><span class="tot tnum">${r.total} min</span></div><div class="legs tnum">${legsChips(r)}</div>`;}
+function cardHTML(r,k,now,future){return `<button class="card" data-k="${k}">${sumHTML(r,now,future)}<div class="cmeta tnum">Arrive ${fmt(r.end)}${r.rides.length>1?" · 1 change":""}${r.fare?" · Rs "+r.fare:""}</div></div></button>`;}
+$("cards").onclick=e=>{const c=e.target.closest(".card");if(!c)return;openDetail(+c.dataset.k);};
 $("res-back").onclick=()=>show("s-home");
+$("r-edit").onclick=()=>openSearch("to");
 
-// detail
-function circleIcon(line){const L=LINES[line];return `<span class="circ" style="background:${L.color}">${line==="OL"?'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2a1400" stroke-width="2.2"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 10h14M8 21l2-4M16 21l-2-4"/></svg>':'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 10h16M7 21v-3M17 21v-3"/></svg>'}</span>`;}
-const walkIcon=`<span class="circ" style="background:var(--surface-2)"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><circle cx="13" cy="4" r="2"/><path d="M13.5 7.5 10 9l-1.5 4.5 1.8.6L11.4 11l1 3.6L9 21h2.2l2.9-5.4 1.7 5.4H18l-2.4-7-1-4.2 1.6 2.3 2.8.9.4-1.8-2.2-.7Z"/></svg></span>`;
+// ---------------------------------------------------------------- TRIP DETAIL
+function circleIcon(line){const L=LINES[line];return `<span class="circ" style="background:${L.color};color:${line==="OL"?"#2a1400":"#fff"}">${modeSvg(line)}</span>`;}
+const walkIcon=`<span class="circ" style="background:var(--surface-2);color:#fff">${SVG.walk.replace(/17/g,"22")}</span>`;
 function renderDetail(){
-  const r=state.trip;$("det-fare").textContent="Rs "+r.fare;
-  let h=`<div class="dsum"><div class="top" style="display:flex;justify-content:space-between;align-items:flex-start"><div class="dep">${r.firstDep!==null?`<small>Departs at</small><b class="tnum">${fmt(r.firstDep)}</b>`:`<small>Walk</small><b>${r.total}<i>min</i></b>`}</div><div><div class="badges">${r.rides.map(x=>`<span class="badge ${LINES[x.line].cls}">${LINES[x.line].short}</span>`).join(" ")}</div><div class="tot tnum">${r.total} min</div></div></div><div class="legs tnum">${legsChips(r)}</div></div><div class="tl">`;
-  // start
-  h+=row(`<span class="time tnum">${fmt(r.start)}</span>`,`<div class="sname">${state.from.name}</div>`);
+  const r=state.trip,now=nowMin();
+  $("det-fare").textContent=r.fare?"Rs "+r.fare:"Free";
+  $("d-fare").innerHTML=r.fare?`Fare · Rs ${r.fare}`:"Walk only";
+  $("dsum").innerHTML=sumHTML(r,now,state.future)+`</div>`;
+  let h="",sep=false;
+  const row=(c,b)=>{const s=`<div class="st${sep?" sep":""}"><div class="c">${c}</div><div class="b">${b}</div></div>`;sep=false;return s;};
+  h+=row(`<span class="time o tnum">${fmt(r.start)}</span>`,`<div class="sname">${esc(state.from.name)}</div>`);
   r.legs.forEach((l,idx)=>{
-    if(l.type==="walk"){ if(!l.min)return;
-      const label=l.transfer?`Change: walk ${Math.round(l.m)} m to ${LINES[l.to.line].name}`:`Walk ${Math.round(l.m)} m`;
-      h+=row(walkIcon+`<span class="vdots"></span>`,`<div class="walk"><span>${label}</span><span>${l.min} min</span></div>${l.transfer&&(l.from.under||l.to.under)?`<div class="sub">Anarkali is underground: go up to street level, then up to the Metrobus platform.</div>`:""}`,true);
+    if(l.type==="walk"){if(!l.min)return;
+      const label=l.transfer?`Change: walk ${Math.round(l.m)} m to the ${LINES[l.to.line].name}`:`Walk ${Math.round(l.m)} m`;
+      h+=row(walkIcon+`<span class="vdots"></span>`,`<div class="walk"><span>${label}</span><span>${l.min} min</span></div>${l.transfer&&(l.from.under||l.to.under)?`<div class="sub">Anarkali is underground: go up to street level, then up to the Metrobus platform.</div>`:""}`);
     }else{
-      const L=LINES[l.line];
+      const L=LINES[l.line];sep=true;
       const stairs=l.from.under?"Go down to the platform (underground station).":"Take the stairs or escalator up to the platform.";
       h+=row(`<span class="time g tnum">${fmt(l.dep)}</span>`+circleIcon(l.line)+`<span class="vbar" style="background:${L.color}"></span>`,
-        `<div class="sname">${l.from.name}</div><div class="sub">${stairs}</div>
-         <div class="ride"><span class="badge ${L.cls}">${L.short}</span><span>→ ${l.headsign.toUpperCase()}</span><span class="dur tnum">${l.min} min</span></div>
+        `<div class="sname">${esc(l.from.name)}</div><div class="sub">${stairs}</div>
+         <div class="ride"><span class="badge ${L.cls}">${L.short}</span><span>→ ${esc(l.headsign.toUpperCase())}</span><span class="dur tnum">${l.min} min</span></div>
          <div class="freq">Departures every about ${L.headway} min</div>
-         <button class="tog" data-tog="${idx}"><span>${l.stops.length-2>0?(l.stops.length-1)+" stops":"1 stop"}</span><span>⌄</span></button>
-         <div id="mid-${idx}" hidden></div>`,true);
-      // intermediate
-      const mids=l.stops.slice(1,-1).map(s=>{const t=l.dep+Math.round(Math.abs(LINES[l.line].cumMin[s.i]-LINES[l.line].cumMin[l.from.i]));return `<div class="mid"><div class="c"><span class="vbar" style="background:${L.color};min-height:38px"></span></div><div class="b"><span class="tt tnum">${fmt(t)}</span><span>${s.name}</span></div></div>`;}).join("");
-      h+=`<div id="midrows-${idx}" hidden>${mids}</div>`;
-      h+=row(`<span class="vbar" style="background:${L.color};max-height:24px"></span><span class="time bl tnum">${fmt(l.arr)}</span>`,`<div class="sname">${l.to.name}</div><div class="sub">Get off here${l.to.under?" · underground station":""}.</div>`);
+         <button class="tog" data-tog="${idx}"><span>${l.stops.length-1} stop${l.stops.length>2?"s":""}</span><span>⌄</span></button>`);
+      h+=`<div id="midrows-${idx}" hidden>`+l.stops.slice(1,-1).map((s,n)=>{const t=l.dep+Math.round(Math.abs(L.cumMin[s.i]-L.cumMin[l.from.i]));
+        return `<div class="pm"><div class="c"><span class="vbar" style="background:${L.color}"></span><span class="mt tnum">${fmt(t)}</span><span class="vbar" style="background:${L.color}"></span></div><div class="b"><span class="n">${n+1}.</span><span>${esc(s.name)}</span></div></div>`;}).join("")+`</div>`;
+      h+=row(`<span class="vbar" style="background:${L.color};max-height:26px"></span><span class="time bl tnum">${fmt(l.arr)}</span>`,`<div class="sname">${l.stops.length-1}. ${esc(l.to.name)}</div><div class="sub">Get off here${l.to.under?" · underground station":""}.</div>`);
+      sep=true;
     }
   });
-  h+=row(`<span class="time tnum">${fmt(r.end)}</span>`,`<div class="sname">${state.to.name}</div><div class="sub">Arrive · fare Rs ${r.fare}${r.rides.length>1?" (two tickets)":""}</div>`);
-  h+=`</div>`;
-  $("detail").innerHTML=h;
+  h+=row(`<span class="time o tnum">${fmt(r.end)}</span>`,`<div class="sname">${esc(state.to.name)}</div><div class="sub">Arrive${r.fare?` · fare Rs ${r.fare}${r.rides.length>1?" (two tickets)":""}`:""}</div>`);
+  $("detail").innerHTML=h;$("detail").scrollTop=0;
 }
-function row(c,b,tall){return `<div class="st"><div class="c">${c}</div><div class="b">${b}</div></div>`;}
-$("detail").onclick=e=>{const t=e.target.closest(".tog");if(!t)return;const el=$("midrows-"+t.dataset.tog);el.hidden=!el.hidden;t.lastElementChild.textContent=el.hidden?"⌄":"⌃";};
-$("det-back").onclick=()=>show("s-results");
-$("det-map").onclick=()=>openMap("trip");
-$("det-nav").onclick=()=>openMap("trip");
+function openDetail(k){state.trip=state.result[k];renderDetail();setPanel(false);show("s-detail");initDmap();
+  setTimeout(()=>{dmap.invalidateSize();drawInto(dlayer,"trip");fitTrip();},60);}
+function setPanel(open){$("s-detail").classList.toggle("open",open);setTimeout(()=>{if(dmap){dmap.invalidateSize();}},320);}
+(function(){const tp=$("tpanel");let x0=null,y0=0,moved=false;
+  tp.addEventListener("pointerdown",e=>{x0=e.clientX;y0=e.clientY;moved=false;});
+  tp.addEventListener("pointermove",e=>{if(x0===null)return;if(Math.abs(e.clientX-x0)>8||Math.abs(e.clientY-y0)>8)moved=true;});
+  tp.addEventListener("pointerup",e=>{if(x0===null)return;const dx=e.clientX-x0,dy=e.clientY-y0;x0=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.2)setPanel(dx<0);});
+  tp.addEventListener("pointercancel",()=>{x0=null;});
+  tp.addEventListener("click",e=>{if(moved)return;const open=$("s-detail").classList.contains("open");
+    if(!open){setPanel(true);return;}
+    const t=e.target.closest(".tog");if(t){const el=$("midrows-"+t.dataset.tog);el.hidden=!el.hidden;t.lastElementChild.textContent=el.hidden?"⌄":"⌃";}});})();
+$("peek").onclick=()=>setPanel(false);
+$("det-back").onclick=()=>{if($("s-detail").classList.contains("open"))setPanel(false);else show("s-results");};
+$("d-alarm").onclick=()=>toast("Departure reminders are coming soon.");
+$("d-fare").onclick=()=>toast(state.trip&&state.trip.fare?"Buy a token or use your Metro card at the station. Metrobus Rs 30 flat, Orange Line Rs 25–45 by distance.":"No ticket needed. It's a short walk.");
+$("d-nav").onclick=()=>{setPanel(false);locateMe((p,msg)=>{if(!p){toast(msg);return;}if(duser)duser.remove();duser=L.circleMarker(ll(p),{radius:9,color:"#fff",weight:3,fillColor:"#1f9ee0",fillOpacity:1}).addTo(dmap);dmap.setView(ll(p),16);});};
+$("dlocate").onclick=$("d-nav").onclick;
 
-// ---------------------------------------------------------------- MAP (Leaflet + OpenStreetMap)
-let lmap=null,layer=null,userDot=null;
-function initMap(){
-  if(lmap)return;
-  lmap=L.map("lmap",{zoomControl:false,attributionControl:true}).setView([31.52,74.33],12);
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,
-    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(lmap);
-  lmap.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
-  layer=L.layerGroup().addTo(lmap);
-  lmap.on("click",onMapClick);
-}
+// ---------------------------------------------------------------- MAPS (Leaflet + OpenStreetMap)
+let lmap=null,layer=null,userDot=null,dmap=null,dlayer=null,duser=null;
 const ll=p=>[p.lat,p.lng];
-function pinIcon(label,col){return L.divIcon({className:"",iconSize:[0,0],html:`<div style="position:relative"><div class="pinlbl">${label}</div><div style="position:absolute;left:-9px;top:-9px;width:18px;height:18px;border-radius:50%;background:#fff;border:4px solid ${col};box-sizing:border-box"></div></div>`});}
+function makeMap(id){const m=L.map(id,{zoomControl:false,attributionControl:false}).setView([31.52,74.33],12);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19}).addTo(m);
+  L.control.attribution({position:"topleft",prefix:false}).addAttribution('&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>').addTo(m);return m;}
+function initMap(){if(lmap)return;lmap=makeMap("lmap");layer=L.layerGroup().addTo(lmap);lmap.on("click",onMapClick);}
+function initDmap(){if(dmap)return;dmap=makeMap("dmap");dlayer=L.layerGroup().addTo(dmap);}
+function fitTrip(){const pts=[state.from,state.to];state.trip.rides.forEach(r=>pts.push(...r.stops));dmap.fitBounds(L.latLngBounds(pts.map(ll)),{paddingTopLeft:[34,44],paddingBottomRight:[124,44]});}
+function pinIcon(label,col){return L.divIcon({className:"",iconSize:[0,0],html:`<div style="position:relative"><div class="pinlbl">${label}</div><div style="position:absolute;left:-10px;top:-10px;width:20px;height:20px;border-radius:50%;background:#fff;border:5px solid ${col};box-sizing:border-box"></div></div>`});}
+const walkCache=new Map();
 async function walkPath(a,b){ // real footpath from OSM routing (free demo server); straight line if unavailable
+  const k=[a.lat,a.lng,b.lat,b.lng].map(v=>v.toFixed(5)).join(",");if(walkCache.has(k))return walkCache.get(k);
   try{const u=`https://routing.openstreetmap.de/routed-foot/route/v1/foot/${a.lng},${a.lat};${b.lng},${b.lat}?overview=full&geometries=geojson`;
-    const r=await fetch(u);const j=await r.json();if(j.routes&&j.routes[0])return{pts:j.routes[0].geometry.coordinates.map(c=>[c[1],c[0]]),m:j.routes[0].distance};}catch(e){}
-  return{pts:[ll(a),ll(b)],m:null};}
-function drawMap(){
-  layer.clearLayers();
-  const trip=state.mapMode==="trip"?state.trip:null;const dim=trip?0.3:1;
-  for(const Ln of Object.values(LINES))L.polyline(Ln.stops.map(ll),{color:Ln.color,weight:5,opacity:dim}).addTo(layer);
-  if(trip){
-    for(const l of trip.legs){
-      if(l.type==="ride")L.polyline(l.stops.map(ll),{color:LINES[l.line].color,weight:8,opacity:1}).addTo(layer);
-      else if(l.m>=40){const line=L.polyline([ll(l.from),ll(l.to)],{color:"#c8ced4",weight:4,dashArray:"1 9",lineCap:"round"}).addTo(layer);
-        walkPath(l.from,l.to).then(w=>{line.setLatLngs(w.pts);});}
-    }
+    const j=await(await fetch(u)).json();if(j.routes&&j.routes[0]){const w={pts:j.routes[0].geometry.coordinates.map(c=>[c[1],c[0]])};walkCache.set(k,w);return w;}}catch(e){}
+  return{pts:[ll(a),ll(b)]};}
+function drawInto(lay,mode){
+  lay.clearLayers();
+  const trip=mode==="trip"?state.trip:null;const dim=trip?0.28:1;
+  for(const Ln of Object.values(LINES))L.polyline(Ln.stops.map(ll),{color:Ln.color,weight:5,opacity:dim}).addTo(lay);
+  if(trip)for(const l of trip.legs){
+    if(l.type==="ride")L.polyline(l.stops.map(ll),{color:LINES[l.line].color,weight:9,opacity:1,lineCap:"round"}).addTo(lay);
+    else if(l.m>=40){const line=L.polyline([ll(l.from),ll(l.to)],{color:"#c8ced4",weight:6,dashArray:"1 11",lineCap:"round"}).addTo(lay);walkPath(l.from,l.to).then(w=>line.setLatLngs(w.pts));}
   }
-  for(const s of STATIONS){const on=trip&&trip.rides.some(r=>r.stops.includes(s));const show=!trip||on;
-    const m=L.circleMarker(ll(s),{radius:on?6:5,color:LINES[s.line].color,weight:3,fillColor:"#141619",fillOpacity:1,opacity:show?1:dim}).addTo(layer);
-    m.bindTooltip(s.name+(s.under?" (underground)":""),{direction:"right",className:"st-label",permanent:!!(trip&&trip.rides.some(r=>r.from===s||r.to===s))});}
-  if(trip){L.marker(ll(state.from),{icon:pinIcon("Start","#1fc77e")}).addTo(layer);L.marker(ll(state.to),{icon:pinIcon("End","#1f9ee0")}).addTo(layer);}
-  if(state.mapMode==="pick"&&state.pickPt)L.marker(ll(state.pickPt),{icon:pinIcon(state.picking==="from"?"Start":"End",state.picking==="from"?"#1fc77e":"#1f9ee0")}).addTo(layer);
+  for(const s of STATIONS){const on=trip&&trip.rides.some(r=>r.stops.includes(s));const vis=!trip||on;const end=trip&&trip.rides.some(r=>r.from===s||r.to===s);
+    const m=L.circleMarker(ll(s),{radius:end?8:on?6:5,color:LINES[s.line].color,weight:end?4:3,fillColor:end?"#fff":"#141619",fillOpacity:1,opacity:vis?1:dim}).addTo(lay);
+    m.bindTooltip(s.name+(s.under?" (underground)":""),{direction:"right",className:"st-label",permanent:!!end});}
+  if(trip){L.marker(ll(state.from),{icon:pinIcon("Start","#1fc77e")}).addTo(lay);L.marker(ll(state.to),{icon:pinIcon("End","#1f9ee0")}).addTo(lay);}
+  if(mode==="pick"&&state.pickPt)L.marker(ll(state.pickPt),{icon:pinIcon(state.picking==="from"?"Start":"End",state.picking==="from"?"#1fc77e":"#1f9ee0")}).addTo(lay);
 }
 function openMap(mode){state.mapMode=mode;show("s-map");initMap();
-  $("pickbar").hidden=mode!=="pick";$("mapctl").style.bottom=mode==="pick"?"86px":"28px";
-  $("map-title").textContent=mode==="pick"?(state.picking==="from"?"Choose start":"Choose destination"):mode==="trip"?"Your trip":"Network map";
+  $("pickbar").hidden=mode!=="pick";$("legend").hidden=mode==="pick";$("mapctl").style.bottom=mode==="pick"?"96px":"";
+  $("map-title").textContent=mode==="pick"?(state.picking==="from"?"Choose start":"Choose destination"):"Network map";
   state.pickPt=null;$("pick-ok").disabled=true;$("pick-txt").textContent="Tap the map to set the point";
-  setTimeout(()=>{lmap.invalidateSize();drawMap();
-    if(mode==="trip"){const pts=[state.from,state.to];state.trip.rides.forEach(r=>pts.push(...r.stops));lmap.fitBounds(L.latLngBounds(pts.map(ll)),{padding:[40,40]});}
-    else if(mode==="network")lmap.fitBounds(L.latLngBounds(STATIONS.map(ll)),{padding:[20,20]});
-    else{const ref=state[state.picking]||state[state.picking==="from"?"to":"from"];if(ref)lmap.setView(ll(ref),15);else lmap.setView([31.52,74.33],13);}
+  setTimeout(()=>{lmap.invalidateSize();drawInto(layer,mode);
+    if(mode==="network")lmap.fitBounds(L.latLngBounds(STATIONS.map(ll)),{padding:[20,20]});
+    else{const ref=state[state.picking]||state[state.picking==="from"?"to":"from"]||state.lastPos;if(ref)lmap.setView(ll(ref),15);else lmap.setView([31.52,74.33],13);}
   },60);}
 $("nav-map").onclick=()=>openMap("network");
-$("map-back").onclick=()=>{if(state.mapMode==="trip")show("s-detail");else if(state.mapMode==="pick")show("s-search");else show("s-home");};
+$("map-back").onclick=()=>show(state.mapMode==="pick"?"s-search":"s-home");
 async function reverseName(p){
-  try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&lat=${p.lat}&lon=${p.lng}`);const j=await r.json();
+  try{const j=await(await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&lat=${p.lat}&lon=${p.lng}`)).json();
     const a=j.address||{};const parts=[j.name,a.road,a.neighbourhood||a.suburb||a.quarter].filter(Boolean);return parts.slice(0,2).join(", ")||"Pinned point";}catch(e){return "Pinned point";}}
 async function onMapClick(e){if(state.mapMode!=="pick")return;const p={lat:e.latlng.lat,lng:e.latlng.lng,name:"Pinned point"};
-  state.pickPt=p;drawMap();$("pick-ok").disabled=false;$("pick-txt").textContent="Finding the address…";
+  state.pickPt=p;drawInto(layer,"pick");$("pick-ok").disabled=false;$("pick-txt").textContent="Finding the address…";
   const near=STATIONS.map(s=>({s,d:dist(p,s)})).sort((a,b)=>a.d-b.d)[0];
   const nm=await reverseName(p);if(state.pickPt!==p)return;p.name=nm;
   $("pick-txt").textContent=nm+" · "+(near.d<1000?Math.round(near.d)+" m":(near.d/1000).toFixed(1)+" km")+" to "+near.s.name;}
-$("pick-ok").onclick=()=>{setPoint(state.picking,state.pickPt);show("s-home");};
+$("pick-ok").onclick=()=>{const p=state.pickPt;show("s-search");choose(p);};
 function locateMe(cb){
   if(!navigator.geolocation){cb(null,"This browser can't share your location.");return;}
   navigator.geolocation.getCurrentPosition(pos=>cb({lat:pos.coords.latitude,lng:pos.coords.longitude,name:"My location"}),
-    err=>cb(null,err.code===1?"Location permission was refused. Allow it in your browser settings, or pick on the map.":"Couldn't get your location. Try again outdoors, or pick on the map."),{enableHighAccuracy:true,timeout:12000});}
-$("locate").onclick=()=>locateMe((p,msg)=>{if(!p){$("pick-txt").textContent=msg||"";return;}
-  if(userDot)userDot.remove();userDot=L.circleMarker(ll(p),{radius:8,color:"#fff",weight:3,fillColor:"#1f9ee0",fillOpacity:1}).addTo(lmap);lmap.setView(ll(p),16);
-  if(state.mapMode==="pick"){state.pickPt=p;drawMap();$("pick-ok").disabled=false;$("pick-txt").textContent="My location";}});
+    err=>cb(null,err.code===1?"Location is blocked. Allow it in your browser settings, or select on the map.":"Couldn't get your location. Try again, or select on the map."),{enableHighAccuracy:true,timeout:12000});}
+$("locate").onclick=()=>locateMe((p,msg)=>{if(!p){toast(msg);return;}state.lastPos={lat:p.lat,lng:p.lng};
+  if(userDot)userDot.remove();userDot=L.circleMarker(ll(p),{radius:9,color:"#fff",weight:3,fillColor:"#1f9ee0",fillOpacity:1}).addTo(lmap);lmap.setView(ll(p),16);
+  if(state.mapMode==="pick"){state.pickPt=p;drawInto(layer,"pick");$("pick-ok").disabled=false;$("pick-txt").textContent="My location";}});
 
 // ---------------------------------------------------------------- LINES SCREEN
 function renderLines(){
-  $("lines").innerHTML=Object.values(LINES).map(L=>`<div style="padding:16px 18px 6px;display:flex;align-items:center;gap:10px"><span class="badge ${L.cls}" style="font-size:16px">${L.short}</span><div><div class="t" style="font-size:18px;font-weight:700">${L.name}</div><div class="sub">${L.stops[0].name} ↔ ${L.stops[L.stops.length-1].name} · ${L.stops.length} stations · every ~${L.headway} min · 06:00–22:00</div><div class="sub">Fare: ${L.id==="MB"?"Rs 30 flat":"Rs 25–45 by distance"}</div></div></div>`+
+  $("lines").innerHTML=Object.values(LINES).map(L=>`<div style="padding:16px 18px 6px;display:flex;align-items:center;gap:10px"><span class="badge ${L.cls}" style="font-size:16px">${L.short}</span><div><div style="font-size:18px;font-weight:700">${L.name}</div><div class="sub">${L.stops[0].name} ↔ ${L.stops[L.stops.length-1].name} · ${L.stops.length} stations · every ~${L.headway} min · 06:00–22:00</div><div class="sub">Fare: ${L.id==="MB"?"Rs 30 flat":"Rs 25–45 by distance"}</div></div></div>`+
    L.stops.map(s=>`<div class="mid"><div class="c"><span class="vbar" style="background:${L.color};min-height:38px"></span></div><div class="b"><span class="tt tnum">${L.cumKm[s.i].toFixed(1)} km</span><span>${s.name}${s.under?' <span class="sub">· underground</span>':""}${(L.id==="OL"&&s.name==="Anarkali")||(L.id==="MB"&&s.name==="MAO College")?' <span class="badge '+(L.id==="OL"?"mb":"ol")+'" style="font-size:11px">'+(L.id==="OL"?"MB":"OL")+'</span>':""}</span></div></div>`).join("")).join("")+`<div style="height:30px"></div>`;}
 renderLines();
 $("tab-lines").onclick=$("nav-lines").onclick=()=>show("s-lines");
 $("lines-back").onclick=()=>show("s-home");
 
-// expose for testing
-window.__plan=plan;window.__LINES=LINES;window.__T=TRANSFERS;
+renderHist();requestAnimationFrame(()=>setHs(false));syncHome();
+window.__plan=plan;window.__LINES=LINES;window.__T=TRANSFERS;window.__state=state;
 </script>
 </body>
 </html>
