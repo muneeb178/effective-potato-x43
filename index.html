@@ -484,7 +484,8 @@ function trackBetween(lineId,a,b){const L=LINES[lineId],A=L.proj[a.i],B=L.proj[b
 const SIDE_OFF={MB:22}; // metres from the track centre to the stairs on the kerb
 function sideEntry(st,dir){const off=SIDE_OFF[st.line];if(!off)return st;const L=LINES[st.line],P=L.proj[st.i],g=L.geom;
   const a=g[Math.max(0,P.i)],b=g[Math.min(g.length-1,P.i+1)];const kx=Math.cos(rad(31.5));
-  let vx=(b[1]-a[1])*kx*dir,vy=(b[0]-a[0])*dir;const n=Math.hypot(vx,vy)||1;vx/=n;vy/=n; // unit travel vector (x=east,y=north)
+  const gs=(L.proj[L.stops.length-1].i>=L.proj[0].i)?1:-1; // geometry may run opposite to station order
+  let vx=(b[1]-a[1])*kx*dir*gs,vy=(b[0]-a[0])*dir*gs;const n=Math.hypot(vx,vy)||1;vx/=n;vy/=n; // unit travel vector (x=east,y=north)
   const lx=-vy,ly=vx; // left of travel
   const m=off/111320;return{...st,lat:P.pt[0]+ly*m,lng:P.pt[1]+lx*m/kx,side:dir};}
 function sideLegs(legs){ // move walk ends onto the right kerb for the ride next to them
