@@ -705,7 +705,7 @@ function renderHist(){const h=loadHist();$("hsheet").hidden=!!(state.from&&state
   $("hist").innerHTML=out;}
 (function(){ // iOS-style swipe left: reveal Delete; tap it, or pull almost all the way and release to delete
   const box=$("hist"),BTN=96;let w=null,b=null,d=null,sx=0,sy=0,dx=0,base=0,mode=0,raf=0,armed=false,open=null;
-  const W=()=>w.offsetWidth,ARM=()=>W()*.62;
+  const W=()=>w.offsetWidth,ARM=()=>W()*.93;
   const setX=(r,x,anim)=>{const it=r.querySelector(".hist"),dl=r.querySelector(".hdel");it.style.transition=anim?"":"none";it.style.transform=x?`translate3d(${x}px,0,0)`:"";
     dl.style.opacity=x?1:0;r.style.setProperty("--rev",(r.offsetWidth+x)+"px");};
   const close=(r)=>{if(!r)return;r.classList.remove("armed");setX(r,0,true);if(open===r)open=null;};
