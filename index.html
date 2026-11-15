@@ -478,6 +478,21 @@ for(const L of Object.values(LINES)){L.geom=GEOM[L.id];L.proj=L.stops.map(s=>pro
 function trackBetween(lineId,a,b){const L=LINES[lineId],A=L.proj[a.i],B=L.proj[b.i];
   if(A.i+A.t<=B.i+B.t)return[A.pt,...L.geom.slice(A.i+1,B.i+1),B.pt];
   return[A.pt,...L.geom.slice(B.i+1,A.i+1).reverse(),B.pt];}
+// Metrobus: each direction has its own stairs on its own side of the road (Pakistan drives on the left).
+// Towards Gajju Matta (dir>0) and towards Shahdara (dir<0) board from the kerb on the LEFT of the direction of travel,
+// so walks end/start at that side's stairs and never cross the road for nothing.
+const SIDE_OFF={MB:22}; // metres from the track centre to the stairs on the kerb
+function sideEntry(st,dir){const off=SIDE_OFF[st.line];if(!off)return st;const L=LINES[st.line],P=L.proj[st.i],g=L.geom;
+  const a=g[Math.max(0,P.i)],b=g[Math.min(g.length-1,P.i+1)];const kx=Math.cos(rad(31.5));
+  let vx=(b[1]-a[1])*kx*dir,vy=(b[0]-a[0])*dir;const n=Math.hypot(vx,vy)||1;vx/=n;vy/=n; // unit travel vector (x=east,y=north)
+  const lx=-vy,ly=vx; // left of travel
+  const m=off/111320;return{...st,lat:P.pt[0]+ly*m,lng:P.pt[1]+lx*m/kx,side:dir};}
+function sideLegs(legs){ // move walk ends onto the right kerb for the ride next to them
+  for(let k=0;k<legs.length;k++){const l=legs[k];if(l.type!=="walk")continue;const nx=legs[k+1],pv=legs[k-1];
+    if(nx&&nx.type==="ride")l.to=sideEntry(nx.from,nx.dir);
+    if(pv&&pv.type==="ride")l.from=sideEntry(pv.to,pv.dir);
+    l.m=walkM(l.from,l.to);}
+  return legs;}
 const ACCESS_MIN=2; // stairs / security / token at elevated & underground stations
 // transfers between lines: walk <= 900 m
 const TRANSFERS=[];
@@ -499,11 +514,11 @@ function plan(A,B,startMin){
   const direct=walkM(A,B);
   for(const line of ["OL","MB"]){
     for(const o of nearest(A,line,3))for(const d of nearest(B,line,3)){if(o.s.i===d.s.i)continue;
-      opts.push([{type:"walk",from:A,to:o.s,m:o.m},fixStops(legRide(line,o.s,d.s)),{type:"walk",from:d.s,to:B,m:d.m}]);}
+      opts.push(sideLegs([{type:"walk",from:A,to:o.s,m:o.m},fixStops(legRide(line,o.s,d.s)),{type:"walk",from:d.s,to:B,m:d.m}]));}
   }
   for(const tr of TRANSFERS){const l1=tr.a.line,l2=tr.b.line;
     for(const o of nearest(A,l1,3))for(const d of nearest(B,l2,3)){if(o.s.i===tr.a.i||d.s.i===tr.b.i)continue;
-      opts.push([{type:"walk",from:A,to:o.s,m:o.m},fixStops(legRide(l1,o.s,tr.a)),{type:"walk",from:tr.a,to:tr.b,m:tr.m,transfer:true},fixStops(legRide(l2,tr.b,d.s)),{type:"walk",from:d.s,to:B,m:d.m}]);}
+      opts.push(sideLegs([{type:"walk",from:A,to:o.s,m:o.m},fixStops(legRide(l1,o.s,tr.a)),{type:"walk",from:tr.a,to:tr.b,m:tr.m,transfer:true},fixStops(legRide(l2,tr.b,d.s)),{type:"walk",from:d.s,to:B,m:d.m}]));}
   }
   // score every pattern at the requested start time
   const walkAll=walkMin(direct);
