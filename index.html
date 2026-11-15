@@ -145,10 +145,10 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 .hist{display:block;width:100%;text-align:left;padding:10px 20px 12px}
 /* swipe right on a history trip to delete it */
 .tabclip,#phone{overscroll-behavior-x:none}
-.hwrap{position:relative;overflow:hidden;transition:height .25s ease,opacity .25s ease}
-.hwrap .hdel{position:absolute;inset:0;display:flex;align-items:center;gap:8px;padding-left:22px;background:#c62f37;color:#fff;font-weight:600;font-size:14px;opacity:0}
-.hwrap .hist{position:relative;background:var(--surface,#1c1f24);touch-action:pan-y;will-change:transform}
-.hwrap.drag .hist{transition:none}.hwrap .hist{transition:transform .25s cubic-bezier(.25,.8,.3,1)}
+.hwrap{position:relative;overflow:hidden;contain:layout paint}
+.hwrap .hdel{position:absolute;inset:0;display:flex;align-items:center;gap:8px;padding-left:22px;background:#c62f37;color:#fff;font-weight:600;font-size:14px;opacity:0;will-change:opacity}
+.hwrap .hist{position:relative;background:var(--surface,#1c1f24);touch-action:pan-y;will-change:transform;transform:translate3d(0,0,0);backface-visibility:hidden}
+.hwrap .hist{transition:transform .26s cubic-bezier(.25,.8,.3,1)}.hwrap.drag .hist{transition:none}
 .hist .l{display:flex;align-items:center;gap:11px;font-size:15px;font-weight:500;line-height:1.2}
 .hist .arr{color:var(--muted);font-size:12px;padding:0 0 0 3px;line-height:12px;height:12px}
 
@@ -703,16 +703,23 @@ function renderHist(){const h=loadHist();$("hsheet").hidden=!!(state.from&&state
   $("hist").innerHTML=out;}
 (function(){ // swipe right to delete a trip from history
   const box=$("hist");let w=null,sx=0,sy=0,dx=0,mode=0;
-  box.addEventListener("touchstart",e=>{const r=e.target.closest(".hwrap");if(!r)return;w=r;sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;mode=0;},{passive:true});
+  let raf=0,cur=null;
+  box.addEventListener("touchstart",e=>{const r=e.target.closest(".hwrap");if(!r)return;w=r;cur={b:r.querySelector(".hist"),d:r.querySelector(".hdel")};sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;mode=0;},{passive:true});
   box.addEventListener("touchmove",e=>{if(!w)return;const x=e.touches[0].clientX-sx,y=e.touches[0].clientY-sy;
     if(!mode){if(Math.abs(x)<4&&Math.abs(y)<4){if(x>0&&Math.abs(x)>=Math.abs(y))e.preventDefault();return;}mode=(x>0&&Math.abs(x)>Math.abs(y))?1:2;if(mode===1)w.classList.add("drag");}
-    if(mode!==1)return;e.preventDefault();dx=Math.max(0,x);const b=w.querySelector(".hist"),d=w.querySelector(".hdel");b.style.transform=`translateX(${dx}px)`;d.style.opacity=Math.min(1,dx/80);},{passive:false});
-  box.addEventListener("touchend",()=>{if(!w)return;const r=w;w=null;r.classList.remove("drag");if(mode!==1)return;
-    const b=r.querySelector(".hist");box._swiped=Date.now();
-    if(dx>r.offsetWidth*.35){b.style.transform=`translateX(${r.offsetWidth}px)`;r.style.height=r.offsetHeight+"px";
-      setTimeout(()=>{r.style.height="0px";r.style.opacity="0";},180);
-      setTimeout(()=>{const i=+r.dataset.h;try{const h=loadHist();h.splice(i,1);localStorage.setItem("lt_hist",JSON.stringify(h));}catch(e){}renderHist();},440);}
-    else{b.style.transform="";r.querySelector(".hdel").style.opacity=0;}});
+    if(mode!==1)return;e.preventDefault();dx=Math.max(0,x);
+    if(!raf)raf=requestAnimationFrame(()=>{raf=0;if(!cur)return;cur.b.style.transform=`translate3d(${dx}px,0,0)`;cur.d.style.opacity=Math.min(1,dx/80);});},{passive:false});
+  const end=()=>{if(!w)return;const r=w;w=null;cancelAnimationFrame(raf);raf=0;cur=null;if(mode!==1)return;
+    const b=r.querySelector(".hist"),d=r.querySelector(".hdel");box._swiped=Date.now();
+    requestAnimationFrame(()=>{r.classList.remove("drag");
+    if(dx>r.offsetWidth*.35){ // slide off, then pull the trips below up (transform only, no layout per frame)
+      b.style.transform=`translate3d(${r.offsetWidth}px,0,0)`;d.style.opacity=1;
+      const hgt=r.offsetHeight,below=[];let n=r.nextElementSibling;while(n){below.push(n);n=n.nextElementSibling;}
+      setTimeout(()=>{r.style.transition="opacity .2s ease";r.style.opacity="0";
+        below.forEach(el=>{el.style.willChange="transform";el.style.transition="transform .28s cubic-bezier(.25,.8,.3,1)";el.style.transform=`translate3d(0,${-hgt}px,0)`;});},200);
+      setTimeout(()=>{const i=+r.dataset.h;try{const h=loadHist();h.splice(i,1);localStorage.setItem("lt_hist",JSON.stringify(h));}catch(e){}renderHist();},500);}
+    else{b.style.transform="";d.style.transition="opacity .2s ease";d.style.opacity=0;setTimeout(()=>d.style.transition="",220);}});};
+  box.addEventListener("touchend",end);box.addEventListener("touchcancel",end);
 })();
 $("hist").onclick=e=>{if($("hist")._swiped&&Date.now()-$("hist")._swiped<400)return;const b=e.target.closest(".hist");if(!b)return;const h=loadHist()[+b.dataset.h];
   setPoint("from",{name:h[0][0].replace(/ station$/,""),lat:h[0][1],lng:h[0][2]});setPoint("to",{name:h[1][0].replace(/ station$/,""),lat:h[1][1],lng:h[1][2]});runSearch();};
