@@ -41,10 +41,10 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 .screen.out-r{z-index:3;animation:outR .32s cubic-bezier(.4,0,.6,1) both;will-change:transform,opacity;backface-visibility:hidden}
 .screen.in-l{animation:inL .4s cubic-bezier(.25,.8,.3,1) both;will-change:transform,opacity}
 /* tab switch (bottom nav <-> Map): Jakdojade-style cross-fade with a slight drift */
-.screen.fi{z-index:3;animation:fadeIn .28s cubic-bezier(.3,.7,.3,1) both;will-change:opacity,transform}
-.screen.fo{visibility:visible;z-index:2;animation:fadeOut .22s ease both;will-change:opacity,transform}
+.screen.fi{z-index:3;animation:fadeIn .45s cubic-bezier(.25,.6,.3,1) both;will-change:opacity,transform}
+.screen.fo{visibility:visible;z-index:2;animation:fadeOut .45s ease-in both;will-change:opacity,transform}
 @keyframes fadeIn{from{opacity:0;transform:translateX(var(--fx,0))}to{opacity:1;transform:none}}
-@keyframes fadeOut{from{opacity:1;transform:none}to{opacity:0;transform:translateX(var(--fx2,0))}}
+@keyframes fadeOut{0%{opacity:1;transform:none}60%{opacity:1}100%{opacity:0;transform:translateX(var(--fx2,0))}}
 @keyframes inR{from{transform:translateX(18%);opacity:0}to{transform:none;opacity:1}}
 @keyframes outR{from{transform:none;opacity:1}to{transform:translateX(18%);opacity:0}}
 @keyframes inL{from{transform:translateX(-5%);opacity:.5}to{transform:none;opacity:1}}
@@ -589,7 +589,7 @@ function show(id,back,instant,fade){if(id==="s-home"){renderHist();if(window.set
   if(cur&&fade&&!matchMedia("(prefers-reduced-motion: reduce)").matches){cur.classList.remove("on");
     const dir=fade==="r"?1:-1;nx.style.setProperty("--fx",(dir*14)+"px");cur.style.setProperty("--fx2",(-dir*14)+"px");
     cur.classList.add("fo");nx.classList.add("fi");
-    clearTimeout(show.t);show.t=setTimeout(()=>document.querySelectorAll(".screen").forEach(x=>x.classList.remove("fi","fo")),300);}
+    clearTimeout(show.t);show.t=setTimeout(()=>document.querySelectorAll(".screen").forEach(x=>x.classList.remove("fi","fo")),480);}
   else if(cur){cur.classList.remove("on");
     if(!instant&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
       if(back){cur.classList.add("out-r");nx.classList.add("in-l");}else{cur.classList.add("under");nx.classList.add("in-r");}
@@ -905,14 +905,14 @@ function drawInto(lay,mode){
   lay.clearLayers();
   const trip=mode==="trip"?state.trip:null;const dim=trip?0.28:1;
   const feeder=id=>id!=="MB"&&id!=="OL"; // street buses: thin, dimmed, small stops, so the map stays readable as routes are added
-  for(const Ln of Object.values(LINES)){if(Ln.hidden)continue;const f=feeder(Ln.id);L.polyline(Ln.geom,{color:Ln.color,weight:f?3:5,opacity:f?Math.min(dim,.3):dim}).addTo(lay);}
+  for(const Ln of Object.values(LINES)){if(Ln.hidden)continue;const f=feeder(Ln.id);L.polyline(Ln.geom,{color:Ln.color,weight:f?3:5,opacity:dim}).addTo(lay);}
   if(trip)for(const l of trip.legs){
     if(l.type==="ride")L.polyline(trackBetween(l.line,l.from,l.to),{color:LINES[l.line].color,weight:8,opacity:1,lineCap:"round",lineJoin:"round"}).addTo(lay);
     else if(l.m>=40){const line=L.polyline([ll(l.from),ll(l.to)],{color:"#c8ced4",weight:6,dashArray:"1 11",lineCap:"round"}).addTo(lay);walkPath(l.from,l.to).then(w=>line.setLatLngs(w.pts));}
   }
   for(const s of STATIONS){if(LINES[s.line].hidden&&!(trip&&trip.rides.some(r=>r.line===s.line)))continue;if(LINES[s.line].tentative&&trip&&!trip.rides.some(r=>r.stops.includes(s)))continue;const on=trip&&trip.rides.some(r=>r.stops.includes(s));const vis=!trip||on;const end=trip&&trip.rides.some(r=>r.from===s||r.to===s);
     const f=feeder(s.line);
-    const m=L.circleMarker(ll(s),f?{radius:end?6:on?3.5:2.5,color:LINES[s.line].color,weight:end?3:1.5,fillColor:end?"#fff":"#141619",fillOpacity:on||end?1:.6,opacity:on||end?1:.35}:{radius:end?8:on?6:5,color:LINES[s.line].color,weight:end?4:3,fillColor:end?"#fff":"#141619",fillOpacity:1,opacity:vis?1:dim}).addTo(lay);
+    const m=L.circleMarker(ll(s),f?{radius:end?6:on?3.5:2.5,color:LINES[s.line].color,weight:end?3:1.5,fillColor:end?"#fff":"#141619",fillOpacity:1,opacity:vis?1:dim}:{radius:end?8:on?6:5,color:LINES[s.line].color,weight:end?4:3,fillColor:end?"#fff":"#141619",fillOpacity:1,opacity:vis?1:dim}).addTo(lay);
     // names of boarding / exit / change stations stay on screen only when zoomed in, and never when they repeat the Start/End point
     const nearPin=trip&&[state.from,state.to].some(p=>p&&dist(p,s)<250);
     m.bindTooltip(s.name+(s.under?" (underground)":""),{direction:"right",className:end&&!nearPin?"st-label perm":"st-label",permanent:!!end&&!nearPin});}
