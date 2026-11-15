@@ -934,7 +934,7 @@ function renderLines(){
   $("lines").innerHTML=Object.values(LINES).map(L=>`<div class="lcard" style="--lc:${L.color}">
     <div class="lhead"><span class="mode" style="color:#e6e9ec">${modeSvg(L.id)}<span class="badge ${L.cls}">${L.short}</span></span><div style="min-width:0"><div class="nm">${L.name}</div>
       <div class="sub" style="margin-top:2px">${L.stops[0].name} ↔ ${L.stops[L.stops.length-1].name}</div>
-      <div class="sub" style="margin-top:2px"><span class="nw">Every ~${L.headway} min</span> · <span class="nw">06:00–22:00</span> · <span class="nw">${L.id==="MB"?"Rs 30 flat":"Rs 25–45 by distance"}</span> · <span class="nw">${L.cumKm[L.stops.length-1].toFixed(1)} km</span></div></div></div>
+      <div class="sub" style="margin-top:2px"><span class="nw">Every ~${L.headway} min</span> · <span class="nw">${fmt(L.open)}–${fmt(L.close)}</span> · <span class="nw">${L.id==="MB"?"Rs 30 flat":"Rs 25–45 by distance"}</span> · <span class="nw">${L.cumKm[L.stops.length-1].toFixed(1)} km</span></div></div></div>
     <button class="ltog"><span>${L.stops.length} stops</span>${chev}</button>
     <div class="lbody"><div>${L.stops.map(st=>`<div class="lst"><span class="km tnum">${L.cumKm[st.i].toFixed(1)} km</span><span class="rail"><i></i></span><span class="x"><span>${st.name}</span>${st.under?'<span class="sub" style="margin:0">underground</span>':""}${(L.id==="OL"&&st.name==="Anarkali")||(L.id==="MB"&&st.name==="MAO College")?'<span class="badge '+(L.id==="OL"?"mb":"ol")+'" style="font-size:10px;padding:1px 5px">'+(L.id==="OL"?"MB":"OL")+'</span>':""}</span></div>`).join("")}<div style="height:8px"></div></div></div>
   </div>`).join("");}
