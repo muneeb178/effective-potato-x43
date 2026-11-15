@@ -580,7 +580,7 @@ function timeLegs(legsIn,startMin){
 const $=id=>document.getElementById(id);
 // haptics: short, light ticks (Android / Play Store app; iPhone Safari ignores vibration silently)
 const hap=(ms=8)=>{try{if(navigator.vibrate&&!(localStorage.getItem("haptics")==="off"))navigator.vibrate(ms);}catch(e){}};
-document.addEventListener("click",e=>{if(e.target.closest("button,.card,.lhead,.ltog,.ocard,.opt,[role=button],label.chip"))hap(8);},true);
+document.addEventListener("click",e=>{if(e.target.closest(".nav button"))hap(8);},true); // bottom bar only
 const state={from:null,to:null,picking:"from",result:null,trip:null,mapMode:"network",when:null,future:false,lastPos:null,pickPt:null};
 const fmt=m=>{m=((Math.round(m)%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");};
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes();};
@@ -702,11 +702,11 @@ function hsFull(){if(hsFullC)return hsFullC;const pane=$("pane-trip").getBoundin
 let navHC=0;document.fonts&&document.fonts.ready.then(()=>{hsFullC=0;navHC=0;if(!hsOpen)setHs(false);});addEventListener("resize",()=>{navHC=0;});
 function hsMax(){return hsc.scrollHeight-hsc.clientHeight;}
 function sizeHs(){const H=hsFull();if(sizeHs.h===H)return;sizeHs.h=H;hsc.style.height=H+"px";$("hsspace").style.height=(H-PEEK)+"px";}
-function setHs(open,smooth){sizeHs();if(smooth===undefined&&typeof hsOpen!=="undefined"&&hsOpen!==open)hap(6);hsOpen=open;hs.classList.toggle("open",open);if(!open)$("hist").scrollTop=0;
+function setHs(open,smooth){sizeHs();hsOpen=open;hs.classList.toggle("open",open);if(!open)$("hist").scrollTop=0;
   const vis=$("s-home").classList.contains("on")&&smooth!==false;hsc.scrollTo({top:open?hsMax():0,behavior:vis?"smooth":"auto"});}
 // native scroll drives the sheet; we only read where it settled
 (function(){let t=0;hsc.addEventListener("scroll",()=>{const open=hsc.scrollTop>hsMax()*0.5;
-    if(open!==hs.classList.contains("open")){hap(6);hs.classList.toggle("open",open);hsOpen=open;if(!open)$("hist").scrollTop=0;}},{passive:true});})();
+    if(open!==hs.classList.contains("open")){hs.classList.toggle("open",open);hsOpen=open;if(!open)$("hist").scrollTop=0;}},{passive:true});})();
 $("hs-top").addEventListener("click",e=>{if(e.target.closest("#hs-close"))return;setHs(!hsOpen);});
 $("hs-close").onclick=()=>setHs(false);
 addEventListener("resize",()=>{if($("s-home").classList.contains("on"))setHs(hsOpen);});
@@ -984,7 +984,7 @@ function foldRows(el,open,tog,done){ // drawer: rows slide out from under the li
     const a=all.map(n=>n.animate([{transform:"none"},{transform:`translateY(${-h}px)`}],{duration:D-40,easing:E,fill:"forwards"}));
     a[0].onfinish=()=>{const keep=box.scrollTop;el.hidden=true;el.style.overflow="";all.forEach(n=>n.getAnimations().forEach(x=>x.cancel()));if(need<=0)box.scrollTop=keep;done&&done();};}}
 function setTab(t){setTab0(t);if(window.syncBack)syncBack();}
-function setTab0(t,fromScroll){const two=t==="lines";if(fromScroll&&setTab0.last!==undefined&&setTab0.last!==two)hap(6);setTab0.last=two;$("tabs").classList.toggle("t2",two);$("tabtrack").classList.toggle("t2",two);
+function setTab0(t,fromScroll){const two=t==="lines";$("tabs").classList.toggle("t2",two);$("tabtrack").classList.toggle("t2",two);
   if(!fromScroll){const c=document.querySelector(".tabclip");c.scrollTo({left:two?c.clientWidth:0,behavior:$("s-home").classList.contains("on")?"smooth":"auto"});}
   $("tab-trip").classList.toggle("on",!two);$("tab-lines").classList.toggle("on",two);$("tab-trip").setAttribute("aria-selected",!two);$("tab-lines").setAttribute("aria-selected",two);
   document.querySelectorAll("#nav button").forEach((b,i)=>b.classList.toggle("on",i===(two?1:0)));
