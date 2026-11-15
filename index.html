@@ -40,6 +40,11 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 .screen.in-r{z-index:3;animation:inR .4s cubic-bezier(.25,.8,.3,1) both;will-change:transform,opacity;backface-visibility:hidden}
 .screen.out-r{z-index:3;animation:outR .32s cubic-bezier(.4,0,.6,1) both;will-change:transform,opacity;backface-visibility:hidden}
 .screen.in-l{animation:inL .4s cubic-bezier(.25,.8,.3,1) both;will-change:transform,opacity}
+/* tab switch (bottom nav <-> Map): Jakdojade-style cross-fade with a slight drift */
+.screen.fi{z-index:3;animation:fadeIn .28s cubic-bezier(.3,.7,.3,1) both;will-change:opacity,transform}
+.screen.fo{visibility:visible;z-index:2;animation:fadeOut .22s ease both;will-change:opacity,transform}
+@keyframes fadeIn{from{opacity:0;transform:translateX(var(--fx,0))}to{opacity:1;transform:none}}
+@keyframes fadeOut{from{opacity:1;transform:none}to{opacity:0;transform:translateX(var(--fx2,0))}}
 @keyframes inR{from{transform:translateX(18%);opacity:0}to{transform:none;opacity:1}}
 @keyframes outR{from{transform:none;opacity:1}to{transform:translateX(18%);opacity:0}}
 @keyframes inL{from{transform:translateX(-5%);opacity:.5}to{transform:none;opacity:1}}
@@ -578,10 +583,14 @@ const fmt=m=>{m=((Math.round(m)%1440)+1440)%1440;return String(Math.floor(m/60))
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes();};
 const brit=t=>String(t).replace(/Defense/g,"Defence").replace(/\bCant\b/g,"Cantt");
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function show(id,back,instant){if(id==="s-home"){renderHist();if(window.setHs)setHs(false,false);}if(id!=="s-search"&&document.activeElement&&document.activeElement.blur)document.activeElement.blur();$("phone").scrollLeft=0;$("phone").scrollTop=0;const nx=$(id),cur=document.querySelector(".screen.on");if(cur===nx)return;
-  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("under","out-r","in-r","in-l"));
+function show(id,back,instant,fade){if(id==="s-home"){renderHist();if(window.setHs)setHs(false,false);}if(id!=="s-search"&&document.activeElement&&document.activeElement.blur)document.activeElement.blur();$("phone").scrollLeft=0;$("phone").scrollTop=0;const nx=$(id),cur=document.querySelector(".screen.on");if(cur===nx)return;
+  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("under","out-r","in-r","in-l","fi","fo"));
   nx.classList.add("on");
-  if(cur){cur.classList.remove("on");
+  if(cur&&fade&&!matchMedia("(prefers-reduced-motion: reduce)").matches){cur.classList.remove("on");
+    const dir=fade==="r"?1:-1;nx.style.setProperty("--fx",(dir*14)+"px");cur.style.setProperty("--fx2",(-dir*14)+"px");
+    cur.classList.add("fo");nx.classList.add("fi");
+    clearTimeout(show.t);show.t=setTimeout(()=>document.querySelectorAll(".screen").forEach(x=>x.classList.remove("fi","fo")),300);}
+  else if(cur){cur.classList.remove("on");
     if(!instant&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
       if(back){cur.classList.add("out-r");nx.classList.add("in-l");}else{cur.classList.add("under");nx.classList.add("in-r");}
       clearTimeout(show.t);show.t=setTimeout(()=>document.querySelectorAll(".screen").forEach(x=>x.classList.remove("under","out-r","in-r","in-l")),430);}}
@@ -915,7 +924,7 @@ function drawInto(lay,mode){
   if(mode==="pick"&&state.pickPt)L.marker(ll(state.pickPt),{icon:pinIcon(state.picking==="from"?"Start":"End",state.picking==="from"?"#1fc77e":"#1f9ee0")}).addTo(lay);
 }
 function openMap(mode){state.mapMode=mode;initMap();$("nav2").hidden=mode==="pick";$("map-back").style.visibility=mode==="pick"?"visible":"hidden";
-  show("s-map",false,mode==="network");$("pickbar").hidden=mode!=="pick";$("legend").hidden=mode==="pick";$("mapctl").style.bottom=mode==="pick"?"96px":"";
+  show("s-map",false,mode==="network",mode==="network"?"r":false);$("pickbar").hidden=mode!=="pick";$("legend").hidden=mode==="pick";$("mapctl").style.bottom=mode==="pick"?"96px":"";
   $("map-title").textContent=mode==="pick"?(state.picking==="from"?"Choose start":"Choose destination"):"Network map";
   state.pickPt=null;$("pick-ok").disabled=true;$("pick-txt").textContent="Tap the map to set the point";
   lmap.invalidateSize({pan:false});drawInto(layer,mode);
@@ -923,8 +932,8 @@ function openMap(mode){state.mapMode=mode;initMap();$("nav2").hidden=mode==="pic
   else{const ref=state[state.picking]||state[state.picking==="from"?"to":"from"]||state.lastPos;if(ref)lmap.setView(ll(ref),15,{animate:false});else lmap.setView([31.52,74.33],13,{animate:false});}}
 $("nav-map").onclick=()=>openMap("network");
 $("map-back").onclick=()=>goBack();
-$("n2-trip").onclick=()=>{show("s-home",false,true);setTab("trip");};
-$("n2-lines").onclick=()=>{show("s-home",false,true);setTab("lines");};
+$("n2-trip").onclick=()=>{setTab0("trip");show("s-home",false,true,"l");if(window.syncBack)syncBack();};
+$("n2-lines").onclick=()=>{setTab0("lines");show("s-home",false,true,"l");if(window.syncBack)syncBack();};
 async function reverseName(p){
   try{const j=await(await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&lat=${p.lat}&lon=${p.lng}`)).json();
     const a=j.address||{};const parts=[j.name,a.road,a.neighbourhood||a.suburb||a.quarter].filter(Boolean);return parts.slice(0,2).join(", ")||"Pinned point";}catch(e){return "Pinned point";}}
@@ -986,7 +995,7 @@ function backTarget(){const c=curScreen();
 function goBack(instant){const c=curScreen();
   if(c==="s-detail"&&$("s-detail").classList.contains("open")){setPanel(false);return;}
   if(c==="s-home"){if($("tabtrack").classList.contains("t2"))setTab("trip");syncBack();return;}
-  const t=backTarget();if(t){show(t,true,instant||c==="s-search");if(t==="s-home"&&c==="s-map")setTab("trip");}}
+  const t=backTarget();if(t){show(t,true,instant||c==="s-search",c==="s-map"&&state.mapMode==="network"?"l":false);if(t==="s-home"&&c==="s-map")setTab("trip");}}
 // one spare browser-history entry while you're inside the app, so Safari's / Android's back swipe steps back inside the app
 let backEntry=false,skipPop=false;
 function syncBack(){const root=atRoot()&&!$("s-detail").classList.contains("open");
