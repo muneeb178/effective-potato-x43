@@ -628,7 +628,13 @@ function plan(A,B,startMin){
   const walkAll=walkMin(direct);
   let pats=opts.map(legs=>timeLegs(legs,startMin)).filter(Boolean)
     .filter(r=>r.total<walkAll-2||walkAll>30);
-  pats.forEach(r=>r.score=r.total+(r.rides.length-1)*6+r.walkTot*0.3);
+  // "stay on the bus": a change is penalised if the next vehicle just runs alongside the one you were already on
+  // (its next stops are next to stops your first vehicle would still reach) — people only change where the routes split.
+  const parallelPen=r=>{let pen=0;for(let k=0;k<r.rides.length-1;k++){const a=r.rides[k],b=r.rides[k+1],L1=LINES[a.line];
+      const rest=[];for(let i=a.to.i+a.dir,n=0;i>=0&&i<L1.stops.length&&n<8;i+=a.dir,n++)rest.push(L1.stops[i]);
+      const nxt=b.stops.slice(1,5);let c=0;for(const s of nxt)if(rest.some(x=>walkM(s,x)<=500))c++;
+      if(c>=1)pen+=12+4*c;}return pen;};
+  pats.forEach(r=>r.score=r.total+(r.rides.length-1)*8+r.walkTot*0.3+parallelPen(r));
   pats.sort((a,b)=>a.score-b.score);
   // keep distinct patterns: same lines boarded at the same station = same trip (only the best exit is kept)
   const seen=new Set(),best=[];
