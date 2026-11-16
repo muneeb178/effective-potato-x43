@@ -345,6 +345,7 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 .lnst:first-child::before{top:50%}.lnst:last-child::before{bottom:50%}
 .lnst i{width:16px;height:16px;border-radius:50%;border:3px solid var(--lc);background:var(--panel,#191b1e);position:relative;z-index:1;flex:none;margin-left:3px}
 .lnst .tb{font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px}
+#lines,.tscroll{overflow-anchor:none}
 </style>
 </head>
 <body>
@@ -1082,12 +1083,12 @@ function foldRows(el,open,tog,done){ // Jakdojade-style: the stop list fades/squ
   const below=[];for(let n=el;n&&n!==box;n=n.parentElement){let x=n.nextElementSibling;while(x){below.push(x);x=x.nextElementSibling;}}
   [el,...el.children,...below].forEach(n=>n.getAnimations().forEach(a=>a.cancel()));
   if(tog)tog.classList.toggle("open",open);
-  if(open){el.hidden=false;const h=el.offsetHeight;
-    // gentle open: everything moves on one soft ease-in-out curve (no front-loaded jump); the list fades in slowly behind the glide
-    const SOFT="cubic-bezier(.45,.05,.2,1)";
-    const L=el.animate([{opacity:0,transform:"translateY(-14px)"},{opacity:1,transform:"none"}],{duration:760,delay:90,easing:SOFT,fill:"backwards"});
-    below.forEach(n=>n.animate([{transform:`translateY(${-h}px)`},{transform:"none"}],{duration:720,easing:SOFT}));
-    L.onfinish=()=>{done&&done();};
+  if(open){el.hidden=false;
+    // reveal: the list's own height grows from 0 (content below follows by normal layout, nothing else is moved) while it fades in a beat behind
+    const h=el.offsetHeight;el.style.overflow="hidden";el.style.boxSizing="border-box";
+    const cs=getComputedStyle(el),pt=cs.paddingTop,pb=cs.paddingBottom,mt=cs.marginTop,mb=cs.marginBottom;
+    const L=el.animate([{height:"0px",paddingTop:"0px",paddingBottom:"0px",marginTop:"0px",marginBottom:"0px",opacity:0},{opacity:.15,offset:.3},{height:h+"px",paddingTop:pt,paddingBottom:pb,marginTop:mt,marginBottom:mb,opacity:1}],{duration:640,easing:"cubic-bezier(.4,0,.2,1)"});
+    L.onfinish=()=>{el.style.overflow="";el.style.boxSizing="";done&&done();};
   }else{const h=el.offsetHeight;
     // if the list is scrolled near its end, shortening it would make the view jump at the end; ease the scroll there instead
     const need=box.scrollTop+box.clientHeight-(box.scrollHeight-h);
