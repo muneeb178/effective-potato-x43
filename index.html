@@ -146,14 +146,10 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 /* swipe left on a history trip to delete it */
 .tabclip,#phone{overscroll-behavior-x:none}
 /* history row = its own native sideways scroller (smooth at 120 Hz like the tabs); red tail sits to the right of the trip */
-.hwrap{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.hwrap::-webkit-scrollbar{display:none}
-.hwrap>.hist{flex:0 0 100%;scroll-snap-align:start;background:var(--surface,#1c1f24)}
-.hwrap>.hdel{flex:0 0 100%;display:flex;align-items:center;background:#ff4048;color:#fff;font-weight:600;font-size:15px;position:relative}
-.hwrap>.hdel .snapbtn{position:absolute;left:96px;top:0;width:1px;height:1px;scroll-snap-align:end}
-.hwrap>.hdel span{margin-left:auto;position:sticky;right:22px;white-space:nowrap;will-change:transform}
-.hwrap.armed>.hdel span{margin-left:22px;margin-right:auto;position:static}
-.hwrap.gone{overflow:hidden}
+.hwrap{position:relative;overflow:hidden;touch-action:pan-y}
+.hwrap>.hist{position:relative;z-index:1;background:var(--surface,#1c1f24);will-change:transform}
+.hwrap>.hdel{position:absolute;inset:0;display:flex;align-items:center;background:#ff4048;color:#fff;font-weight:600;font-size:15px}
+.hwrap>.hdel span{position:absolute;top:50%;left:0;white-space:nowrap;will-change:transform}
 
 .hist .l{display:flex;align-items:center;gap:11px;font-size:15px;font-weight:500;line-height:1.2}
 .hist .arr{color:var(--muted);font-size:12px;padding:0 0 0 3px;line-height:12px;height:12px}
@@ -773,31 +769,43 @@ function dayLabel(ts){const d=new Date(ts),t=new Date();const s=d.toLocaleDateSt
   return d.toLocaleDateString("en-GB",{weekday:"short"})+" "+s;}
 function renderHist(){const h=loadHist();$("hsheet").hidden=!!(state.from&&state.to);if(!h.length){$("hist").innerHTML=`<p class="note" style="padding:6px 20px">No trips yet. Your searches will show up here.</p>`;return;}let last="",out="";
   h.forEach((x,i)=>{const d=x[2]?dayLabel(x[2]):"Earlier";if(d!==last){out+=`<div class="hday">${d}</div>`;last=d;}
-    out+=`<div class="hwrap" data-h="${i}"><button class="hist" data-h="${i}"><div class="l"><span class="dot"></span>${esc(x[0][0].replace(/ station$/,""))}</div><div class="arr">↓</div><div class="l"><span class="dot b"></span>${esc(x[1][0].replace(/ station$/,""))}</div></button><div class="hdel"><i class="snapbtn"></i><span>Delete</span></div></div>`;});
+    out+=`<div class="hwrap" data-h="${i}"><button class="hist" data-h="${i}"><div class="l"><span class="dot"></span>${esc(x[0][0].replace(/ station$/,""))}</div><div class="arr">↓</div><div class="l"><span class="dot b"></span>${esc(x[1][0].replace(/ station$/,""))}</div></button><div class="hdel"><span>Delete</span></div></div>`;});
   $("hist").innerHTML=out;}
-(function(){ // swipe left = native scroll of the row (smooth); reveal Delete, tap it, or pull ~93% / flick and let go to delete
-  const box=$("hist");let open=null,touching=null;
-  const flip=(r,arm)=>{const l=r.querySelector(".hdel span"),x0=l.getBoundingClientRect().left;r.classList.toggle("armed",arm);
-    const x1=l.getBoundingClientRect().left;l.style.transition="none";l.style.transform=`translate3d(${x0-x1}px,0,0)`;l.offsetWidth;
-    l.style.transition="transform .38s cubic-bezier(.22,.8,.25,1)";l.style.transform="";hap(10);};
-  const close=r=>{if(!r)return;r.scrollTo({left:0,behavior:"smooth"});if(open===r)open=null;};
-  const del=r=>{if(r.classList.contains("gone"))return;open=null;r.classList.add("gone");const W=r.clientWidth;
-    const t=r.querySelector(".hist"),d=r.querySelector(".hdel"),sl=r.scrollLeft;r.style.scrollSnapType="none";
-    [t,d].forEach(el=>{el.style.transition="none";el.style.transform=`translate3d(${-sl}px,0,0)`;});r.scrollLeft=0;r.offsetWidth;
-    [t,d].forEach(el=>{el.style.transition="transform .42s cubic-bezier(.3,.6,.3,1)";el.style.transform=`translate3d(${-W}px,0,0)`;});
+(function(){ // swipe left (JS drag on transform, iOS-style): short swipe opens Delete, long pull (past ~55%) or a hard flick deletes
+  const box=$("hist"),R=88;let open=null,cur=null,x0=0,y0=0,base=0,x=0,axis=0,vt=[],raf=0,W=0;
+  const lab=r=>r.querySelector(".hdel span"),row=r=>r.querySelector(".hist");
+  const place=(r,X,anim)=>{const t=row(r),l=lab(r),w=r.clientWidth,lw=l.offsetWidth||60;r._x=X;
+    const ease="transform .36s cubic-bezier(.22,.8,.25,1)";t.style.transition=anim?ease:"none";
+    l.style.transition=anim||Date.now()-(r._la||0)<320?"transform .3s cubic-bezier(.22,.8,.25,1)":"none";
+    t.style.transform=`translate3d(${X}px,0,0)`;
+    // label sits centred in the revealed red strip; once armed it glides to follow the row's edge on the left
+    const rev=-X,armed=r.classList.contains("armed");const lx=armed?Math.max(18,w-rev+18):w-Math.max(rev,R)/2-lw/2+Math.max(0,R-rev)/2;
+    l.style.transform=`translate3d(${lx}px,-50%,0)`;};
+  const arm=(r,on)=>{if(on===r.classList.contains("armed"))return;r.classList.toggle("armed",on);r._la=Date.now();hap(10);};
+  const close=r=>{if(!r)return;r.classList.remove("armed");place(r,0,true);if(open===r)open=null;};
+  const del=r=>{if(r.classList.contains("gone"))return;r.classList.add("gone");if(open===r)open=null;const w=r.clientWidth;
+    r.classList.add("armed");place(r,-w,true);
     const hgt=r.offsetHeight,below=[];let n=r.nextElementSibling;while(n){below.push(n);n=n.nextElementSibling;}
     setTimeout(()=>{r.style.transition="opacity .25s ease";r.style.opacity="0";
-      below.forEach(el=>{el.style.willChange="transform";el.style.transition="transform .45s cubic-bezier(.22,.8,.25,1)";el.style.transform=`translate3d(0,${-hgt}px,0)`;});},380);
-    setTimeout(()=>{const k=+r.dataset.h;try{const h=loadHist();h.splice(k,1);localStorage.setItem("lt_hist",JSON.stringify(h));}catch(e){}renderHist();},880);};
-  box.addEventListener("scroll",e=>{const r=e.target;if(!r.classList||!r.classList.contains("hwrap")||r.classList.contains("gone"))return;
-    const W=r.clientWidth,sl=r.scrollLeft;if(sl>2&&open&&open!==r)close(open);if(sl>2)open=r;else if(open===r)open=null;
-    const arm=sl>W*.93;if(arm!==r.classList.contains("armed"))flip(r,arm);
-    if(arm&&touching!==r)del(r);},{capture:true,passive:true}); // flick carried it to the end after lifting
-  box.addEventListener("touchstart",e=>{const r=e.target.closest(".hwrap");touching=r;if(open&&open!==r)close(open);},{passive:true});
-  const up=()=>{const r=touching;touching=null;if(r&&r.classList.contains("armed"))del(r);};
+      below.forEach(el=>{el.style.willChange="transform";el.style.transition="transform .45s cubic-bezier(.22,.8,.25,1)";el.style.transform=`translate3d(0,${-hgt}px,0)`;});},340);
+    setTimeout(()=>{const k=+r.dataset.h;try{const h=loadHist();h.splice(k,1);localStorage.setItem("lt_hist",JSON.stringify(h));}catch(e){}renderHist();},840);};
+  box.addEventListener("touchstart",e=>{const r=e.target.closest(".hwrap");if(open&&open!==r)close(open);if(!r||r.classList.contains("gone")){cur=null;return;}
+    cur=r;const t=e.touches[0];x0=t.clientX;y0=t.clientY;base=r._x||0;x=base;axis=0;W=r.clientWidth;vt=[[performance.now(),x0]];row(r).style.transition="none";},{passive:true});
+  box.addEventListener("touchmove",e=>{if(!cur)return;const t=e.touches[0],dx=t.clientX-x0,dy=t.clientY-y0;
+    if(!axis){if(Math.abs(dx)<7&&Math.abs(dy)<7)return;axis=Math.abs(dx)>Math.abs(dy)?1:2;}
+    if(axis!==1)return;e.preventDefault();vt.push([performance.now(),t.clientX]);if(vt.length>6)vt.shift();
+    x=base+dx;if(x>0)x=x*.25;if(x<-W)x=-W+(x+W)*.25;
+    if(!raf)raf=requestAnimationFrame(()=>{raf=0;if(!cur)return;arm(cur,x<-W*.55);place(cur,x,false);});},{passive:false});
+  const up=()=>{const r=cur;cur=null;if(!r||axis!==1)return;cancelAnimationFrame(raf);raf=0;
+    const v=vt.length>1?(vt[vt.length-1][1]-vt[0][1])/Math.max(1,vt[vt.length-1][0]-vt[0][0]):0; // px/ms, negative = leftwards
+    if(x<-W*.55||(v<-1.1&&x<-R*.6)){box._swiped=Date.now();del(r);return;}
+    r.classList.remove("armed");
+    if(v>.3||x>-R*.5){close(r);}else{place(r,-R,true);open=r;}
+    box._swiped=Date.now();};
   box.addEventListener("touchend",up);box.addEventListener("touchcancel",up);
-  box.addEventListener("click",e=>{if(e.target.closest(".hdel")){e.stopImmediatePropagation();del(e.target.closest(".hwrap"));return;}
-    const r=e.target.closest(".hwrap");if(r&&r.scrollLeft>2){e.stopImmediatePropagation();close(r);box._swiped=Date.now();}},true);
+  box.addEventListener("click",e=>{const r=e.target.closest(".hwrap");if(!r)return;
+    if(e.target.closest(".hdel")){e.stopImmediatePropagation();del(r);return;}
+    if((r._x||0)<-2){e.stopImmediatePropagation();close(r);box._swiped=Date.now();}},true);
   document.addEventListener("touchstart",e=>{if(open&&!e.target.closest("#hist"))close(open);},{passive:true});
 })();
 $("hist").onclick=e=>{if($("hist")._swiped&&Date.now()-$("hist")._swiped<400)return;const b=e.target.closest(".hist");if(!b)return;const h=loadHist()[+b.dataset.h];
