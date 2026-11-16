@@ -1091,23 +1091,26 @@ function foldRows(el,open,tog,done){ // Jakdojade-style: the stop list fades/squ
   const box=el.closest(".tscroll,#lines")||el.parentElement,E="cubic-bezier(.3,.75,.25,1)",D=420;
   const below=[];for(let n=el;n&&n!==box;n=n.parentElement){let x=n.nextElementSibling;while(x){below.push(x);x=x.nextElementSibling;}}
   [el,...el.children,...below].forEach(n=>n.getAnimations().forEach(a=>a.cancel()));
-  [el,...below].forEach(n=>{n.style.transform="";n.style.clipPath="";n.style.opacity="";n.style.willChange="";});
+  [el,...below,...el.querySelectorAll(".pm .b,.pm .mt,.lst>.km,.lst>.x,.lst .rail i")].forEach(n=>{n.getAnimations().forEach(a=>a.cancel());n.style.transform="";n.style.clipPath="";n.style.opacity="";n.style.willChange="";});
   if(tog)tog.classList.toggle("open",open);
+  const fx=()=>{const t=el.querySelectorAll(".pm .b,.pm .mt,.lst>.km,.lst>.x,.lst .rail i");return t.length?[...t]:[el];};
   if(open){el.hidden=false;
     // 60/120 fps reveal: no layout per frame. Everything is set to its start state synchronously (before the next paint, so no flash),
     // then only transform / clip-path / opacity animate: content below glides down from where it was, the list is uncovered top-down in step and fades in.
     const h=el.offsetHeight,SOFT="cubic-bezier(.4,0,.2,1)",T=620;
     below.forEach(n=>{n.style.transform=`translateY(${-h}px)`;n.style.willChange="transform";});
-    el.style.clipPath="inset(0 0 100% 0)";el.style.opacity="0";el.style.willChange="opacity,clip-path";
+    el.style.clipPath="inset(0 0 100% 0)";el.style.willChange="clip-path";const F=fx();F.forEach(n=>n.style.opacity="0");
     const anims=below.map(n=>n.animate([{transform:`translateY(${-h}px)`},{transform:"translateY(0)"}],{duration:T,easing:SOFT,fill:"both"}));
     anims.push(el.animate([{clipPath:"inset(0 0 100% 0)"},{clipPath:"inset(0 0 0% 0)"}],{duration:T,easing:SOFT,fill:"both"}));
-    const L=el.animate([{opacity:0},{opacity:.2,offset:.3},{opacity:1}],{duration:T,easing:"linear",fill:"both"});anims.push(L);
-    L.onfinish=()=>{[el,...below].forEach(n=>{n.style.transform="";n.style.clipPath="";n.style.opacity="";n.style.willChange="";});anims.forEach(x=>x.cancel());done&&done();};
+    F.forEach(n=>anims.push(n.animate([{opacity:0},{opacity:.2,offset:.3},{opacity:1}],{duration:T,easing:"linear",fill:"both"})));const L=anims[anims.length-1];
+    L.onfinish=()=>{[el,...below,...F].forEach(n=>{n.style.transform="";n.style.clipPath="";n.style.opacity="";n.style.willChange="";});anims.forEach(x=>x.cancel());done&&done();};
   }else{const h=el.offsetHeight;
     // if the list is scrolled near its end, shortening it would make the view jump at the end; ease the scroll there instead
     const need=box.scrollTop+box.clientHeight-(box.scrollHeight-h);
     if(need>0){const t0=box.scrollTop,T=performance.now();const step=now=>{const k=Math.min(1,(now-T)/(D-40)),e=1-Math.pow(1-k,3);box.scrollTop=t0-need*e;if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
-    el.animate([{opacity:1,transform:"none",transformOrigin:"top"},{opacity:0,transform:"translateY(-8px) scaleY(.9)",transformOrigin:"top"}],{duration:230,easing:"cubic-bezier(.4,0,1,1)",fill:"forwards"});
+    // close: text fades out, the line is wiped up in step with the content below (no separate fading piece of line)
+    fx().forEach(n=>n.animate([{opacity:1},{opacity:0}],{duration:230,easing:"cubic-bezier(.4,0,1,1)",fill:"forwards"}));
+    el.animate([{clipPath:"inset(0 0 0% 0)"},{clipPath:"inset(0 0 100% 0)"}],{duration:D-40,easing:E,fill:"forwards"});
     const a=below.map(n=>n.animate([{transform:"none"},{transform:`translateY(${-h}px)`}],{duration:D-40,easing:E,fill:"forwards"}));
     const fin=()=>{const keep=box.scrollTop;el.hidden=true;[el,...below].forEach(n=>n.getAnimations().forEach(x=>x.cancel()));if(need<=0)box.scrollTop=keep;done&&done();};
     if(a.length)a[0].onfinish=fin;else setTimeout(fin,D-40);}}
