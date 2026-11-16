@@ -583,6 +583,12 @@ const TRANSFERS=[];
 for(const a of LINES.OL.stops)for(const b of LINES.MB.stops){const m=walkM(a,b);if(m<=900){TRANSFERS.push({a,b,m});TRANSFERS.push({a:b,b:a,m});}}
 for(const ev of Object.keys(LINES).filter(k=>k!=="OL"&&k!=="MB"))for(const rl of ["OL","MB"])for(const b of LINES[rl].stops){let best=null;for(const a of LINES[ev].stops){const m=walkM(a,b);if(m<=450&&(!best||m<best.m))best={a,m};}
   if(best){TRANSFERS.push({a:best.a,b,m:best.m});TRANSFERS.push({a:b,b:best.a,m:best.m});}}
+// bus <-> bus (e-bus, PTC, later Speedo): change where two routes' stops are within 400 m — closest stop pair per meeting point
+{const bus=Object.keys(LINES).filter(k=>k!=="OL"&&k!=="MB");
+ for(const l1 of bus)for(const l2 of bus){if(l1===l2||l1.replace(/R$/,"")===l2.replace(/R$/,""))continue;const byB=new Map();
+   for(const a of LINES[l1].stops){let best=null;for(const b of LINES[l2].stops){const m=walkM(a,b);if(m<=400&&(!best||m<best.m))best={b,m};}
+     if(best&&(!byB.has(best.b)||best.m<byB.get(best.b).m))byB.set(best.b,{a,b:best.b,m:best.m});}
+   for(const t of byB.values())TRANSFERS.push(t);}}
 
 function fareFor(lineId,i,j){const L=LINES[lineId];if(L.fare)return L.fare;if(lineId==="MB")return MB_FARE;const km=Math.abs(L.cumKm[j]-L.cumKm[i]);for(const[max,f]of OL_FARE)if(km<=max)return f;return 45;}
 function rideMin(lineId,i,j){const L=LINES[lineId];return Math.max(2,Math.round(Math.abs(L.cumMin[j]-L.cumMin[i])));}
@@ -810,7 +816,7 @@ function runSearch(){
   let list=plan(A,B,start);if(!list.some(r=>r.rides.length)&&start>=17*60){const m=plan(A,B,LINES.OL.open-15);if(m.some(r=>r.rides.length)){list=m;start=LINES.OL.open-15;state.future=true;banner="The last Metrobus and Orange Line trips for tonight have left. Showing the first trips tomorrow morning (from 06:00).";}}state.result=list;
   $("r-from").textContent=A.name;$("r-to").textContent=B.name;
   if(list.some(r=>r.rides.length))list=allDepartures(plan.best,plan.walk,start,start+120);state.result=list;state.shown=0;state.now=now;
-  $("cards").innerHTML=`<div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div>`+(banner?`<div class="banner">${banner}</div>`:"")+(list.length?`<div id="cardlist"></div>`:`<p class="note" style="font-size:15px">No Metrobus or Orange Line trip fits this journey yet. Both points need to be within about 2.5 km of a station. Speedo and e-bus routes will widen this.</p>`)+
+  $("cards").innerHTML=`<div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div>`+(banner?`<div class="banner">${banner}</div>`:"")+(list.length?`<div id="cardlist"></div>`:`<p class="note" style="font-size:15px">No trip found with at most one change. Both points need to be within about 2.5 km of a stop, and the bus must be running at this time.</p>`)+
     `<p class="proto">Times are estimates from published frequencies. No live tracking yet.</p><div style="height:24px"></div>`;
   moreCards(16);$("cards").scrollTop=0;
   const R=$("s-results"),clist=$("cardlist");show("s-results",false,true);R.animate([{opacity:0},{opacity:1}],{duration:220,easing:"ease-out"});
