@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" translate="no">
 <head>
 <meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow">
+<meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no">
+<meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#141619">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -343,6 +345,7 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 .lnst i{width:16px;height:16px;border-radius:50%;border:3px solid var(--lc);background:var(--panel,#191b1e);position:relative;z-index:1;flex:none;margin-left:3px}
 .lnst .tb{font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px}
 #lines,.tscroll{overflow-anchor:none}
+a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important;pointer-events:none}
 </style>
 </head>
 <body>
@@ -538,7 +541,8 @@ const walkMin=m=>Math.max(1,Math.round(m/WALK_MPM));
 // build stations
 const STATIONS=[];
 for(const L of Object.values(LINES)){
-  L.stops=L.st.map(([name,lat,lng],i)=>{const s={id:L.id+":"+i,name,lat,lng,line:L.id,i,under:L.underground.includes(name)};STATIONS.push(s);return s;});
+  const isRail=L.id==="MB"||L.id==="OL";
+  L.stops=L.st.map(([name,lat,lng],i)=>{if(!isRail&&!/(Railway|Police) Station$/i.test(name))name=name.replace(/\s+(Metro\s*Bus\s+Station|Metro\s+Station|OL\s+Station|Station)$/i,""); /* street bus stops: never "… Metro Bus Station" */const s={id:L.id+":"+i,name,lat,lng,line:L.id,i,under:L.underground.includes(name)};STATIONS.push(s);return s;});
   // cumulative km + minutes
   L.cumKm=[0];L.cumMin=[0];
   if(L.id==="MB"){for(let i=1;i<L.stops.length;i++){L.cumKm[i]=L.cumKm[i-1]+L.km[i];L.cumMin[i]=L.cumKm[i]/L.speedKmh*60;}}
@@ -597,6 +601,7 @@ function nextDep(L,t,off=0){ // minutes since midnight; trains leave the terminu
 const MAX_ACCESS_WALK=2600; // m (walk-distance incl. detour)
 function nearest(p,line,n){return LINES[line].stops.map(s=>({s,m:walkM(p,s)})).filter(x=>x.m<=MAX_ACCESS_WALK).sort((x,y)=>x.m-y.m).slice(0,n);}
 function legRide(lineId,from,to){const dir=to.i>from.i?1:-1;const L=LINES[lineId];return{type:"ride",line:lineId,from,to,stops:L.stops.slice(Math.min(from.i,to.i),Math.max(from.i,to.i)+1)[dir>0?"slice":"reverse"]().slice(),dir,headsign:dir>0?L.stops[L.stops.length-1].name:L.stops[0].name,min:rideMin(lineId,from.i,to.i),fare:fareFor(lineId,from.i,to.i)};}
+function stopKind(id){return id==="MB"?"Metrobus station":id==="OL"?"Orange Line station":/^E\d|^EV3/.test(id)?"electric bus stop":"Speedo stop";}
 function fixStops(leg){const L=LINES[leg.line];const a=Math.min(leg.from.i,leg.to.i),b=Math.max(leg.from.i,leg.to.i);let s=L.stops.slice(a,b+1);if(leg.dir<0)s=s.reverse();leg.stops=s;return leg;}
 
 function plan(A,B,startMin){
@@ -885,11 +890,11 @@ function renderDetail(){
   h+=row(`<span class="time o tnum">${fmt(r.start)}</span>`,`<div class="sname">${esc(state.from.name)}</div>`);
   r.legs.forEach((l,idx)=>{
     if(l.type==="walk"){if(!l.min)return;
-      const label=l.transfer?`Change: walk ${Math.round(l.m)} m to the ${LINES[l.to.line].name}`:`Walk ${Math.round(l.m)} m`;
+      const label=l.transfer?`Change: walk ${Math.round(l.m)} m to the ${stopKind(l.to.line)}: ${l.to.name.replace(/ station$/i,"")}`:`Walk ${Math.round(l.m)} m`;
       h+=row(walkIcon+`<span class="vdots"></span>`,`<div class="walk"><span>${label}</span><span>${l.min} min</span></div>${l.transfer&&l.from.under?`<div class="sub">Anarkali is underground: go up to street level, then up to the Metrobus platform.</div>`:l.transfer&&l.to.under?`<div class="sub">Come down from the elevated Metrobus platform, walk to Anarkali, then go down to the underground Orange Line platform.</div>`:""}`);
     }else{
       const L=LINES[l.line];sep=true;
-      const stairs=l.from.under?"Go down to the platform (underground station).":"Take the stairs or escalator up to the platform.";
+      const rail=l.line==="MB"||l.line==="OL";const stairs=!rail?"Wait at the roadside bus stop.":l.from.under?"Go down to the platform (underground station).":"Take the stairs or escalator up to the platform.";
       h+=row(`<span class="time g tnum">${fmt(l.dep)}</span>`+circleIcon(l.line)+`<span class="vbar" style="background:${L.color}"></span>`,
         `<div class="sname">${esc(l.from.name)}</div><div class="sub">${stairs}</div>
          <div class="ride"><span class="badge ${L.cls}">${L.short}</span><span>→ ${esc(l.headsign.toUpperCase())}</span><span class="dur tnum">${l.min} min</span></div>
@@ -897,7 +902,7 @@ function renderDetail(){
          <button class="tog" data-tog="${idx}"><span>${l.stops.length-1} stop${l.stops.length>2?"s":""}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>`);
       h+=`<div id="midrows-${idx}" hidden>`+l.stops.slice(1,-1).map((s,n)=>{const t=l.dep+Math.round(Math.abs(L.cumMin[s.i]-L.cumMin[l.from.i]));
         return `<div class="pm"><div class="c"><span class="vbar" style="background:${L.color}"></span><span class="mt tnum">${fmt(t)}</span><span class="vbar" style="background:${L.color}"></span></div><div class="b"><span class="n">${n+1}.</span><span>${esc(s.name)}</span></div></div>`;}).join("")+`</div>`;
-      h+=row(`<span class="vbar" style="background:${L.color};max-height:22px;flex:none;height:22px"></span><span class="ring" style="border-color:${L.color}"></span><span class="time bl tnum" style="margin-top:6px">${fmt(l.arr)}</span>`,`<div class="sname">${l.stops.length-1}. ${esc(l.to.name)}</div><div class="sub">Get off here${l.to.under?" · underground station":""}.</div>`);
+      h+=row(`<span class="vbar" style="background:${L.color};max-height:22px;flex:none;height:22px"></span><span class="ring" style="border-color:${L.color}"></span><span class="time bl tnum" style="margin-top:6px">${fmt(l.arr)}</span>`,`<div class="sname">${l.stops.length-1}. ${esc(l.to.name)}</div><div class="sub">${l.line!=="MB"&&l.line!=="OL"?"Get off here.":l.to.under?"Get off here, then go up to street level.":"Get off here, then take the stairs down to street level."}</div>`);
       sep=true;
     }
   });
