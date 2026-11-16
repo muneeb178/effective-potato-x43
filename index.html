@@ -1010,20 +1010,23 @@ function renderLines(){
 renderLines();
 $("lines").onclick=e=>{const t=e.target.closest(".ltog");if(!t)return;const c=t.closest(".lcard"),b=c.querySelector(".lbody");
   const open=!c.classList.contains("open");if(open)c.classList.add("open");foldRows(b,open,null,()=>{if(!open)c.classList.remove("open");});};
-function foldRows(el,open,tog,done){ // drawer: rows slide out from under the line above while the content below moves in step (transform only)
+function foldRows(el,open,tog,done){ // Jakdojade-style: the stop list fades/squeezes as ONE block while the content below glides (transform+opacity only)
   const box=el.closest(".tscroll,#lines")||el.parentElement,E="cubic-bezier(.3,.75,.25,1)",D=420;
   const below=[];for(let n=el;n&&n!==box;n=n.parentElement){let x=n.nextElementSibling;while(x){below.push(x);x=x.nextElementSibling;}}
-  const kids=[...el.children],all=[...kids,...below];all.forEach(n=>n.getAnimations().forEach(a=>a.cancel()));
-  if(tog)tog.classList.toggle("open",open);el.style.overflow="hidden";
+  [el,...el.children,...below].forEach(n=>n.getAnimations().forEach(a=>a.cancel()));
+  if(tog)tog.classList.toggle("open",open);
   if(open){el.hidden=false;const h=el.offsetHeight;
-    const a=all.map(n=>n.animate([{transform:`translateY(${-h}px)`},{transform:"none"}],{duration:D,easing:E}));
-    a[0].onfinish=()=>{el.style.overflow="";done&&done();};
+    const L=el.animate([{opacity:0,transform:"translateY(-10px) scaleY(.94)",transformOrigin:"top"},{opacity:1,transform:"none",transformOrigin:"top"}],{duration:320,delay:60,easing:E,fill:"backwards"});
+    below.forEach(n=>n.animate([{transform:`translateY(${-h}px)`},{transform:"none"}],{duration:D,easing:E}));
+    L.onfinish=()=>{done&&done();};
   }else{const h=el.offsetHeight;
     // if the list is scrolled near its end, shortening it would make the view jump at the end; ease the scroll there instead
     const need=box.scrollTop+box.clientHeight-(box.scrollHeight-h);
     if(need>0){const t0=box.scrollTop,T=performance.now();const step=now=>{const k=Math.min(1,(now-T)/(D-40)),e=1-Math.pow(1-k,3);box.scrollTop=t0-need*e;if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
-    const a=all.map(n=>n.animate([{transform:"none"},{transform:`translateY(${-h}px)`}],{duration:D-40,easing:E,fill:"forwards"}));
-    a[0].onfinish=()=>{const keep=box.scrollTop;el.hidden=true;el.style.overflow="";all.forEach(n=>n.getAnimations().forEach(x=>x.cancel()));if(need<=0)box.scrollTop=keep;done&&done();};}}
+    el.animate([{opacity:1,transform:"none",transformOrigin:"top"},{opacity:0,transform:"translateY(-8px) scaleY(.9)",transformOrigin:"top"}],{duration:230,easing:"cubic-bezier(.4,0,1,1)",fill:"forwards"});
+    const a=below.map(n=>n.animate([{transform:"none"},{transform:`translateY(${-h}px)`}],{duration:D-40,easing:E,fill:"forwards"}));
+    const fin=()=>{const keep=box.scrollTop;el.hidden=true;[el,...below].forEach(n=>n.getAnimations().forEach(x=>x.cancel()));if(need<=0)box.scrollTop=keep;done&&done();};
+    if(a.length)a[0].onfinish=fin;else setTimeout(fin,D-40);}}
 function setTab(t){setTab0(t);if(window.syncBack)syncBack();}
 function setTab0(t,fromScroll){const two=t==="lines";$("tabs").classList.toggle("t2",two);$("tabtrack").classList.toggle("t2",two);
   if(!fromScroll){const c=document.querySelector(".tabclip");c.scrollTo({left:two?c.clientWidth:0,behavior:$("s-home").classList.contains("on")?"smooth":"auto"});}
