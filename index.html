@@ -1082,13 +1082,18 @@ function foldRows(el,open,tog,done){ // Jakdojade-style: the stop list fades/squ
   const box=el.closest(".tscroll,#lines")||el.parentElement,E="cubic-bezier(.3,.75,.25,1)",D=420;
   const below=[];for(let n=el;n&&n!==box;n=n.parentElement){let x=n.nextElementSibling;while(x){below.push(x);x=x.nextElementSibling;}}
   [el,...el.children,...below].forEach(n=>n.getAnimations().forEach(a=>a.cancel()));
+  [el,...below].forEach(n=>{n.style.transform="";n.style.clipPath="";n.style.opacity="";n.style.willChange="";});
   if(tog)tog.classList.toggle("open",open);
   if(open){el.hidden=false;
-    // reveal: the list's own height grows from 0 (content below follows by normal layout, nothing else is moved) while it fades in a beat behind
-    const h=el.offsetHeight;el.style.overflow="hidden";el.style.boxSizing="border-box";
-    const cs=getComputedStyle(el),pt=cs.paddingTop,pb=cs.paddingBottom,mt=cs.marginTop,mb=cs.marginBottom;
-    const L=el.animate([{height:"0px",paddingTop:"0px",paddingBottom:"0px",marginTop:"0px",marginBottom:"0px",opacity:0},{opacity:.15,offset:.3},{height:h+"px",paddingTop:pt,paddingBottom:pb,marginTop:mt,marginBottom:mb,opacity:1}],{duration:640,easing:"cubic-bezier(.4,0,.2,1)"});
-    L.onfinish=()=>{el.style.overflow="";el.style.boxSizing="";done&&done();};
+    // 60/120 fps reveal: no layout per frame. Everything is set to its start state synchronously (before the next paint, so no flash),
+    // then only transform / clip-path / opacity animate: content below glides down from where it was, the list is uncovered top-down in step and fades in.
+    const h=el.offsetHeight,SOFT="cubic-bezier(.4,0,.2,1)",T=620;
+    below.forEach(n=>{n.style.transform=`translateY(${-h}px)`;n.style.willChange="transform";});
+    el.style.clipPath="inset(0 0 100% 0)";el.style.opacity="0";el.style.willChange="opacity,clip-path";
+    const anims=below.map(n=>n.animate([{transform:`translateY(${-h}px)`},{transform:"translateY(0)"}],{duration:T,easing:SOFT,fill:"both"}));
+    anims.push(el.animate([{clipPath:"inset(0 0 100% 0)"},{clipPath:"inset(0 0 0% 0)"}],{duration:T,easing:SOFT,fill:"both"}));
+    const L=el.animate([{opacity:0},{opacity:.2,offset:.3},{opacity:1}],{duration:T,easing:"linear",fill:"both"});anims.push(L);
+    L.onfinish=()=>{[el,...below].forEach(n=>{n.style.transform="";n.style.clipPath="";n.style.opacity="";n.style.willChange="";});anims.forEach(x=>x.cancel());done&&done();};
   }else{const h=el.offsetHeight;
     // if the list is scrolled near its end, shortening it would make the view jump at the end; ease the scroll there instead
     const need=box.scrollTop+box.clientHeight-(box.scrollHeight-h);
