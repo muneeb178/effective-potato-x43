@@ -317,19 +317,19 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 @media (prefers-reduced-motion:reduce){.hsscroll,.toast,.lbody{transition:none}.screen{animation:none!important}}
 
 /* Lines tab: route-number buttons for bus routes (Jakdojade "Schedules" style) */
-.lsec{margin:18px 16px 6px;font-weight:700;font-size:16px}.lsec .sub{font-weight:500;margin-left:6px}
-.lgrid{display:flex;flex-wrap:wrap;gap:12px 14px;padding:4px 16px 8px}
-.lnum{min-width:58px;height:46px;padding:0 14px;border:1.5px solid #3b4046;border-radius:10px;font-weight:700;font-size:18px;display:grid;place-items:center;color:#fff;background:transparent}
+.lsec{margin:16px 16px 8px;font-weight:700;font-size:15px}.lsec .sub{font-weight:500;margin-left:6px}
+.lgrid{display:flex;flex-wrap:wrap;gap:12px 18px;padding:2px 16px 6px}
+.lnum{min-width:38px;height:30px;padding:0 8px;border:1.5px solid #3b4046;border-radius:7px;font-weight:700;font-size:15px;display:grid;place-items:center;color:#fff;background:transparent}
 .lnum.off{color:#5c636b;border-color:#2c3035}
 /* single line page: full map + pull-up sheet (native scroll) */
 #s-line{background:#000}
 #lnmap{position:absolute;inset:0;z-index:0}
 #lnmap .leaflet-top.leaflet-left{left:auto;right:6px;top:calc(env(safe-area-inset-top) + 6px)}
 .lnback{position:absolute;left:14px;top:calc(env(safe-area-inset-top) + 12px);z-index:30;background:#16181bdd;width:48px;height:48px}
-.lnscroll{position:absolute;inset:0;z-index:20;overflow-y:auto;scroll-snap-type:y proximity;overscroll-behavior:contain;scrollbar-width:none;pointer-events:none}
-.lnscroll::-webkit-scrollbar{display:none}
-.lnspace{scroll-snap-align:start}
-.lnsheet{pointer-events:auto;background:var(--panel,#191b1e);border-radius:22px 22px 0 0;min-height:100%;scroll-snap-align:start;scroll-margin-top:22vh;box-shadow:0 -6px 18px #0008;padding-bottom:40px}
+.lnsheet{position:absolute;left:0;right:0;top:0;z-index:20;background:var(--panel,#191b1e);border-radius:22px 22px 0 0;box-shadow:0 -6px 18px #0008;display:flex;flex-direction:column;will-change:transform}
+.lnsheet.anim{transition:transform .38s cubic-bezier(.25,.8,.3,1)}
+.lnbody{flex:1;min-height:0;overflow:hidden;overscroll-behavior:contain;scrollbar-width:none;padding-bottom:30px}.lnbody::-webkit-scrollbar{display:none}
+.lnsheet.up .lnbody{overflow-y:auto;touch-action:pan-y}
 .lnsheet .grab{width:42px;height:5px;border-radius:9px;background:#3a3f45;margin:9px auto 14px}
 .lnhead{display:flex;align-items:center;gap:10px;padding:0 18px}.lnhead .op{margin-left:auto;color:var(--muted);font-size:14px}
 .lnhead .bnum{background:#fff;color:#111;border-radius:8px;padding:2px 9px;font-weight:800;font-size:19px}
@@ -460,13 +460,15 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 <section class="screen" id="s-line">
   <div id="lnmap"></div>
   <button class="iconbtn round lnback" id="ln-back" aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
-  <div class="lnscroll" id="lnscroll"><div class="lnspace" id="lnspace"></div><div class="lnsheet" id="lnsheet">
+  <div class="lnsheet" id="lnsheet">
     <div class="grab"></div>
     <div class="lnhead"><span id="ln-mode" style="color:#e6e9ec"></span><span class="bnum" id="ln-num"></span><span class="op" id="ln-op"></span></div>
     <div class="lndir"><span>→</span><span class="to" id="ln-to"></span><button class="sw" id="ln-swap" aria-label="Other direction"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M8 4v16M4 8l4-4 4 4M16 20V4M12 16l4 4 4-4"/></svg></button></div>
-    <div class="adband slim" style="margin-top:10px"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div>
-    <div class="lnstops" id="lnstops"></div>
-  </div></div>
+    <div class="lnbody" id="lnbody">
+      <div class="adband slim" style="margin-top:10px"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div>
+      <div class="lnstops" id="lnstops"></div>
+    </div>
+  </div>
 </section>
 <section class="screen" id="s-map">
   <div class="hdr">
@@ -1089,9 +1091,11 @@ const atRoot=()=>curScreen()==="s-home"&&!$("tabtrack").classList.contains("t2")
 let lnMap=null,lnLay=null,lnState={id:null,rev:false};
 function lnStops(){const Ln=LINES[lnState.id];if(Ln.id==="EV3"&&lnState.rev)return LINES.EV3R.stops;return lnState.rev?[...Ln.stops].reverse():Ln.stops;}
 function lnGeom(){return LINES[lnState.id].geom;}
-function lnSize(){const H=$("s-line").clientHeight;$("lnspace").style.height=Math.round(H*.52)+"px";return H;}
-function lnFit(anim){if(!lnMap)return;const H=$("s-line").clientHeight,sc=$("lnscroll"),top=Math.max(Math.round(H*.22),$("lnspace").offsetHeight-sc.scrollTop); // never smaller than the strip left above the fully-raised sheet
-  const b=L.latLngBounds(lnGeom());lnMap.invalidateSize(false);lnMap.flyToBounds(b,{paddingTopLeft:[28,90],paddingBottomRight:[28,H-top+24],duration:anim?.55:0.01,easeLinearity:.35});}
+let lnUp=false,lnY=0;const lnLim=()=>{const H=$("s-line").clientHeight;return{H,top:Math.round(H*.2),low:Math.round(H*.5)};};
+function lnSet(y,anim){const sh=$("lnsheet");sh.classList.toggle("anim",!!anim);lnY=y;sh.style.transform=`translate3d(0,${y}px,0)`;}
+function lnSize(){const {H,top,low}=lnLim();$("lnsheet").style.height=(H-top)+"px";lnSet(lnUp?top:low,false);return H;}
+function lnFit(anim){if(!lnMap)return;const {H}=lnLim();const b=L.latLngBounds(lnGeom());lnMap.invalidateSize(false);
+  lnMap.flyToBounds(b,{paddingTopLeft:[28,80],paddingBottomRight:[28,H-lnY+24],duration:anim?.5:0.01,easeLinearity:.35});}
 function lnRender(){const Ln=LINES[lnState.id],st=lnStops();
   $("s-line").style.setProperty("--lc",Ln.color);
   $("ln-mode").innerHTML=modeSvg(Ln.id);$("ln-num").textContent=Ln.short==="EV3"?"EV-03":Ln.short;$("ln-op").textContent=Ln.kind.startsWith("PTC")?"PTC":"PMA";
@@ -1102,14 +1106,24 @@ function lnRender(){const Ln=LINES[lnState.id],st=lnStops();
   st.forEach((s,k)=>L.circleMarker([s.lat,s.lng],{radius:k===0||k===st.length-1?7:5,color:Ln.color,weight:3,fillColor:"#141619",fillOpacity:1}).bindTooltip(s.name).addTo(lnLay));}
 function openLine(id){lnState={id,rev:false};
   show("s-line");if(window.syncBack)syncBack();
+  lnUp=false;$("lnsheet").classList.remove("up");$("lnbody").scrollTop=0;
   requestAnimationFrame(()=>{lnSize();if(!lnMap){lnMap=makeMap("lnmap");lnLay=L.layerGroup().addTo(lnMap);}
-    $("lnscroll").scrollTop=0;lnRender();lnFit(false);setTimeout(()=>lnFit(false),420);});}
+    lnRender();lnFit(false);setTimeout(()=>lnFit(false),420);});}
 $("ln-swap").onclick=()=>{lnState.rev=!lnState.rev;lnRender();};
 $("ln-back").onclick=()=>goBack();
-(function(){const sc=$("lnscroll");let t=0,lastTop=null;
-  const settle=()=>{const H=$("s-line").clientHeight,top=Math.max(Math.round(H*.22),Math.round($("lnspace").offsetHeight-sc.scrollTop));if(lastTop!==null&&Math.abs(top-lastTop)<30)return;lastTop=top;lnFit(true);};
-  sc.addEventListener("scroll",()=>{clearTimeout(t);t=setTimeout(settle,160);},{passive:true});
-  if("onscrollend" in window)sc.addEventListener("scrollend",()=>{clearTimeout(t);settle();});
+(function(){ // sheet drag: header always drags; the list scrolls natively once the sheet is up, and pulling down at its top drags the sheet back
+  const sh=$("lnsheet"),body=$("lnbody");let y0=0,s0=0,mode=0,raf=0,ny=0,vt=[];
+  sh.addEventListener("touchstart",e=>{const t=e.touches[0];y0=t.clientY;s0=lnY;mode=0;vt=[[performance.now(),y0]];},{passive:true});
+  sh.addEventListener("touchmove",e=>{const t=e.touches[0],dy=t.clientY-y0;vt.push([performance.now(),t.clientY]);if(vt.length>6)vt.shift();
+    if(!mode){if(Math.abs(dy)<4)return;const inList=body.contains(e.target);
+      mode=(lnUp&&inList&&(body.scrollTop>0||dy<0))?2:1;if(mode===1)sh.classList.remove("anim");}
+    if(mode!==1)return;e.preventDefault();const {top,low}=lnLim();let y=s0+dy;if(y<top)y=top-(top-y)*.25;if(y>low)y=low+(y-low)*.35;ny=y;
+    if(!raf)raf=requestAnimationFrame(()=>{raf=0;lnSet(ny,false);});},{passive:false});
+  const end=()=>{if(mode!==1){mode=0;return;}mode=0;cancelAnimationFrame(raf);raf=0;const {top,low}=lnLim();
+    const v=vt.length>1?(vt[vt.length-1][1]-vt[0][1])/Math.max(1,vt[vt.length-1][0]-vt[0][0]):0;
+    const up=v<-.35?true:v>.35?false:(lnY<(top+low)/2);lnUp=up;sh.classList.toggle("up",up);if(!up)body.scrollTop=0;
+    lnSet(up?top:low,true);setTimeout(()=>lnFit(true),60);};
+  sh.addEventListener("touchend",end);sh.addEventListener("touchcancel",end);
   addEventListener("resize",()=>{if($("s-line").classList.contains("on")){lnSize();lnFit(false);}});})();
 function backTarget(){const c=curScreen();
   if(c==="s-search"||c==="s-results")return"s-home";
