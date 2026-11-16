@@ -1085,7 +1085,7 @@ let lnMap=null,lnLay=null,lnState={id:null,rev:false};
 function lnStops(){const Ln=LINES[lnState.id];if(Ln.id==="EV3"&&lnState.rev)return LINES.EV3R.stops;return lnState.rev?[...Ln.stops].reverse():Ln.stops;}
 function lnGeom(){return LINES[lnState.id].geom;}
 function lnSize(){const H=$("s-line").clientHeight;$("lnspace").style.height=Math.round(H*.52)+"px";return H;}
-function lnFit(anim){if(!lnMap)return;const H=$("s-line").clientHeight,sc=$("lnscroll"),top=Math.max(70,$("lnspace").offsetHeight-sc.scrollTop);
+function lnFit(anim){if(!lnMap)return;const H=$("s-line").clientHeight,sc=$("lnscroll"),top=Math.max(Math.round(H*.22),$("lnspace").offsetHeight-sc.scrollTop); // never smaller than the strip left above the fully-raised sheet
   const b=L.latLngBounds(lnGeom());lnMap.invalidateSize(false);lnMap.flyToBounds(b,{paddingTopLeft:[28,90],paddingBottomRight:[28,H-top+24],duration:anim?.55:0.01,easeLinearity:.35});}
 function lnRender(){const Ln=LINES[lnState.id],st=lnStops();
   $("s-line").style.setProperty("--lc",Ln.color);
@@ -1102,7 +1102,7 @@ function openLine(id){lnState={id,rev:false};
 $("ln-swap").onclick=()=>{lnState.rev=!lnState.rev;lnRender();};
 $("ln-back").onclick=()=>goBack();
 (function(){const sc=$("lnscroll");let t=0,lastTop=null;
-  const settle=()=>{const top=Math.round($("lnspace").offsetHeight-sc.scrollTop);if(lastTop!==null&&Math.abs(top-lastTop)<30)return;lastTop=top;lnFit(true);};
+  const settle=()=>{const H=$("s-line").clientHeight,top=Math.max(Math.round(H*.22),Math.round($("lnspace").offsetHeight-sc.scrollTop));if(lastTop!==null&&Math.abs(top-lastTop)<30)return;lastTop=top;lnFit(true);};
   sc.addEventListener("scroll",()=>{clearTimeout(t);t=setTimeout(settle,160);},{passive:true});
   if("onscrollend" in window)sc.addEventListener("scrollend",()=>{clearTimeout(t);settle();});
   addEventListener("resize",()=>{if($("s-line").classList.contains("on")){lnSize();lnFit(false);}});})();
