@@ -612,11 +612,20 @@ function plan(A,B,startMin){
     for(const o of nearest(A,l1,3))for(const d of nearest(B,l2,3)){if(o.s.i===tr.a.i||d.s.i===tr.b.i)continue;if((LINES[l1].oneway&&tr.a.i<o.s.i)||(LINES[l2].oneway&&d.s.i<tr.b.i))continue;
       opts.push(sideLegs([{type:"walk",from:A,to:o.s,m:o.m},fixStops(legRide(l1,o.s,tr.a)),{type:"walk",from:tr.a,to:tr.b,m:tr.m,transfer:true},fixStops(legRide(l2,tr.b,d.s)),{type:"walk",from:d.s,to:B,m:d.m}]));}
   }
+  // two changes (any line → any line → any line), e.g. e-bus → Orange Line → Metrobus
+  {const nA={},nB={};for(const l of Object.keys(LINES)){const x=nearest(A,l,2),y=nearest(B,l,2);if(x.length)nA[l]=x;if(y.length)nB[l]=y;}
+   const byFrom={};for(const t of TRANSFERS)(byFrom[t.a.line]=byFrom[t.a.line]||[]).push(t);
+   const ok=(l,i,j)=>i!==j&&!(LINES[l].oneway&&j<i);
+   for(const t1 of TRANSFERS){const l1=t1.a.line,l2=t1.b.line;if(!nA[l1])continue;
+     for(const t2 of byFrom[l2]||[]){const l3=t2.b.line;if(!nB[l3]||l3===l1||l3===l2||!ok(l2,t1.b.i,t2.a.i))continue;
+       for(const o of nA[l1])for(const d of nB[l3]){if(!ok(l1,o.s.i,t1.a.i)||!ok(l3,t2.b.i,d.s.i))continue;
+         opts.push(sideLegs([{type:"walk",from:A,to:o.s,m:o.m},fixStops(legRide(l1,o.s,t1.a)),{type:"walk",from:t1.a,to:t1.b,m:t1.m,transfer:true},
+           fixStops(legRide(l2,t1.b,t2.a)),{type:"walk",from:t2.a,to:t2.b,m:t2.m,transfer:true},fixStops(legRide(l3,t2.b,d.s)),{type:"walk",from:d.s,to:B,m:d.m}]));}}}}
   // score every pattern at the requested start time
   const walkAll=walkMin(direct);
   let pats=opts.map(legs=>timeLegs(legs,startMin)).filter(Boolean)
     .filter(r=>r.total<walkAll-2||walkAll>30);
-  pats.forEach(r=>r.score=r.total+(r.rides.length>1?6:0)+r.walkTot*0.3);
+  pats.forEach(r=>r.score=r.total+(r.rides.length-1)*6+r.walkTot*0.3);
   pats.sort((a,b)=>a.score-b.score);
   // keep distinct patterns: same lines boarded at the same station = same trip (only the best exit is kept)
   const seen=new Set(),best=[];
@@ -816,7 +825,7 @@ function runSearch(){
   let list=plan(A,B,start);if(!list.some(r=>r.rides.length)&&start>=17*60){const m=plan(A,B,LINES.OL.open-15);if(m.some(r=>r.rides.length)){list=m;start=LINES.OL.open-15;state.future=true;banner="The last Metrobus and Orange Line trips for tonight have left. Showing the first trips tomorrow morning (from 06:00).";}}state.result=list;
   $("r-from").textContent=A.name;$("r-to").textContent=B.name;
   if(list.some(r=>r.rides.length))list=allDepartures(plan.best,plan.walk,start,start+120);state.result=list;state.shown=0;state.now=now;
-  $("cards").innerHTML=`<div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div>`+(banner?`<div class="banner">${banner}</div>`:"")+(list.length?`<div id="cardlist"></div>`:`<p class="note" style="font-size:15px">No trip found with at most one change. Both points need to be within about 2.5 km of a stop, and the bus must be running at this time.</p>`)+
+  $("cards").innerHTML=`<div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div>`+(banner?`<div class="banner">${banner}</div>`:"")+(list.length?`<div id="cardlist"></div>`:`<p class="note" style="font-size:15px">No trip found with up to two changes. Both points need to be within about 2.5 km of a stop, and the bus must be running at this time.</p>`)+
     `<p class="proto">Times are estimates from published frequencies. No live tracking yet.</p><div style="height:24px"></div>`;
   moreCards(16);$("cards").scrollTop=0;
   const R=$("s-results"),clist=$("cardlist");show("s-results",false,true);R.animate([{opacity:0},{opacity:1}],{duration:220,easing:"ease-out"});
@@ -882,7 +891,7 @@ function renderDetail(){
       sep=true;
     }
   });
-  h+=row(`<span class="time o tnum">${fmt(r.end)}</span>`,`<div class="sname">${esc(state.to.name)}</div><div class="sub">Arrive${r.fare?` · fare Rs ${r.fare}${r.rides.length>1?" (two tickets)":""}`:""}</div>`);
+  h+=row(`<span class="time o tnum">${fmt(r.end)}</span>`,`<div class="sname">${esc(state.to.name)}</div><div class="sub">Arrive${r.fare?` · fare Rs ${r.fare}${r.rides.length>1?` (${r.rides.length} tickets)`:""}`:""}</div>`);
   h+=`<div class="tad"><div class="adband slim"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div></div>`;
   $("detail").innerHTML=h;$("detail").scrollTop=0;if(window.watchBottomAd)watchBottomAd();
 }
