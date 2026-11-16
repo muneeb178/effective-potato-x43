@@ -1083,9 +1083,10 @@ function foldRows(el,open,tog,done){ // Jakdojade-style: the stop list fades/squ
   [el,...el.children,...below].forEach(n=>n.getAnimations().forEach(a=>a.cancel()));
   if(tog)tog.classList.toggle("open",open);
   if(open){el.hidden=false;const h=el.offsetHeight;
-    // mirror of the close: content below glides down while the list drifts down from above and fades in (slow, soft)
-    const L=el.animate([{opacity:0,transform:"translateY(-10px) scaleY(.92)",transformOrigin:"top"},{opacity:.55,offset:.45},{opacity:1,transform:"none",transformOrigin:"top"}],{duration:560,delay:40,easing:"cubic-bezier(.22,.7,.3,1)",fill:"backwards"});
-    below.forEach(n=>n.animate([{transform:`translateY(${-h}px)`},{transform:"none"}],{duration:560,easing:"cubic-bezier(.25,.8,.3,1)"}));
+    // gentle open: everything moves on one soft ease-in-out curve (no front-loaded jump); the list fades in slowly behind the glide
+    const SOFT="cubic-bezier(.45,.05,.2,1)";
+    const L=el.animate([{opacity:0,transform:"translateY(-14px)"},{opacity:1,transform:"none"}],{duration:760,delay:90,easing:SOFT,fill:"backwards"});
+    below.forEach(n=>n.animate([{transform:`translateY(${-h}px)`},{transform:"none"}],{duration:720,easing:SOFT}));
     L.onfinish=()=>{done&&done();};
   }else{const h=el.offsetHeight;
     // if the list is scrolled near its end, shortening it would make the view jump at the end; ease the scroll there instead
