@@ -1016,8 +1016,8 @@ function foldRows(el,open,tog,done){ // Jakdojade-style: the stop list fades/squ
   [el,...el.children,...below].forEach(n=>n.getAnimations().forEach(a=>a.cancel()));
   if(tog)tog.classList.toggle("open",open);
   if(open){el.hidden=false;const h=el.offsetHeight;
-    const L=el.animate([{opacity:0,transform:"translateY(-10px) scaleY(.94)",transformOrigin:"top"},{opacity:1,transform:"none",transformOrigin:"top"}],{duration:320,delay:60,easing:E,fill:"backwards"});
-    below.forEach(n=>n.animate([{transform:`translateY(${-h}px)`},{transform:"none"}],{duration:D,easing:E}));
+    const L=el.animate([{opacity:0,transform:"translateY(-14px) scaleY(.9)",transformOrigin:"top"},{opacity:1,transform:"none",transformOrigin:"top"}],{duration:560,delay:90,easing:"cubic-bezier(.25,.6,.3,1)",fill:"backwards"});
+    below.forEach(n=>n.animate([{transform:`translateY(${-h}px)`},{transform:"none"}],{duration:520,easing:E}));
     L.onfinish=()=>{done&&done();};
   }else{const h=el.offsetHeight;
     // if the list is scrolled near its end, shortening it would make the view jump at the end; ease the scroll there instead
