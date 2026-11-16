@@ -1096,9 +1096,10 @@ function foldRows(el,open,tog,done){ // Jakdojade-style: the stop list fades/squ
   const box=el.closest(".tscroll,#lines")||el.parentElement,E="cubic-bezier(.3,.75,.25,1)",D=420;
   const below=[];for(let n=el;n&&n!==box;n=n.parentElement){let x=n.nextElementSibling;while(x){below.push(x);x=x.nextElementSibling;}}
   [el,...el.children,...below].forEach(n=>n.getAnimations().forEach(a=>a.cancel()));
-  [el,...below,...el.querySelectorAll(".pm .b,.pm .mt,.lst>.km,.lst>.x,.lst .rail i")].forEach(n=>{n.getAnimations().forEach(a=>a.cancel());n.style.transform="";n.style.clipPath="";n.style.opacity="";n.style.willChange="";});
+  [el,...below,...el.querySelectorAll(".pm .b,.pm .mt")].forEach(n=>{n.getAnimations().forEach(a=>a.cancel());n.style.transform="";n.style.clipPath="";n.style.opacity="";n.style.willChange="";});
   if(tog)tog.classList.toggle("open",open);
-  const fx=()=>{const t=el.querySelectorAll(".pm .b,.pm .mt,.lst>.km,.lst>.x,.lst .rail i");return t.length?[...t]:[el];};
+  const trip=!!el.querySelector(".pm"); // trip stop lists: only text fades, line extends. Lines tab: whole list fades as one block (approved version)
+  const fx=()=>trip?[...el.querySelectorAll(".pm .b,.pm .mt")]:[el];
   if(open){el.hidden=false;
     // 60/120 fps reveal: no layout per frame. Everything is set to its start state synchronously (before the next paint, so no flash),
     // then only transform / clip-path / opacity animate: content below glides down from where it was, the list is uncovered top-down in step and fades in.
@@ -1114,8 +1115,9 @@ function foldRows(el,open,tog,done){ // Jakdojade-style: the stop list fades/squ
     const need=box.scrollTop+box.clientHeight-(box.scrollHeight-h);
     if(need>0){const t0=box.scrollTop,T=performance.now();const step=now=>{const k=Math.min(1,(now-T)/(D-40)),e=1-Math.pow(1-k,3);box.scrollTop=t0-need*e;if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
     // close: text fades out, the line is wiped up in step with the content below (no separate fading piece of line)
-    fx().forEach(n=>n.animate([{opacity:1},{opacity:0}],{duration:230,easing:"cubic-bezier(.4,0,1,1)",fill:"forwards"}));
-    el.animate([{clipPath:"inset(0 0 0% 0)"},{clipPath:"inset(0 0 100% 0)"}],{duration:D-40,easing:E,fill:"forwards"});
+    if(trip){fx().forEach(n=>n.animate([{opacity:1},{opacity:0}],{duration:230,easing:"cubic-bezier(.4,0,1,1)",fill:"forwards"}));
+      el.animate([{clipPath:"inset(0 0 0% 0)"},{clipPath:"inset(0 0 100% 0)"}],{duration:D-40,easing:E,fill:"forwards"});}
+    else el.animate([{opacity:1,transform:"none",transformOrigin:"top"},{opacity:0,transform:"translateY(-8px) scaleY(.9)",transformOrigin:"top"}],{duration:230,easing:"cubic-bezier(.4,0,1,1)",fill:"forwards"});
     const a=below.map(n=>n.animate([{transform:"none"},{transform:`translateY(${-h}px)`}],{duration:D-40,easing:E,fill:"forwards"}));
     const fin=()=>{const keep=box.scrollTop;el.hidden=true;[el,...below].forEach(n=>n.getAnimations().forEach(x=>x.cancel()));if(need<=0)box.scrollTop=keep;done&&done();};
     if(a.length)a[0].onfinish=fin;else setTimeout(fin,D-40);}}
