@@ -1082,19 +1082,19 @@ const atRoot=()=>curScreen()==="s-home"&&!$("tabtrack").classList.contains("t2")
 
 // ---------------------------------------------------------------- LINE PAGE: map + pull-up stop list; sheet up = map zooms out to fit, sheet down = zooms in
 let lnMap=null,lnLay=null,lnState={id:null,rev:false};
-function lnStops(){const L=LINES[lnState.id];if(L.id==="EV3"&&lnState.rev)return LINES.EV3R.stops;return lnState.rev?[...L.stops].reverse():L.stops;}
-function lnGeom(){const L=LINES[lnState.id];return L.geom;}
+function lnStops(){const Ln=LINES[lnState.id];if(Ln.id==="EV3"&&lnState.rev)return LINES.EV3R.stops;return lnState.rev?[...Ln.stops].reverse():Ln.stops;}
+function lnGeom(){return LINES[lnState.id].geom;}
 function lnSize(){const H=$("s-line").clientHeight;$("lnspace").style.height=Math.round(H*.52)+"px";return H;}
 function lnFit(anim){if(!lnMap)return;const H=$("s-line").clientHeight,sc=$("lnscroll"),top=Math.max(70,$("lnspace").offsetHeight-sc.scrollTop);
   const b=L.latLngBounds(lnGeom());lnMap.invalidateSize(false);lnMap.flyToBounds(b,{paddingTopLeft:[28,90],paddingBottomRight:[28,H-top+24],duration:anim?.55:0.01,easeLinearity:.35});}
-function lnRender(){const L=LINES[lnState.id],st=lnStops();
-  $("s-line").style.setProperty("--lc",L.color);
-  $("ln-mode").innerHTML=modeSvg(L.id);$("ln-num").textContent=L.short==="EV3"?"EV-03":L.short;$("ln-op").textContent=L.kind.startsWith("PTC")?"PTC":"PMA";
+function lnRender(){const Ln=LINES[lnState.id],st=lnStops();
+  $("s-line").style.setProperty("--lc",Ln.color);
+  $("ln-mode").innerHTML=modeSvg(Ln.id);$("ln-num").textContent=Ln.short==="EV3"?"EV-03":Ln.short;$("ln-op").textContent=Ln.kind.startsWith("PTC")?"PTC":"PMA";
   $("ln-to").textContent=st[st.length-1].name;
   const near=s=>{for(const rl of ["MB","OL"])for(const x of LINES[rl].stops)if(walkM(s,x)<=350)return rl;return null;};
   $("lnstops").innerHTML=st.map(s=>{const t=near(s);return `<div class="lnst"><i></i><span>${esc(s.name)}</span>${t?`<span class="tb badge ${LINES[t].cls}">${LINES[t].short}</span>`:""}</div>`;}).join("");
-  lnLay.clearLayers();L.polyline(lnGeom(),{color:L.color,weight:5,opacity:1}).addTo(lnLay);
-  st.forEach((s,k)=>L.circleMarker([s.lat,s.lng],{radius:k===0||k===st.length-1?7:5,color:L.color,weight:3,fillColor:"#141619",fillOpacity:1}).bindTooltip(s.name).addTo(lnLay));}
+  lnLay.clearLayers();L.polyline(lnGeom(),{color:Ln.color,weight:5,opacity:1}).addTo(lnLay);
+  st.forEach((s,k)=>L.circleMarker([s.lat,s.lng],{radius:k===0||k===st.length-1?7:5,color:Ln.color,weight:3,fillColor:"#141619",fillOpacity:1}).bindTooltip(s.name).addTo(lnLay));}
 function openLine(id){lnState={id,rev:false};
   show("s-line");if(window.syncBack)syncBack();
   requestAnimationFrame(()=>{lnSize();if(!lnMap){lnMap=makeMap("lnmap");lnLay=L.layerGroup().addTo(lnMap);}
