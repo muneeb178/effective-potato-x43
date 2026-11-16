@@ -327,6 +327,9 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 #lnmap .leaflet-top.leaflet-left{left:auto;right:6px;top:calc(env(safe-area-inset-top) + 6px)}
 .lnback{position:absolute;left:14px;top:calc(env(safe-area-inset-top) + 12px);z-index:30;background:#16181bdd;width:48px;height:48px}
 .lnsheet{position:absolute;left:0;right:0;top:0;z-index:20;background:var(--panel,#191b1e);border-radius:22px 22px 0 0;box-shadow:0 -6px 18px #0008;display:flex;flex-direction:column;will-change:transform}
+.lnsheet::after{content:"";position:absolute;left:0;right:0;top:calc(100% - 2px);height:120vh;background:inherit;pointer-events:none}
+.lntop{position:absolute;left:0;right:0;top:0;z-index:19;background:var(--panel,#191b1e);opacity:0;pointer-events:none;will-change:opacity}
+.lntop.anim{transition:opacity .38s cubic-bezier(.25,.8,.3,1)}
 .lnsheet.anim{transition:transform .38s cubic-bezier(.25,.8,.3,1)}
 .lnbody{flex:1;min-height:0;overflow:hidden;overscroll-behavior:contain;scrollbar-width:none;padding-bottom:30px}.lnbody::-webkit-scrollbar{display:none}
 .lnsheet.up .lnbody{overflow-y:auto;touch-action:pan-y}
@@ -460,6 +463,7 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 <section class="screen" id="s-line">
   <div id="lnmap"></div>
   <button class="iconbtn round lnback" id="ln-back" aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
+  <div class="lntop" id="lntop"></div>
   <div class="lnsheet" id="lnsheet">
     <div class="grab"></div>
     <div class="lnhead"><span id="ln-mode" style="color:#e6e9ec"></span><span class="bnum" id="ln-num"></span><span class="op" id="ln-op"></span></div>
@@ -1091,10 +1095,13 @@ const atRoot=()=>curScreen()==="s-home"&&!$("tabtrack").classList.contains("t2")
 let lnMap=null,lnLay=null,lnState={id:null,rev:false};
 function lnStops(){const Ln=LINES[lnState.id];if(Ln.id==="EV3"&&lnState.rev)return LINES.EV3R.stops;return lnState.rev?[...Ln.stops].reverse():Ln.stops;}
 function lnGeom(){return LINES[lnState.id].geom;}
-let lnUp=false,lnY=0;const lnLim=()=>{const H=$("s-line").clientHeight;return{H,top:Math.round(H*.34),low:Math.round(H*.56)};};
-function lnSet(y,anim){const sh=$("lnsheet");sh.classList.toggle("anim",!!anim);lnY=y;sh.style.transform=`translate3d(0,${y}px,0)`;}
-function lnSize(){const {H,top,low}=lnLim();$("lnsheet").style.height=(H-top)+"px";lnSet(lnUp?top:low,false);return H;}
-function lnFit(anim){if(!lnMap)return;const {H}=lnLim();const b=L.latLngBounds(lnGeom());lnMap.invalidateSize(false);
+let lnUp=false,lnY=0,lnPos=1;const lnLim=()=>{const H=$("s-line").clientHeight,bk=$("ln-back");
+  const full=Math.round(bk.offsetTop+bk.offsetHeight+10);return{H,full,top:full,mid:Math.round(H*.5),low:Math.round(H*.74)};};
+const lnSnaps=()=>{const l=lnLim();return[l.full,l.mid,l.low];};
+function lnSet(y,anim){const sh=$("lnsheet"),tb=$("lntop"),{full,mid}=lnLim();sh.classList.toggle("anim",!!anim);tb.classList.toggle("anim",!!anim);lnY=y;
+  sh.style.transform=`translate3d(0,${y}px,0)`;tb.style.opacity=Math.max(0,Math.min(1,(mid-y)/Math.max(1,mid-full)));}
+function lnSize(){const {H,full}=lnLim();$("lnsheet").style.height=(H-full)+"px";$("lntop").style.height=(full+24)+"px";lnSet(lnSnaps()[lnPos],false);return H;}
+function lnFit(anim){if(!lnMap||lnPos===0)return;const {H,full}=lnLim();const b=L.latLngBounds(lnGeom());lnMap.invalidateSize(false);
   lnMap.flyToBounds(b,{paddingTopLeft:[28,64],paddingBottomRight:[28,H-lnY+24],duration:anim?.5:0.01,easeLinearity:.35});}
 function lnRender(){const Ln=LINES[lnState.id],st=lnStops();
   $("s-line").style.setProperty("--lc",Ln.color);
@@ -1106,7 +1113,7 @@ function lnRender(){const Ln=LINES[lnState.id],st=lnStops();
   st.forEach((s,k)=>L.circleMarker([s.lat,s.lng],{radius:k===0||k===st.length-1?7:5,color:Ln.color,weight:3,fillColor:"#141619",fillOpacity:1}).bindTooltip(s.name).addTo(lnLay));}
 function openLine(id){lnState={id,rev:false};
   show("s-line");if(window.syncBack)syncBack();
-  lnUp=false;$("lnsheet").classList.remove("up");$("lnbody").scrollTop=0;
+  lnUp=false;lnPos=1;$("lnsheet").classList.remove("up");$("lnbody").scrollTop=0;
   requestAnimationFrame(()=>{lnSize();if(!lnMap){lnMap=makeMap("lnmap");lnLay=L.layerGroup().addTo(lnMap);}
     lnRender();lnFit(false);setTimeout(()=>lnFit(false),420);});}
 $("ln-swap").onclick=()=>{lnState.rev=!lnState.rev;lnRender();};
@@ -1117,14 +1124,16 @@ $("ln-back").onclick=()=>goBack();
   sh.addEventListener("touchmove",e=>{const t=e.touches[0],dy=t.clientY-y0;vt.push([performance.now(),t.clientY]);if(vt.length>6)vt.shift();
     if(!mode){if(Math.abs(dy)<4)return;const inList=body.contains(e.target);
       mode=(lnUp&&inList&&(body.scrollTop>0||dy<0))?2:1;if(mode===1)sh.classList.remove("anim");}
-    if(mode!==1)return;e.preventDefault();const {top,low}=lnLim();let y=s0+dy;if(y<top)y=top-(top-y)*.25;if(y>low)y=low+(y-low)*.35;ny=y;
+    if(mode!==1)return;e.preventDefault();const sn=lnSnaps(),top=sn[0],low=sn[2];let y=s0+dy;if(y<top)y=top-(top-y)*.2;if(y>low)y=low+(y-low)*.3;ny=y;
     if(!raf)raf=requestAnimationFrame(()=>{raf=0;lnSet(ny,false);});},{passive:false});
-  const end=()=>{if(mode!==1){mode=0;return;}mode=0;cancelAnimationFrame(raf);raf=0;const {top,low}=lnLim();
+  const end=()=>{if(mode!==1){mode=0;return;}mode=0;cancelAnimationFrame(raf);raf=0;const sn=lnSnaps();
     const v=vt.length>1?(vt[vt.length-1][1]-vt[0][1])/Math.max(1,vt[vt.length-1][0]-vt[0][0]):0;
-    const up=v<-.35?true:v>.35?false:(lnY<(top+low)/2);lnUp=up;sh.classList.toggle("up",up);if(!up)body.scrollTop=0;
-    lnSet(up?top:low,true);setTimeout(()=>lnFit(true),60);};
+    let i=0,d=1e9;sn.forEach((y,k)=>{const dd=Math.abs(y-lnY);if(dd<d){d=dd;i=k;}});
+    if(v<-.4){i=sn.findLastIndex(y=>y<lnY-2);if(i<0)i=0;}else if(v>.4){i=sn.findIndex(y=>y>lnY+2);if(i<0)i=2;}
+    lnPos=i;lnUp=i===0;sh.classList.toggle("up",lnUp);if(!lnUp)body.scrollTop=0;
+    lnSet(sn[i],true);setTimeout(()=>lnFit(true),60);};
   sh.addEventListener("touchend",end);sh.addEventListener("touchcancel",end);
-  addEventListener("resize",()=>{if($("s-line").classList.contains("on")){lnSize();lnFit(false);}});})();
+  let rzT=0;addEventListener("resize",()=>{if(!$("s-line").classList.contains("on"))return;clearTimeout(rzT);rzT=setTimeout(()=>{lnSize();lnFit(false);},150);});})();
 function backTarget(){const c=curScreen();
   if(c==="s-search"||c==="s-results")return"s-home";
   if(c==="s-detail")return $("s-detail").classList.contains("open")?null:"s-results";
