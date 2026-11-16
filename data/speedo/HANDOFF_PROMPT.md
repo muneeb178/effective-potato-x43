@@ -7,7 +7,9 @@ Copy everything in this file into a new Claude chat. It contains the full contex
 ## Who I am and what this is for
 I'm Muneeb, from Lahore. I'm building **Lahore Transit**, a Jakdojade-style public-transport journey planner for Lahore (live at https://muneeb178.github.io/effective-potato-x43/). It already has the Metrobus, Orange Line, PTC electric bus EV-03, and PMA Electric Routes 20 and 26. Next I'm adding the **Speedo feeder bus routes** (Punjab Masstransit Authority, "Lahore Feeder Routes System").
 
-For each route I have the **official stop list in order** (from PMA posters). What's missing are the **coordinates of each stop**. Your job is to find them, as accurately as possible, and give them back in the exact format below so they can be pasted straight into the app.
+For each route I have the **official stop list in order** (from PMA posters). What's missing are the **coordinates of each stop, in both directions**. Your job is to find them, as accurately as possible, and give them back in the exact format below.
+
+**This is a data-collection job only.** Please don't write code, build or change the app, or suggest app changes. No GitHub or app access is needed. Just research and return the data; another assistant will put it into the app.
 
 ## Rules (important — please follow exactly)
 1. **Official order and names win.** Keep the stop order and names from the lists below. Don't add, drop or reorder stops. If you think a name is wrong or a stop doesn't exist, keep the row and say so in `notes`.
@@ -18,9 +20,13 @@ For each route I have the **official stop list in order** (from PMA posters). Wh
    - (B) The named landmark/junction itself (chowk, college, hospital, market) placed on the route road at that landmark → confidence `B`
    - (C) Your estimate between neighbouring stops along the road → confidence `C` (say why in `notes`)
 5. **Coordinates:** decimal degrees, 5–6 decimals, `lat,lng` (Lahore is about lat 31.3–31.7, lng 74.1–74.6). Sanity-check: consecutive stops are usually 300–1500 m apart and in order along the road. If two stops come out more than ~3 km apart or out of order, re-check.
-6. **Reuse known coordinates.** The KNOWN STOPS section lists stops already verified in the app. If a Speedo stop is the same place (e.g. Route 7 shares stops 1–10 with EV-03; Route 8 shares Canal Road stops with Route 26), copy those coordinates and mark the source as `known:<line>`.
-7. **Also record the road path.** For each route, list in order the roads the bus drives along and any notable turns or U-turns (e.g. "Ferozepur Rd N → right onto Canal Bank Rd (north bank) → U-turn at Thokar"). This is needed to draw the route on real roads.
-8. Don't invent precision. A `C` estimate is fine; a fake `A` is not.
+6. **Both directions, separately.** Every route runs both ways on ordinary roads, so each stop usually has TWO points, one on each side of the road (on the left-hand kerb for that direction of travel). They are often **not opposite each other**: the return stop can be 50–300 m away, wherever the road allows (e.g. a "Club Road" stop on one side may sit at a different spot from the other side's "Club Road" stop). Sometimes a stop exists **only in one direction**, or has a **different name** the other way, or the return trip uses a **different road** (one-way streets, U-turn points). Collect:
+   - `OUT` rows: the direction printed on the poster (first stop → last stop), in that order.
+   - `RET` rows: the return trip, in the order the bus meets them coming back. Leave out stops that don't exist on the way back, and add ones that only exist on the way back. Say so in `notes` ("only on return", "named X on return").
+   - On divided roads and Canal Road, the two directions are on different carriageways/banks, so the points must differ.
+7. **Reuse known coordinates.** The KNOWN STOPS section lists stops already verified in the app. If a Speedo stop is the same place (e.g. Route 7 shares stops 1–10 with EV-03; Route 8 shares Canal Road stops with Route 26), copy those coordinates and mark the source as `known:<line>`.
+8. **Also record the road path, for each direction.** For each route, list in order the roads the bus drives along and any notable turns or U-turns (e.g. "Ferozepur Rd N → right onto Canal Bank Rd (north bank) → U-turn at Thokar"). This is needed to draw the route on real roads.
+9. Don't invent precision. A `C` estimate is fine; a fake `A` is not.
 
 ## How to look things up
 - If you have a browser or computer-use tool: open Google Maps and search "<stop name> bus stop Lahore" or "<landmark>, <area>, Lahore". The coordinates are in the URL after `@` or `!3d<lat>!4d<lng>`, or right-click → copy coordinates.
@@ -30,14 +36,17 @@ For each route I have the **official stop list in order** (from PMA posters). Wh
 
 ## Output format (exactly this, one CSV block per route)
 ```
-route,seq,stop_en,lat,lng,confidence,source,notes
-RT-07,1,Depot Chowk (Green Town),31.430920,74.311294,A,known:EV3,
-RT-07,2,Pulley Bus Stop,31.436854,74.314476,A,known:EV3 (Pully),
+route,dir,seq,stop_en,lat,lng,confidence,source,notes
+RT-07,OUT,1,Depot Chowk (Green Town),31.430920,74.311294,A,known:EV3,
+RT-07,OUT,2,Pulley Bus Stop,31.436854,74.314476,A,known:EV3 (Pully),
+...
+RT-07,RET,1,Chungi Amar Sidhu,…,…,B,Google: landmark,return stop is ~120 m south of the OUT stop
 ...
 ```
 After each route's CSV, add:
 ```
-ROAD PATH RT-07: <road 1> → <road 2> → … (turns/U-turns)
+ROAD PATH RT-07 OUT: <road 1> → <road 2> → … (turns/U-turns)
+ROAD PATH RT-07 RET: … (only if different from OUT reversed)
 UNSURE RT-07: <list of stops you'd like me to confirm>
 ```
 
@@ -320,7 +329,7 @@ Gulberg (Main Market, MM Alam, Liberty, Hafeez Centre) → Barkat Market → Cam
 | 27 | Bilal Daewoo |
 | 28 | Babu Sabu |
 
-## KNOWN STOPS (already verified in the app — reuse when a Speedo stop is the same place)
+## KNOWN STOPS (already in the app — reuse when a Speedo stop is the same place. These are mostly ONE direction only, so the other side of the road still needs its own point)
 Format: name, lat, lng
 
 **PTC EV-03 (Depot Green Town → Railway Station; exact = GPS/Google-verified)**
