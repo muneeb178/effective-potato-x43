@@ -1,0 +1,40 @@
+ROUTE RT-07: Depot Chowk (Green Town) -> Chungi Amar Sidhu
+ROAD PATH RT-07: Green Town main road N (same as EV-03: Depot Chowk -> Pindi Stop) -> right (east) onto Peco Road -> Treet -> Peco Mor -> left (north) along the Kot Lakhpat railway-side road (Phatki, Phattak Mandi) -> Model Town Katchery -> Ferozepur Rd south -> Qainchi -> Ghazi Chowk -> Chungi Amar Sidhu. IN = same roads reversed.
+UNSURE RT-07: Kot Lakhpat Railway Station exact roadside point; road names between Peco Mor and Model Town Katchery
+
+ROUTE RT-08: Canal -> Daewoo / Jinnah Bus Terminal
+ROAD PATH RT-08: Ferozepur Rd S (Canal -> Qaddafi -> Kalma Chowk) -> right (west) at Kalma Chowk to Barkat Market (Garden Town) -> Campus Pull -> left onto Canal Bank Rd heading SW -> Thokar Niaz Baig -> right onto Multan Rd W -> Daewoo Terminal -> Jinnah Bus Terminal. IN = reverse (Canal Bank Rd NE on north bank).
+UNSURE RT-08: which canal bank OUT uses (R26 points kept); Judicial Colony; Daewoo Terminal roadside point; Jinnah Bus Terminal coords in R20/R26 data
+
+ROUTE RT-04: R.A Bazar -> Chungi Amar Sidhu
+ROAD PATH RT-04: R.A Bazar (Cantt) -> Nadeem Chowk -> south via T-Stop to Walton Rd -> Walton Rd SW (Defence Morr, Korray, Shareef Market, College, Walton, Bab-e-Pakistan, Workshop, Packages) -> left onto Ferozepur Rd south at Qainchi -> Ghazi Chowk -> Chungi Amar Sidhu. IN = reverse.
+UNSURE RT-04: Bab-e-Pakistan (estimated on road); Nadeem Chowk exact stop; Workshop
+
+ROUTE RT-09: Railway Station -> Gulshan Ravi OL Station
+ROAD PATH RT-09: Railway Station -> Allama Iqbal Rd/Empress Rd S (Haji Camp, Police Line) -> Shimla Pahari -> Egerton Rd W (LDA Plaza, Aiwan-e-Iqbal) -> Mall Rd W (Zoo, Charing Cross) -> Mall/Lytton/Jail Rd area (Ganga Ram, Waris Rd) -> Qartaba Chowk -> Lytton Rd/Multan Rd W to Chauburji -> Multan Rd SW (Poonch House) -> Gulshan Ravi. IN = reverse.
+UNSURE RT-09: LDA Plaza (estimated); Poonch House; Gulshan Ravi roadside point; exact Shimla Pahari vs Shimla Pahari-2 split
+
+ROUTE RT-10: Wahdat Road Station -> Qartaba Chowk
+ROAD PATH RT-10: Multan Rd at Wahdat Rd (Wahdat Road Station, Multan Chungi) -> Wahdat Rd NE (Elephant Link Rd, Mustafa Town) -> through Allama Iqbal Town (Karim Block, Sikander Block, Raza Block) -> PU Examination Hall -> Science College -> back on Wahdat Rd NE (Bhekewal Morr, Wahdat Colony, School, Bank, Naqsha, Karma Abad, Aab Para) -> left onto Ferozepur Rd north at Canal/Ichhra Pull -> Rehman Pura -> Ichhra -> Shama -> LOS -> Qartaba Chowk. IN = reverse.
+UNSURE RT-10: roads inside Allama Iqbal Town (Karim/Sikander/Raza Block are area centroids); Shama street stop
+
+ROUTE RT-12: R.A Bazar -> Nasir Bagh
+ROAD PATH RT-12: R.A Bazar -> north through Cantt (PAF Market, Telephone Exchange, Girja Chowk, Alla-ud-Din Rd, Afshan Chowk) -> Rahat Bakery -> Fortress Stadium -> Mian Mir -> Upper Mall NW (Gymkhana, Canal Bridge, Aitchison) -> Mall Rd W (Club Rd, PC Hotel, Governor House, Zoo, Charing Cross, Regal, GPO, Anarkali) -> PU Old Campus -> Lower Mall (GC, Nasir Bagh). IN = reverse.
+UNSURE RT-12: Alla-ud-Din Road stop position; PU Old Campus, Government College, Nasir Bagh (all estimated)
+
+ROUTE RT-19: Paragon City -> Railway Station
+ROAD PATH RT-19: Paragon City (Barki Rd side) -> Dograi -> Baoo Wala -> Mehfooz Shaheed Garrison / Quaid Check Post -> Askari-X -> Rangers HQ -> Jawad Cheema Rd -> Army Museum -> Ayub Stadium -> Sarfaraz Rafiqui Rd (APS) -> PAF Market -> R.A Bazar -> Nadeem Chowk -> Serwar Rd -> Shami Rd N (D-Mess, F-Mess, Munir Rd) -> Alla-ud-Din Rd -> Abid Majid Rd -> Fortress Stadium -> Hyperstar -> CMH -> Infantry Rd (Mian Mir) -> Dharampura Bridge -> Ghari Shahu road NW (Euro Store, Police Station, Bazar, Chowk) -> Railway HQ -> Bohar Wala Chowk -> Railway Station. IN = reverse.
+UNSURE RT-19: Dograi, Baoo Wala, D-Mess/F-Mess/Munir Rd/Abid Majid Rd (estimated), Mehfooz Shaheed vs Quaid Check Post (too close), Bohar Wala Chowk, APS stop
+
+ROUTE RT-03: Railway Station -> Rana Town
+ROAD PATH RT-03: Railway Station -> NW past Nawaz Sharif Hospital -> Circular Rd W (Sheranwala Gate, Kashmiri Gate) -> Lari Adda / Gol Chakar -> Circular Rd S (Azadi Chowk, Texali, Bhatti) -> U-turn at Bhatti Chowk -> back N (Bhatti-2, Texali-2, Azadi-2) -> Ravi Rd N (Timber Market, Metro, Niazi Chowk) -> Niazi Interchange -> over the Ravi -> Shahdara (Metro Station, Lari Adda, Kot Shahab-ud-Din, Railway Station) -> Wandala Rd / Sheikhupura-side road N (Kashmir Park ... Rachna Town ... Nazim Rd) -> Rana Town. IN = reverse.
+UNSURE RT-03: Nawaz Sharif (which landmark?), Metro, Niazi Interchange, Bhatti-2 and Azadi-2 positions, Imamia Colony, Feroz Wala, Rachna Town, College/Haider/Nazim Rd (all estimated), Barkat Town
+
+ROUTE RT-05: Bhatti Chowk -> Shadbagh Underpass
+ROAD PATH RT-05: Circular Rd N (Bhatti Chowk -> Texali Chowk) -> Lari Adda Gol Chakar -> Badami Bagh -> Ravi Rd side to Sabzi Mandi -> east via Usman Chowk -> Lohay Wali Pulley -> Shadbagh roads (Ali Hajvery Shadi Hall, Masoom Shah Darbar, Madina Chowk, Rajput Park) -> Shadbagh Underpass. IN = reverse, plus Azadi Chowk between Lari Adda and Texali.
+UNSURE RT-05: Badami Bagh exact stop; Rajput Park; roads inside Shadbagh
+
+ROUTE RT-11: Main Market Gulberg -> Babu Sabu
+ROAD PATH RT-11: Gulberg loop: Main Market -> Main Blvd NE (McDonald's-1) -> Siddique Trade Center (Tevta Rd) -> back (McDonald's-2, Main Market-2) -> Mini Market -> south on Main Blvd/Gulberg (Hafeez Centre, Liberty Chowk, Centre Point) -> west to Barkat Market -> Campus Pul -> Canal Rd/PU New Campus -> Shaikh Zayed -> Bhekewal Morr -> north through Allama Iqbal Town/Samanabad (Pilot School, Farooq Hospital, Gulshan-e-Iqbal, Dubai Chowk, Flat Stop, Kali Kothi, Scheme Morr, Grand Battery) -> Chowk Yateem Khana -> Bund Rd W (City Bus Stand, Shezan, Niazi Adda, Bilal Daewoo) -> Babu Sabu. IN = reverse.
+UNSURE RT-11: Gulberg loop order and McDonald's-1/-2, Main Market-2; Gulshan-e-Iqbal, Flat Stop, Shezan Factory (estimated); names translated from Urdu
+

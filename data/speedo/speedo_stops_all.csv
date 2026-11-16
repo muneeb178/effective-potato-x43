@@ -1,0 +1,436 @@
+route,direction,seq,stop_en,lat,lng,confidence,source,notes
+RT-07,OUT,1,Depot Chowk (Green Town),31.430910,74.311296,A,gmaps:Depot Chowk,EV3 depot stop ~150 m north (31.432172)
+RT-07,OUT,2,Pulley Bus Stop,31.436854,74.314476,A,known:EV3 (Pully),
+RT-07,OUT,3,Minhaj University,31.443570,74.318242,A,known:EV3,
+RT-07,OUT,4,Hamdard Chowk,31.447238,74.320235,A,known:EV3,
+RT-07,OUT,5,Somi Center Bus Stop,31.450104,74.321890,A,gmaps:Somi Centre Bus Stop,
+RT-07,OUT,6,Nursery Bus Stop,31.452740,74.323334,A,known:EV3,gmaps Nursary Bus Stop matches
+RT-07,OUT,7,Rehmat Eye Hospital,31.454754,74.324479,A,known:EV3 (Riphah University),confirmed by Muneeb = Riphah stop
+RT-07,OUT,8,Pindi Stop,31.459608,74.327968,A,gmaps:Pindi Stop (RT07),both RT07 markers used
+RT-07,OUT,9,Treet Stop,31.457508,74.332326,A,gmaps:Treet Bus Stop / Treet Stop,
+RT-07,OUT,10,Peco Mor,31.456387,74.335424,A,gmaps:Peco Mor (RT07),
+RT-07,OUT,11,Kot Lakhpat Railway Station,31.459518,74.338809,B,gmaps:station,station landmark; exact roadside point unconfirmed
+RT-07,OUT,12,Phatki Stop,31.464600,74.340929,A,gmaps:Phatki Kot Lakhpat Bus Stop,
+RT-07,OUT,13,Phattak Mandi Stop,31.470847,74.344026,A,gmaps:Phattak Mandi Stop / Phatak Mandi (RT13),
+RT-07,OUT,14,Model Town Katchery,31.473382,74.344919,B,gmaps:Model Town Katchery,
+RT-07,OUT,15,Qainchi Stop,31.464554,74.349042,A,gmaps:Qainchi (RT04),"OUT=east side (southbound), IN=west side"
+RT-07,OUT,16,Ghazi Chowk,31.457328,74.351410,A,gmaps:Ghazi Chowk (RT07),"OUT=east side, IN=west side"
+RT-07,OUT,17,Chungi Amar Sidhu,31.449917,74.353467,A,gmaps:Chungi Amer Sidhu (RT04),"OUT=east side, IN=west side"
+RT-07,IN,1,Chungi Amar Sidhu,31.449861,74.353287,A,gmaps:Chungi Amer Sidhu (RT04),"OUT=east side, IN=west side"
+RT-07,IN,2,Ghazi Chowk,31.456370,74.351073,A,gmaps:Ghazi Chowk (RT07),"OUT=east side, IN=west side"
+RT-07,IN,3,Qainchi Stop,31.465590,74.348767,A,gmaps:Qainchi (RT04),"OUT=east side (southbound), IN=west side"
+RT-07,IN,4,Model Town Katchery,31.473342,74.345092,B,gmaps:Model Town Katchery,
+RT-07,IN,5,Phattak Mandi Stop,31.470773,74.344331,A,gmaps:Phattak Mandi Stop / Phatak Mandi (RT13),
+RT-07,IN,6,Phatki Stop,31.464600,74.340929,A,gmaps:Phatki Kot Lakhpat Bus Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-07,IN,7,Kot Lakhpat Railway Station,31.459363,74.338714,B,gmaps:station,station landmark; exact roadside point unconfirmed
+RT-07,IN,8,Peco Mor,31.456829,74.335347,A,gmaps:Peco Mor (RT07),
+RT-07,IN,9,Treet Stop,31.457649,74.332271,A,gmaps:Treet Bus Stop / Treet Stop,
+RT-07,IN,10,Pindi Stop,31.459326,74.327377,A,gmaps:Pindi Stop (RT07),both RT07 markers used
+RT-07,IN,11,Rehmat Eye Hospital,31.454754,74.324479,A,known:EV3 (Riphah University),same point as OUT; opposite-side stop may be ~20-50 m across. confirmed by Muneeb = Riphah stop
+RT-07,IN,12,Nursery Bus Stop,31.452740,74.323334,A,known:EV3,same point as OUT; opposite-side stop may be ~20-50 m across. gmaps Nursary Bus Stop matches
+RT-07,IN,13,Somi Center Bus Stop,31.450104,74.321890,A,gmaps:Somi Centre Bus Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-07,IN,14,Hamdard Chowk,31.447238,74.320235,A,known:EV3,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-07,IN,15,Minhaj University,31.443570,74.318242,A,known:EV3,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-07,IN,16,Pulley Bus Stop,31.436854,74.314476,A,known:EV3 (Pully),same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-07,IN,17,Depot Chowk (Green Town),31.431120,74.311782,A,gmaps:Depot Chowk,EV3 depot stop ~150 m north (31.432172)
+RT-08,OUT,1,Canal,31.518595,74.328079,A,gmaps:Canal (RT08),"street stop on Ferozepur Rd; OUT=east side, IN=west side"
+RT-08,OUT,2,Qaddafi Stadium,31.512862,74.328722,A,gmaps:Speedo Bus Stop Qadafi Stadium / Qaddafi Stadium (RT16),
+RT-08,OUT,3,Kalma Chowk,31.503832,74.330301,A,gmaps:Kalma Chowk (RT08),
+RT-08,OUT,4,Barkat Market,31.500968,74.320806,A,gmaps:Barkat Market (RT08),OUT=south side (westbound)
+RT-08,OUT,5,Campus Pull,31.503491,74.312063,A,gmaps:Campus Pull Bus Stop,IN = R26 Campus Pull
+RT-08,OUT,6,Gate No. 4,31.501010,74.308660,A,known:R26,R26 point (north bank); SW-bound bus likely uses south bank ~50 m SE
+RT-08,OUT,7,Hailey College,31.496720,74.304660,A,known:R26,R26 point (north bank); SW-bound bus likely uses south bank ~50 m SE
+RT-08,OUT,8,IBA Stop,31.493220,74.301100,A,known:R26,R26 point (north bank); SW-bound bus likely uses south bank ~50 m SE
+RT-08,OUT,9,Shah Di Khoi,31.490080,74.297210,A,known:R26,R26 point (north bank); SW-bound bus likely uses south bank ~50 m SE
+RT-08,OUT,10,Jinnah Hospital,31.486037,74.294288,A,known:EV3,not in R26 list
+RT-08,OUT,11,Wafaqi Colony,31.484670,74.289030,A,known:R26,R26 point (north bank); SW-bound bus likely uses south bank ~50 m SE
+RT-08,OUT,12,Doctor Hospital,31.481550,74.282040,A,known:R26,gmaps Doctor's Hospital Bus Stop used for IN
+RT-08,OUT,13,PCSIR-1,31.479240,74.275100,A,known:R26,R26 point (north bank); SW-bound bus likely uses south bank ~50 m SE
+RT-08,OUT,14,G-4 Johar Town,31.477224,74.269973,A,gmaps:G4 Johar Town Speedo Bus Stop,
+RT-08,OUT,15,Hanjarwal,31.476545,74.267018,A,gmaps:Hanjarwal / Spedo Bus Stop Hanjarwal North,"OUT=south bank, IN=north bank"
+RT-08,OUT,16,Mughal Eye Hospital,31.474376,74.256966,A,gmaps:Bus Stop Mughal Eye Hospital / Canal View Gate 2 North,
+RT-08,OUT,17,Canal View Gate 1,31.473398,74.250222,A,gmaps:Canal View Gate 1 / known:R26,IN matches gmaps Speedo Canal View Gate 1 North
+RT-08,OUT,18,Judicial Colony,31.470274,74.244821,B,gmaps:Judicial Colony,
+RT-08,OUT,19,Thokar Niaz Baig,31.471090,74.240340,A,known:R26,matches gmaps Thokar Multan Road Bus Stop
+RT-08,OUT,20,Daewoo Terminal,31.470142,74.239053,B,gmaps:Daewoo Express Thokar,terminal landmark on Multan Rd
+RT-08,OUT,21,Jinnah Bus Terminal,31.467364,74.225731,A,gmaps:Jinnah Bus Terminal / Speedo Bus Stop,R26/R20 value 74.241000 is ~1.5 km east and looks wrong
+RT-08,IN,1,Jinnah Bus Terminal,31.467404,74.226071,A,gmaps:Jinnah Bus Terminal / Speedo Bus Stop,R26/R20 value 74.241000 is ~1.5 km east and looks wrong
+RT-08,IN,2,Daewoo Terminal,31.469316,74.240473,B,gmaps:Daewoo Express Thokar,terminal landmark on Multan Rd
+RT-08,IN,3,Thokar Niaz Baig,31.471090,74.240340,A,known:R26,same point as OUT; opposite-side stop may be ~20-50 m across. matches gmaps Thokar Multan Road Bus Stop
+RT-08,IN,4,Judicial Colony,31.469937,74.244429,B,gmaps:Judicial Colony,
+RT-08,IN,5,Canal View Gate 1,31.473350,74.250450,A,gmaps:Canal View Gate 1 / known:R26,IN matches gmaps Speedo Canal View Gate 1 North
+RT-08,IN,6,Mughal Eye Hospital,31.474799,74.256761,A,gmaps:Bus Stop Mughal Eye Hospital / Canal View Gate 2 North,
+RT-08,IN,7,Hanjarwal,31.477027,74.266419,A,gmaps:Hanjarwal / Spedo Bus Stop Hanjarwal North,"OUT=south bank, IN=north bank"
+RT-08,IN,8,G-4 Johar Town,31.477224,74.269973,A,gmaps:G4 Johar Town Speedo Bus Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-08,IN,9,PCSIR-1,31.479240,74.275100,A,known:R26,same point as OUT; opposite-side stop may be ~20-50 m across. R26 point (north bank); SW-bound bus likely uses south bank ~50 m SE
+RT-08,IN,10,Doctor Hospital,31.481905,74.283125,A,known:R26,gmaps Doctor's Hospital Bus Stop used for IN
+RT-08,IN,11,Wafaqi Colony,31.484670,74.289030,A,known:R26,same point as OUT; opposite-side stop may be ~20-50 m across. R26 point (north bank); SW-bound bus likely uses south bank ~50 m SE
+RT-08,IN,12,Jinnah Hospital,31.486037,74.294288,A,known:EV3,same point as OUT; opposite-side stop may be ~20-50 m across. not in R26 list
+RT-08,IN,13,Shah Di Khoi,31.490080,74.297210,A,known:R26,same point as OUT; opposite-side stop may be ~20-50 m across. R26 point (north bank); SW-bound bus likely uses south bank ~50 m SE
+RT-08,IN,14,IBA Stop,31.493220,74.301100,A,known:R26,same point as OUT; opposite-side stop may be ~20-50 m across. R26 point (north bank); SW-bound bus likely uses south bank ~50 m SE
+RT-08,IN,15,Hailey College,31.496720,74.304660,A,known:R26,same point as OUT; opposite-side stop may be ~20-50 m across. R26 point (north bank); SW-bound bus likely uses south bank ~50 m SE
+RT-08,IN,16,Gate No. 4,31.501010,74.308660,A,known:R26,same point as OUT; opposite-side stop may be ~20-50 m across. R26 point (north bank); SW-bound bus likely uses south bank ~50 m SE
+RT-08,IN,17,Campus Pull,31.504030,74.311520,A,gmaps:Campus Pull Bus Stop,IN = R26 Campus Pull
+RT-08,IN,18,Barkat Market,31.501081,74.320063,A,gmaps:Barkat Market (RT08),OUT=south side (westbound)
+RT-08,IN,19,Kalma Chowk,31.505200,74.330873,A,gmaps:Kalma Chowk (RT08),
+RT-08,IN,20,Qaddafi Stadium,31.512027,74.328621,A,gmaps:Speedo Bus Stop Qadafi Stadium / Qaddafi Stadium (RT16),
+RT-08,IN,21,Canal,31.518122,74.327668,A,gmaps:Canal (RT08),"street stop on Ferozepur Rd; OUT=east side, IN=west side"
+RT-04,OUT,1,R.A Bazar,31.506229,74.384893,A,gmaps:R.A Bazar (RT04) / (RT14),
+RT-04,OUT,2,Nadeem Chowk,31.506531,74.378515,B,gmaps:Nadeem Chowk,
+RT-04,OUT,3,T-Stop,31.501213,74.378310,A,gmaps:T-Stop,several T-Stop markers nearby
+RT-04,OUT,4,Defence Morr,31.494442,74.373924,A,gmaps:Defense mor bus stop,
+RT-04,OUT,5,Korray Stop,31.493077,74.372105,A,gmaps:Korray Stop,
+RT-04,OUT,6,Shareef Market,31.490408,74.369703,B,gmaps:Shareef Market,
+RT-04,OUT,7,College Stop,31.487694,74.367564,A,gmaps:College Stop,
+RT-04,OUT,8,Walton,31.484484,74.364494,A,gmaps:Walton Bus Stop,
+RT-04,OUT,9,Bab-e-Pakistan,31.481500,74.361500,C,estimate on Walton Rd beside Bab-e-Pakistan (monument at 31.481899 74.353557 is off-road),between Walton and Workshop
+RT-04,OUT,10,Workshop,31.478427,74.358430,B,gmaps:Workshop,
+RT-04,OUT,11,Packages,31.471776,74.352376,A,gmaps:Package / Packages,OUT=SE side
+RT-04,OUT,12,Qainchi,31.464554,74.349042,A,gmaps:Qainchi (RT04),
+RT-04,OUT,13,Ghazi Chowk,31.457322,74.351324,A,gmaps:Ghazi Chowk (RT04),
+RT-04,OUT,14,Chungi Amar Sidhu,31.449917,74.353467,A,gmaps:Chungi Amer Sidhu (RT04),
+RT-04,IN,1,Chungi Amar Sidhu,31.449861,74.353287,A,gmaps:Chungi Amer Sidhu (RT04),
+RT-04,IN,2,Ghazi Chowk,31.456447,74.350856,A,gmaps:Ghazi Chowk (RT04),
+RT-04,IN,3,Qainchi,31.465590,74.348767,A,gmaps:Qainchi (RT04),
+RT-04,IN,4,Packages,31.471801,74.352085,A,gmaps:Package / Packages,OUT=SE side
+RT-04,IN,5,Workshop,31.478427,74.358430,B,gmaps:Workshop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-04,IN,6,Bab-e-Pakistan,31.481500,74.361500,C,estimate on Walton Rd beside Bab-e-Pakistan (monument at 31.481899 74.353557 is off-road),same point as OUT; opposite-side stop may be ~20-50 m across. between Walton and Workshop
+RT-04,IN,7,Walton,31.485813,74.365214,A,gmaps:Walton Bus Stop,
+RT-04,IN,8,College Stop,31.487694,74.367564,A,gmaps:College Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-04,IN,9,Shareef Market,31.490113,74.369467,B,gmaps:Shareef Market,
+RT-04,IN,10,Korray Stop,31.493077,74.372105,A,gmaps:Korray Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-04,IN,11,Defence Morr,31.494442,74.373924,A,gmaps:Defense mor bus stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-04,IN,12,T-Stop,31.502698,74.377996,A,gmaps:T-Stop,several T-Stop markers nearby
+RT-04,IN,13,Nadeem Chowk,31.506531,74.378515,B,gmaps:Nadeem Chowk,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-04,IN,14,R.A Bazar,31.505911,74.385161,A,gmaps:R.A Bazar (RT04) / (RT14),
+RT-09,OUT,1,Railway Station,31.574257,74.335631,A,gmaps:Railway Station (RT09),
+RT-09,OUT,2,Haji Camp,31.570389,74.335236,A,known:EV3,
+RT-09,OUT,3,Police Line,31.567862,74.335490,A,known:EV3,
+RT-09,OUT,4,Shimla Pahari,31.564197,74.335460,A,gmaps:Shimla Pahari / Shimla Pahari bus stop,
+RT-09,OUT,5,Shimla Pahari-2,31.562111,74.334321,A,gmaps:Shimla Pahari-2 = known:EV3 Shimla Hill,two gmaps markers named Shimla Pahari-2
+RT-09,OUT,6,LDA Plaza,31.561400,74.332500,C,estimate on Egerton Rd between Shimla Pahari-2 and Aiwan-e-Iqbal,gmaps LDA Plaza result was in Johar Town (wrong)
+RT-09,OUT,7,Aiwan-e-Iqbal,31.560771,74.330383,B,gmaps:Aiwan-e-Iqbal Complex,building centroid on Egerton Rd
+RT-09,OUT,8,Lahore Zoo,31.558032,74.327167,A,gmaps:Lahore Zoo (RT09),IN = EV3 Lahore Zoo
+RT-09,OUT,9,Charing Cross,31.559030,74.323970,A,gmaps:Charing Cross (RT09),
+RT-09,OUT,10,Ganga Ram Hospital,31.554302,74.320208,A,known:EV3,
+RT-09,OUT,11,Waris Road,31.551540,74.318770,A,known:EV3,
+RT-09,OUT,12,Qartaba Chowk,31.549230,74.315559,A,gmaps:Qartaba Chowk (RT09),IN = EV3 Qartaba Chowk
+RT-09,OUT,13,Chauburji OL Station,31.553019,74.305979,A,gmaps:Chuburji (RT09) / Chauburji Bus Stop,"road stop, not OL platform"
+RT-09,OUT,14,Poonch House,31.550969,74.302058,B,gmaps:Poonch House Multan Rd,
+RT-09,OUT,15,Gulshan Ravi OL Station,31.544873,74.295171,B,gmaps:Gulshan e Ravi Station / Morr Samanabad,Multan Rd under OL station
+RT-09,IN,1,Gulshan Ravi OL Station,31.544402,74.294467,B,gmaps:Gulshan e Ravi Station / Morr Samanabad,Multan Rd under OL station
+RT-09,IN,2,Poonch House,31.550969,74.302058,B,gmaps:Poonch House Multan Rd,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-09,IN,3,Chauburji OL Station,31.554799,74.304743,A,gmaps:Chuburji (RT09) / Chauburji Bus Stop,"road stop, not OL platform"
+RT-09,IN,4,Qartaba Chowk,31.548156,74.315106,A,gmaps:Qartaba Chowk (RT09),IN = EV3 Qartaba Chowk
+RT-09,IN,5,Waris Road,31.551540,74.318770,A,known:EV3,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-09,IN,6,Ganga Ram Hospital,31.554302,74.320208,A,known:EV3,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-09,IN,7,Charing Cross,31.559044,74.324217,A,gmaps:Charing Cross (RT09),
+RT-09,IN,8,Lahore Zoo,31.558640,74.326746,A,gmaps:Lahore Zoo (RT09),IN = EV3 Lahore Zoo
+RT-09,IN,9,Aiwan-e-Iqbal,31.560771,74.330383,B,gmaps:Aiwan-e-Iqbal Complex,same point as OUT; opposite-side stop may be ~20-50 m across. building centroid on Egerton Rd
+RT-09,IN,10,LDA Plaza,31.561400,74.332500,C,estimate on Egerton Rd between Shimla Pahari-2 and Aiwan-e-Iqbal,same point as OUT; opposite-side stop may be ~20-50 m across. gmaps LDA Plaza result was in Johar Town (wrong)
+RT-09,IN,11,Shimla Pahari-2,31.563654,74.335167,A,gmaps:Shimla Pahari-2 = known:EV3 Shimla Hill,two gmaps markers named Shimla Pahari-2
+RT-09,IN,12,Shimla Pahari,31.562283,74.334891,A,gmaps:Shimla Pahari / Shimla Pahari bus stop,
+RT-09,IN,13,Police Line,31.567862,74.335490,A,known:EV3,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-09,IN,14,Haji Camp,31.570389,74.335236,A,known:EV3,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-09,IN,15,Railway Station,31.574227,74.335821,A,gmaps:Railway Station (RT09),
+RT-10,OUT,1,Wahdat Road Station,31.495277,74.263856,A,gmaps:Wahdat Road Station,Multan Rd at Wahdat Rd junction
+RT-10,OUT,2,Multan Chungi,31.496146,74.264084,A,gmaps:Multan Chungi,
+RT-10,OUT,3,Elephant Link Road,31.497610,74.269972,A,gmaps:Elephant Link Road / Metro Bus Feeder Stop No. 207,
+RT-10,OUT,4,Mustafa Town,31.498954,74.274204,A,gmaps:Mustafa Town Stop,
+RT-10,OUT,5,Karim Block Market,31.503739,74.280907,B,gmaps:Karim Block Market,route goes inside Allama Iqbal Town; road unconfirmed
+RT-10,OUT,6,Sikander Block,31.504871,74.282120,C,gmaps:Sikandar Block (area centroid),"block centroid, not a stop marker"
+RT-10,OUT,7,Raza Block,31.506420,74.286153,C,gmaps:Raza Block (area centroid),"block centroid, not a stop marker"
+RT-10,OUT,8,PU Examination Hall,31.505617,74.292080,B,gmaps:PU Examination Hall,
+RT-10,OUT,9,Science College,31.507609,74.296447,B,gmaps:Government Graduate College of Science,
+RT-10,OUT,10,Bhekewal Morr,31.509632,74.300885,A,gmaps:Bhekewal Morr (RT10),
+RT-10,OUT,11,Wahdat Colony,31.511915,74.305833,A,gmaps:Wahdat Colony,
+RT-10,OUT,12,School Stop,31.513162,74.307876,A,gmaps:School Stop,
+RT-10,OUT,13,Bank Stop,31.514663,74.311368,A,gmaps:Bank Stop (RT10),
+RT-10,OUT,14,Naqsha Stop,31.517249,74.316330,A,gmaps:Naqsha Stop,
+RT-10,OUT,15,Karma Abad,31.518315,74.318475,A,gmaps:Karma Abad,
+RT-10,OUT,16,Aab Para Market,31.520100,74.321642,B,gmaps:Aab Para Market,
+RT-10,OUT,17,Canal,31.520533,74.323319,A,gmaps:Canal (RT10),= EV3 Ichhra Pull; Ferozepur Rd at canal
+RT-10,OUT,18,Rehman Pura,31.524070,74.323620,A,known:EV3,
+RT-10,OUT,19,Ichhra,31.531708,74.320984,A,gmaps:Ichara West / Ichra Bus Stop,"street stop, not Metrobus station"
+RT-10,OUT,20,Shama,31.539101,74.319085,B,known:EV3 (Shama Station),EV3 point; check it is the street stop not the elevated station
+RT-10,OUT,21,LOS,31.541322,74.317361,A,gmaps:LOS Stop / Los,
+RT-10,OUT,22,Qartaba Chowk,31.549533,74.315015,A,gmaps:Qartaba Chowk (RT10),
+RT-10,IN,1,Qartaba Chowk,31.548156,74.315106,A,gmaps:Qartaba Chowk (RT10),
+RT-10,IN,2,LOS,31.542197,74.317589,A,gmaps:LOS Stop / Los,
+RT-10,IN,3,Shama,31.539101,74.319085,B,known:EV3 (Shama Station),same point as OUT; opposite-side stop may be ~20-50 m across. EV3 point; check it is the street stop not the elevated station
+RT-10,IN,4,Ichhra,31.532844,74.321205,A,gmaps:Ichara West / Ichra Bus Stop,"street stop, not Metrobus station"
+RT-10,IN,5,Rehman Pura,31.524070,74.323620,A,known:EV3,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-10,IN,6,Canal,31.520497,74.324540,A,gmaps:Canal (RT10),= EV3 Ichhra Pull; Ferozepur Rd at canal
+RT-10,IN,7,Aab Para Market,31.520186,74.321214,B,gmaps:Aab Para Market,
+RT-10,IN,8,Karma Abad,31.518307,74.318838,A,gmaps:Karma Abad,
+RT-10,IN,9,Naqsha Stop,31.517249,74.316330,A,gmaps:Naqsha Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-10,IN,10,Bank Stop,31.514897,74.311523,A,gmaps:Bank Stop (RT10),
+RT-10,IN,11,School Stop,31.513162,74.307876,A,gmaps:School Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-10,IN,12,Wahdat Colony,31.511844,74.305309,A,gmaps:Wahdat Colony,
+RT-10,IN,13,Bhekewal Morr,31.510499,74.302507,A,gmaps:Bhekewal Morr (RT10),
+RT-10,IN,14,Science College,31.507609,74.296447,B,gmaps:Government Graduate College of Science,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-10,IN,15,PU Examination Hall,31.505570,74.292390,B,gmaps:PU Examination Hall,
+RT-10,IN,16,Raza Block,31.506420,74.286153,C,gmaps:Raza Block (area centroid),"same point as OUT; opposite-side stop may be ~20-50 m across. block centroid, not a stop marker"
+RT-10,IN,17,Sikander Block,31.504871,74.282120,C,gmaps:Sikandar Block (area centroid),"same point as OUT; opposite-side stop may be ~20-50 m across. block centroid, not a stop marker"
+RT-10,IN,18,Karim Block Market,31.503739,74.280907,B,gmaps:Karim Block Market,same point as OUT; opposite-side stop may be ~20-50 m across. route goes inside Allama Iqbal Town; road unconfirmed
+RT-10,IN,19,Mustafa Town,31.499128,74.274623,A,gmaps:Mustafa Town Stop,
+RT-10,IN,20,Elephant Link Road,31.497331,74.269537,A,gmaps:Elephant Link Road / Metro Bus Feeder Stop No. 207,
+RT-10,IN,21,Multan Chungi,31.496224,74.265475,A,gmaps:Multan Chungi,
+RT-10,IN,22,Wahdat Road Station,31.494907,74.264498,A,gmaps:Wahdat Road Station,Multan Rd at Wahdat Rd junction
+RT-12,OUT,1,R.A Bazar,31.506187,74.385161,A,gmaps:R.A Bazar (RT12),
+RT-12,OUT,2,PAF Market,31.519235,74.381677,A,gmaps:PAF Market / PAF Cinema Bus Stop,
+RT-12,OUT,3,Telephone Exchange,31.521847,74.380645,B,gmaps:Telephone Exchange,
+RT-12,OUT,4,Girja Chowk,31.522060,74.380703,A,gmaps:Bus Stop at Girja Chowk,junction at 31.522203 74.379266
+RT-12,OUT,5,Alla-ud-Din Road,31.524700,74.379200,C,estimate on main road at Alla-ud-Din Rd junction between Girja and Afshan,gmaps Alla-Ud-Din Road marker 31.525956 74.368681 is on Alla-ud-Din Rd itself (used for RT-19)
+RT-12,OUT,6,Afshan Chowk,31.527242,74.379042,A,gmaps:Afshan Chowk,
+RT-12,OUT,7,Rahat Bakery,31.529898,74.376022,A,gmaps:Rahat Bus Stop,
+RT-12,OUT,8,Fortress Stadium,31.528905,74.368760,A,gmaps:Fotress Stadium,
+RT-12,OUT,9,Mian Mir,31.537691,74.356408,A,gmaps:Mian Mir,
+RT-12,OUT,10,Gym Khana,31.540447,74.353374,A,gmaps:Gymkhana Speedo Bus Stop,
+RT-12,OUT,11,Canal Bridge,31.542605,74.351132,A,gmaps:Canal Bridge / NIPA Canal Bridge Bus Stop,
+RT-12,OUT,12,Aitchison College,31.544856,74.348915,A,gmaps:Aitchison College / Aitchison College Bus Stop,
+RT-12,OUT,13,Club Road,31.551202,74.341157,A,gmaps:Club Road Bus Stop = known:EV3 Club Chowk,
+RT-12,OUT,14,PC Hotel,31.553355,74.338078,A,gmaps:PC Hotel,
+RT-12,OUT,15,Governor House,31.554603,74.334590,A,known:EV3,
+RT-12,OUT,16,Lahore Zoo,31.558384,74.326606,A,gmaps:Lahore Zoo (RT12),
+RT-12,OUT,17,Charing Cross,31.559918,74.323705,A,gmaps:Charing Cross (RT12),
+RT-12,OUT,18,Regal Chowk,31.562176,74.318563,A,gmaps:Regal South / Regal Chowk,
+RT-12,OUT,19,GPO,31.566058,74.314066,A,gmaps:GPO Bus Stop,"street stop, not OL station"
+RT-12,OUT,20,Anarkali,31.567644,74.310612,A,gmaps:Anarkali Bus Stop,"street stop, not OL station"
+RT-12,OUT,21,PU Old Campus,31.568500,74.309200,C,estimate on Mall Rd at PU Old Campus,
+RT-12,OUT,22,Government College,31.570300,74.308000,C,estimate on Lower Mall at GC University,
+RT-12,OUT,23,Nasir Bagh,31.571600,74.307200,C,estimate on Lower Mall beside Nasir Bagh (park centroid 31.5711 74.30629),
+RT-12,IN,1,Nasir Bagh,31.571600,74.307200,C,estimate on Lower Mall beside Nasir Bagh (park centroid 31.5711 74.30629),same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-12,IN,2,Government College,31.570300,74.308000,C,estimate on Lower Mall at GC University,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-12,IN,3,PU Old Campus,31.568500,74.309200,C,estimate on Mall Rd at PU Old Campus,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-12,IN,4,Anarkali,31.567644,74.310612,A,gmaps:Anarkali Bus Stop,"same point as OUT; opposite-side stop may be ~20-50 m across. street stop, not OL station"
+RT-12,IN,5,GPO,31.564905,74.315101,A,gmaps:GPO Bus Stop,"street stop, not OL station"
+RT-12,IN,6,Regal Chowk,31.562425,74.318624,A,gmaps:Regal South / Regal Chowk,
+RT-12,IN,7,Charing Cross,31.560693,74.322701,A,gmaps:Charing Cross (RT12),
+RT-12,IN,8,Lahore Zoo,31.558640,74.326746,A,gmaps:Lahore Zoo (RT12),
+RT-12,IN,9,Governor House,31.554603,74.334590,A,known:EV3,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-12,IN,10,PC Hotel,31.553592,74.338253,A,gmaps:PC Hotel,
+RT-12,IN,11,Club Road,31.551202,74.341157,A,gmaps:Club Road Bus Stop = known:EV3 Club Chowk,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-12,IN,12,Aitchison College,31.545654,74.348496,A,gmaps:Aitchison College / Aitchison College Bus Stop,
+RT-12,IN,13,Canal Bridge,31.542938,74.351465,A,gmaps:Canal Bridge / NIPA Canal Bridge Bus Stop,
+RT-12,IN,14,Gym Khana,31.539654,74.354731,A,gmaps:Gymkhana Speedo Bus Stop,
+RT-12,IN,15,Mian Mir,31.537988,74.356563,A,gmaps:Mian Mir,
+RT-12,IN,16,Fortress Stadium,31.529039,74.368872,A,gmaps:Fotress Stadium,
+RT-12,IN,17,Rahat Bakery,31.529898,74.376022,A,gmaps:Rahat Bus Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-12,IN,18,Afshan Chowk,31.527442,74.379469,A,gmaps:Afshan Chowk,
+RT-12,IN,19,Alla-ud-Din Road,31.524700,74.379200,C,estimate on main road at Alla-ud-Din Rd junction between Girja and Afshan,same point as OUT; opposite-side stop may be ~20-50 m across. gmaps Alla-Ud-Din Road marker 31.525956 74.368681 is on Alla-ud-Din Rd itself (used for RT-19)
+RT-12,IN,20,Girja Chowk,31.523267,74.378965,A,gmaps:Bus Stop at Girja Chowk,junction at 31.522203 74.379266
+RT-12,IN,21,Telephone Exchange,31.522094,74.380320,B,gmaps:Telephone Exchange,
+RT-12,IN,22,PAF Market,31.519055,74.381644,A,gmaps:PAF Market / PAF Cinema Bus Stop,
+RT-12,IN,23,R.A Bazar,31.506187,74.385161,A,gmaps:R.A Bazar (RT12),same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-19,OUT,1,Paragon City,31.522803,74.451358,A,gmaps:RT19 buss stop paragon city,
+RT-19,OUT,2,Dograi,31.528136,74.446334,B,gmaps:Dograi (village pin),on Barki Rd side; roadside point unconfirmed
+RT-19,OUT,3,Baoo Wala,31.529435,74.437175,C,gmaps:Baoo Wala Park View CHS (area pin),"area pin, not a stop"
+RT-19,OUT,4,Mehfooz Shaheed Garrison,31.541579,74.431859,B,gmaps:Mehfooz Shaheed Garrison Main Gate,
+RT-19,OUT,5,Quaid Check Post,31.541317,74.431598,B,gmaps:Quaid CP Mehfooz Shaheed Garrison,only ~35 m from previous stop - check
+RT-19,OUT,6,Askari-X,31.541189,74.416600,A,gmaps:Askari X Bus Stop,
+RT-19,OUT,7,Ranger Headquarter,31.542921,74.414876,B,gmaps:Pakistan Rangers Punjab Headquarters,building pin
+RT-19,OUT,8,Jawad Cheema Road,31.542140,74.400828,B,gmaps:Jawad Cheema Shaheed Chowk,
+RT-19,OUT,9,Army Museum,31.532300,74.398400,B,gmaps:Army Museum Lahore,building pin
+RT-19,OUT,10,Ayub Stadium,31.528573,74.393074,B,gmaps:Ayub Sports Complex,building pin
+RT-19,OUT,11,APS Sarfaraz Rafique Road,31.522944,74.381517,C,gmaps:Garrison College / APC (Boys) SSR,school on Sarfaraz Rafiqui Rd
+RT-19,OUT,12,PAF Market,31.519141,74.381543,A,gmaps:PAF Market,
+RT-19,OUT,13,R.A Bazar,31.505993,74.384674,A,gmaps:R.A Bazar (RT19),
+RT-19,OUT,14,Nadeem Chowk,31.506531,74.378515,B,gmaps:Nadeem Chowk,
+RT-19,OUT,15,Serwar Road,31.506643,74.376434,A,gmaps:Serwar Road,
+RT-19,OUT,16,D-Mess Shami Road,31.511000,74.370000,C,estimate on Shami Rd,Shami Rd pin 31.520912 74.368513
+RT-19,OUT,17,F-Mess Shami Road,31.516000,74.369000,C,estimate on Shami Rd,
+RT-19,OUT,18,Munir Road,31.519000,74.368800,C,estimate at Shami Rd / Munir Rd junction,Munir Rd pin 31.517315 74.378436
+RT-19,OUT,19,Alla-ud-Din Road,31.525956,74.368681,A,gmaps:Alla-Ud-Din Road,
+RT-19,OUT,20,Abid Majid Road,31.527000,74.369000,C,estimate at Abid Majeed Rd junction before Fortress,Abid Majeed Rd pin 31.522200 74.375413
+RT-19,OUT,21,Fortress Stadium,31.528905,74.368760,A,gmaps:Fotress Stadium,
+RT-19,OUT,22,Navy Selection Center-Hyperstar,31.532919,74.364635,B,gmaps:Fortress Stadium Market (Hyperstar/Carrefour),
+RT-19,OUT,23,CMH,31.539253,74.369477,A,gmaps:CMH,
+RT-19,OUT,24,Infantry Road Mian Mir,31.549282,74.363333,A,gmaps:Infantry Road Mian Mir,
+RT-19,OUT,25,Dharampura Bridge,31.552942,74.358725,A,gmaps:Dharampura Underpass Stop / Dharampura Bridge,
+RT-19,OUT,26,Euro Store,31.556688,74.354688,B,gmaps:EURO Store Ghari Shahu,
+RT-19,OUT,27,Police Station Ghari Shahu,31.561148,74.352489,B,gmaps:Police Station Garhi Shahu,
+RT-19,OUT,28,Ghari Shahu Bazar,31.563883,74.348048,B,gmaps:Garhi Shahu Market,
+RT-19,OUT,29,Ghari Shahu Chowk,31.565434,74.343265,A,gmaps:Ghari Shahu Chowk,
+RT-19,OUT,30,Railway Headquarters,31.568056,74.338001,B,gmaps:Lahore Railway Headquarter,
+RT-19,OUT,31,Bohar Wala Chowk,31.571500,74.337000,C,estimate between Railway HQ and Railway Station,gmaps Bohar Wala Chowk result was in Baghbanpura (wrong one)
+RT-19,OUT,32,Railway Station,31.574221,74.335992,A,gmaps:Railway Station (RT19),
+RT-19,IN,1,Railway Station,31.574316,74.336236,A,gmaps:Railway Station (RT19),
+RT-19,IN,2,Bohar Wala Chowk,31.571500,74.337000,C,estimate between Railway HQ and Railway Station,same point as OUT; opposite-side stop may be ~20-50 m across. gmaps Bohar Wala Chowk result was in Baghbanpura (wrong one)
+RT-19,IN,3,Railway Headquarters,31.568056,74.338001,B,gmaps:Lahore Railway Headquarter,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-19,IN,4,Ghari Shahu Chowk,31.565616,74.343381,A,gmaps:Ghari Shahu Chowk,
+RT-19,IN,5,Ghari Shahu Bazar,31.563883,74.348048,B,gmaps:Garhi Shahu Market,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-19,IN,6,Police Station Ghari Shahu,31.561148,74.352489,B,gmaps:Police Station Garhi Shahu,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-19,IN,7,Euro Store,31.556688,74.354688,B,gmaps:EURO Store Ghari Shahu,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-19,IN,8,Dharampura Bridge,31.552885,74.359184,A,gmaps:Dharampura Underpass Stop / Dharampura Bridge,
+RT-19,IN,9,Infantry Road Mian Mir,31.549421,74.362886,A,gmaps:Infantry Road Mian Mir,
+RT-19,IN,10,CMH,31.540652,74.369343,A,gmaps:CMH,
+RT-19,IN,11,Navy Selection Center-Hyperstar,31.532919,74.364635,B,gmaps:Fortress Stadium Market (Hyperstar/Carrefour),same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-19,IN,12,Fortress Stadium,31.529039,74.368872,A,gmaps:Fotress Stadium,
+RT-19,IN,13,Abid Majid Road,31.527000,74.369000,C,estimate at Abid Majeed Rd junction before Fortress,same point as OUT; opposite-side stop may be ~20-50 m across. Abid Majeed Rd pin 31.522200 74.375413
+RT-19,IN,14,Alla-ud-Din Road,31.525956,74.368681,A,gmaps:Alla-Ud-Din Road,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-19,IN,15,Munir Road,31.519000,74.368800,C,estimate at Shami Rd / Munir Rd junction,same point as OUT; opposite-side stop may be ~20-50 m across. Munir Rd pin 31.517315 74.378436
+RT-19,IN,16,F-Mess Shami Road,31.516000,74.369000,C,estimate on Shami Rd,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-19,IN,17,D-Mess Shami Road,31.511000,74.370000,C,estimate on Shami Rd,same point as OUT; opposite-side stop may be ~20-50 m across. Shami Rd pin 31.520912 74.368513
+RT-19,IN,18,Serwar Road,31.506643,74.376434,A,gmaps:Serwar Road,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-19,IN,19,Nadeem Chowk,31.506531,74.378515,B,gmaps:Nadeem Chowk,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-19,IN,20,R.A Bazar,31.506101,74.384894,A,gmaps:R.A Bazar (RT19),
+RT-19,IN,21,PAF Market,31.519235,74.381677,A,gmaps:PAF Market,
+RT-19,IN,22,APS Sarfaraz Rafique Road,31.522944,74.381517,C,gmaps:Garrison College / APC (Boys) SSR,same point as OUT; opposite-side stop may be ~20-50 m across. school on Sarfaraz Rafiqui Rd
+RT-19,IN,23,Ayub Stadium,31.528573,74.393074,B,gmaps:Ayub Sports Complex,same point as OUT; opposite-side stop may be ~20-50 m across. building pin
+RT-19,IN,24,Army Museum,31.532300,74.398400,B,gmaps:Army Museum Lahore,same point as OUT; opposite-side stop may be ~20-50 m across. building pin
+RT-19,IN,25,Jawad Cheema Road,31.542140,74.400828,B,gmaps:Jawad Cheema Shaheed Chowk,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-19,IN,26,Ranger Headquarter,31.542921,74.414876,B,gmaps:Pakistan Rangers Punjab Headquarters,same point as OUT; opposite-side stop may be ~20-50 m across. building pin
+RT-19,IN,27,Askari-X,31.541189,74.416600,A,gmaps:Askari X Bus Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-19,IN,28,Quaid Check Post,31.541317,74.431598,B,gmaps:Quaid CP Mehfooz Shaheed Garrison,same point as OUT; opposite-side stop may be ~20-50 m across. only ~35 m from previous stop - check
+RT-19,IN,29,Mehfooz Shaheed Garrison,31.541579,74.431859,B,gmaps:Mehfooz Shaheed Garrison Main Gate,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-19,IN,30,Baoo Wala,31.529435,74.437175,C,gmaps:Baoo Wala Park View CHS (area pin),"same point as OUT; opposite-side stop may be ~20-50 m across. area pin, not a stop"
+RT-19,IN,31,Dograi,31.528136,74.446334,B,gmaps:Dograi (village pin),same point as OUT; opposite-side stop may be ~20-50 m across. on Barki Rd side; roadside point unconfirmed
+RT-19,IN,32,Paragon City,31.522803,74.451358,A,gmaps:RT19 buss stop paragon city,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,OUT,1,Railway Station,31.574257,74.335631,A,gmaps:Railway Station (RT09),same stop used by RT09
+RT-03,OUT,2,Railway Station-2,31.574316,74.336236,A,gmaps:Railway Station (RT19),other marker at the station
+RT-03,OUT,3,Nawaz Sharif,31.584524,74.327305,B,gmaps:Govt Mian Muhammad Nawaz Sharif Hospital,hospital pin; name assumed to mean this hospital
+RT-03,OUT,4,Sheranwala Gate,31.585898,74.324112,B,gmaps:Sheranwala Gate Bazar,
+RT-03,OUT,5,Kashmiri Gate,31.586866,74.321040,B,gmaps:Kashmiri Gate,
+RT-03,OUT,6,Lari Adda,31.593047,74.317495,B,gmaps:General Bus Stand Badami Bagh,
+RT-03,OUT,7,Lari Adda Gol Chakar,31.595342,74.311017,A,gmaps:Lari adda Gol Chaker (RT05),
+RT-03,OUT,8,Azadi Chowk,31.591439,74.306695,A,gmaps:Azadi Chowk (RT05),"street stop, not Metrobus station"
+RT-03,OUT,9,Texali Chowk,31.586103,74.306956,A,gmaps:Texali Chowk (RT05),southbound side
+RT-03,OUT,10,Bhatti Chowk,31.582758,74.306844,A,gmaps:Bhatti Chowk (RT05),
+RT-03,OUT,11,Bhatti Chowk-2,31.582758,74.306844,C,same point as Bhatti Chowk,other side of the road; no separate marker found
+RT-03,OUT,12,Texali Chowk-2,31.585468,74.306746,A,gmaps:Texali Chowk (RT05) other marker,northbound side
+RT-03,OUT,13,Azadi Chowk 2,31.591439,74.306695,C,same point as Azadi Chowk,other side of the road; no separate marker found
+RT-03,OUT,14,Timber Market,31.594638,74.301668,A,gmaps:Timber market Speedo Bus stop,
+RT-03,OUT,15,Metro,31.598000,74.300500,C,estimate between Timber Market and Niazi Chowk,name unclear on poster
+RT-03,OUT,16,Niazi Chowk,31.601394,74.299110,A,gmaps:Niazi Chowk Speedo Bus Stop,
+RT-03,OUT,17,Niazi Interchange,31.606000,74.296500,C,estimate north of Niazi Chowk toward the Ravi bridge,
+RT-03,OUT,18,Shahdara Metro Station,31.615193,74.290911,A,gmaps:Shahdara Station Speedo Bus Stop / Shahdara Morr Speedo,"street stop, not Metrobus terminal"
+RT-03,OUT,19,Shahdara Lari Adda,31.619440,74.289741,A,gmaps:Speedo Stop Shahdara Lorry adda,
+RT-03,OUT,20,Kot Shahab-ud-Din,31.623746,74.288880,A,gmaps:Kot Shab ud Din Speedo Bus Stop,
+RT-03,OUT,21,Shahdara Railway Station,31.628732,74.289231,B,gmaps:Shahdarah railway station,
+RT-03,OUT,22,Wandala Road,31.629455,74.287627,A,gmaps:Vandala Speedo Bus Stop,
+RT-03,OUT,23,Kashmir Park,31.633621,74.286957,A,gmaps:Kashmir park Speedo Bus Stop,
+RT-03,OUT,24,Machas Factory,31.637809,74.286324,B,gmaps:Machas Factory,
+RT-03,OUT,25,Barkat Town,31.642466,74.287600,C,gmaps:Barkat Town Rd (road pin),
+RT-03,OUT,26,Kala Khatai Road,31.644642,74.284657,B,gmaps:Kala Khatai Road,
+RT-03,OUT,27,Imamia Colony,31.649500,74.283000,C,estimate on main road; Imamia Colony area pin is 31.649987 74.272218,
+RT-03,OUT,28,Feroz Wala,31.653500,74.280500,C,estimate between Imamia Colony and Rachna Town,Ferozewala town pin (31.685 74.277) is far north - stop probably named after the area
+RT-03,OUT,29,Rachna Town,31.657071,74.278819,C,gmaps:Rachna Town (area pin),
+RT-03,OUT,30,College Road,31.664000,74.276000,C,estimate between Rachna Town and Rana Town,
+RT-03,OUT,31,Haider Road,31.671000,74.274000,C,estimate between Rachna Town and Rana Town,
+RT-03,OUT,32,Nazim Road,31.678000,74.272000,C,estimate between Rachna Town and Rana Town,
+RT-03,OUT,33,Rana Town,31.685744,74.269284,B,gmaps:Rana Town (area pin),
+RT-03,IN,1,Rana Town,31.685744,74.269284,B,gmaps:Rana Town (area pin),same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,2,Nazim Road,31.678000,74.272000,C,estimate between Rachna Town and Rana Town,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,3,Haider Road,31.671000,74.274000,C,estimate between Rachna Town and Rana Town,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,4,College Road,31.664000,74.276000,C,estimate between Rachna Town and Rana Town,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,5,Rachna Town,31.657071,74.278819,C,gmaps:Rachna Town (area pin),same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,6,Feroz Wala,31.653500,74.280500,C,estimate between Imamia Colony and Rachna Town,same point as OUT; opposite-side stop may be ~20-50 m across. Ferozewala town pin (31.685 74.277) is far north - stop probably named after the area
+RT-03,IN,7,Imamia Colony,31.649500,74.283000,C,estimate on main road; Imamia Colony area pin is 31.649987 74.272218,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,8,Kala Khatai Road,31.644418,74.284948,B,gmaps:Kala Khatai Road,
+RT-03,IN,9,Barkat Town,31.642466,74.287600,C,gmaps:Barkat Town Rd (road pin),same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,10,Machas Factory,31.638030,74.286037,B,gmaps:Machas Factory,
+RT-03,IN,11,Kashmir Park,31.633621,74.286957,A,gmaps:Kashmir park Speedo Bus Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,12,Wandala Road,31.629455,74.287627,A,gmaps:Vandala Speedo Bus Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,13,Shahdara Railway Station,31.628732,74.289231,B,gmaps:Shahdarah railway station,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,14,Kot Shahab-ud-Din,31.623746,74.288880,A,gmaps:Kot Shab ud Din Speedo Bus Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,15,Shahdara Lari Adda,31.619440,74.289741,A,gmaps:Speedo Stop Shahdara Lorry adda,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,16,Shahdara Metro Station,31.615182,74.290395,A,gmaps:Shahdara Station Speedo Bus Stop / Shahdara Morr Speedo,"street stop, not Metrobus terminal"
+RT-03,IN,17,Niazi Interchange,31.606000,74.296500,C,estimate north of Niazi Chowk toward the Ravi bridge,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,18,Niazi Chowk,31.601394,74.299110,A,gmaps:Niazi Chowk Speedo Bus Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,19,Metro,31.598000,74.300500,C,estimate between Timber Market and Niazi Chowk,same point as OUT; opposite-side stop may be ~20-50 m across. name unclear on poster
+RT-03,IN,20,Timber Market,31.594638,74.301668,A,gmaps:Timber market Speedo Bus stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,21,Azadi Chowk 2,31.591439,74.306695,C,same point as Azadi Chowk,same point as OUT; opposite-side stop may be ~20-50 m across. other side of the road; no separate marker found
+RT-03,IN,22,Texali Chowk-2,31.585468,74.306746,A,gmaps:Texali Chowk (RT05) other marker,same point as OUT; opposite-side stop may be ~20-50 m across. northbound side
+RT-03,IN,23,Bhatti Chowk-2,31.582758,74.306844,C,same point as Bhatti Chowk,same point as OUT; opposite-side stop may be ~20-50 m across. other side of the road; no separate marker found
+RT-03,IN,24,Bhatti Chowk,31.582758,74.306844,A,gmaps:Bhatti Chowk (RT05),same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,25,Texali Chowk,31.586103,74.306956,A,gmaps:Texali Chowk (RT05),same point as OUT; opposite-side stop may be ~20-50 m across. southbound side
+RT-03,IN,26,Azadi Chowk,31.591439,74.306695,A,gmaps:Azadi Chowk (RT05),"same point as OUT; opposite-side stop may be ~20-50 m across. street stop, not Metrobus station"
+RT-03,IN,27,Lari Adda Gol Chakar,31.595057,74.311506,A,gmaps:Lari adda Gol Chaker (RT05),
+RT-03,IN,28,Lari Adda,31.593047,74.317495,B,gmaps:General Bus Stand Badami Bagh,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,29,Kashmiri Gate,31.586866,74.321040,B,gmaps:Kashmiri Gate,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,30,Sheranwala Gate,31.585898,74.324112,B,gmaps:Sheranwala Gate Bazar,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-03,IN,31,Nawaz Sharif,31.584524,74.327305,B,gmaps:Govt Mian Muhammad Nawaz Sharif Hospital,same point as OUT; opposite-side stop may be ~20-50 m across. hospital pin; name assumed to mean this hospital
+RT-03,IN,32,Railway Station-2,31.574316,74.336236,A,gmaps:Railway Station (RT19),same point as OUT; opposite-side stop may be ~20-50 m across. other marker at the station
+RT-03,IN,33,Railway Station,31.574257,74.335631,A,gmaps:Railway Station (RT09),same point as OUT; opposite-side stop may be ~20-50 m across. same stop used by RT09
+RT-05,OUT,1,Bhatti Chowk,31.582758,74.306844,A,gmaps:Bhatti Chowk (RT05),"street stop, not Metrobus station"
+RT-05,OUT,2,Texali Chowk,31.585468,74.306746,A,gmaps:Texali Chowk (RT05),
+RT-05,OUT,3,Lari Adda Gol Chakar,31.595342,74.311017,A,gmaps:Lari adda Gol Chaker (RT05),
+RT-05,OUT,4,Badami Bagh,31.597604,74.314091,B,gmaps:Badami Bagh,
+RT-05,OUT,5,Sabzi Mandi,31.600935,74.311843,A,gmaps:Sabzi Mandi (RT05),
+RT-05,OUT,6,Usman Chowk,31.600199,74.317868,B,gmaps:Usman Chowk,
+RT-05,OUT,7,Lohay Wali Pulley,31.603484,74.318959,A,gmaps:Lohay Wali Pulli Feeder Bus Stop,
+RT-05,OUT,8,Ali Hajvery Shadi Hall,31.602712,74.322451,B,gmaps:Ali Hajvery Marriage Hall,
+RT-05,OUT,9,Masoom Shah Darbar,31.600521,74.325322,B,gmaps:Masoom Shah Darbar (Shadbagh one),
+RT-05,OUT,10,Madina Chowk,31.600629,74.327163,B,gmaps:Madina Chowk,
+RT-05,OUT,11,Rajput Park,31.602715,74.333086,C,gmaps:Rajput Park (area pin),"area pin, not a stop"
+RT-05,OUT,12,Shadbagh Underpass,31.609086,74.337610,B,gmaps:Shad Bagh Underpass,
+RT-05,IN,1,Shadbagh Underpass,31.609086,74.337610,B,gmaps:Shad Bagh Underpass,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-05,IN,2,Rajput Park,31.602715,74.333086,C,gmaps:Rajput Park (area pin),"same point as OUT; opposite-side stop may be ~20-50 m across. area pin, not a stop"
+RT-05,IN,3,Madina Chowk,31.600733,74.327740,B,gmaps:Madina Chowk,
+RT-05,IN,4,Masoom Shah Darbar,31.600521,74.325322,B,gmaps:Masoom Shah Darbar (Shadbagh one),same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-05,IN,5,Ali Hajvery Shadi Hall,31.602712,74.322451,B,gmaps:Ali Hajvery Marriage Hall,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-05,IN,6,Lohay Wali Pulley,31.603484,74.318959,A,gmaps:Lohay Wali Pulli Feeder Bus Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-05,IN,7,Usman Chowk,31.600257,74.317774,B,gmaps:Usman Chowk,
+RT-05,IN,8,Sabzi Mandi,31.600329,74.311886,A,gmaps:Sabzi Mandi (RT05),
+RT-05,IN,9,Badami Bagh,31.597604,74.314091,B,gmaps:Badami Bagh,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-05,IN,10,Lari Adda Gol Chakar,31.595057,74.311506,A,gmaps:Lari adda Gol Chaker (RT05),
+RT-05,IN,11,Azadi Chowk,31.591439,74.306695,A,gmaps:Azadi Chowk (RT05),IN only (poster: reverse has 13 stops)
+RT-05,IN,12,Texali Chowk,31.586103,74.306956,A,gmaps:Texali Chowk (RT05),
+RT-05,IN,13,Bhatti Chowk,31.582758,74.306844,A,gmaps:Bhatti Chowk (RT05),"same point as OUT; opposite-side stop may be ~20-50 m across. street stop, not Metrobus station"
+RT-11,OUT,1,Main Market Gulberg,31.524408,74.346452,B,gmaps:Main Market Gulberg,
+RT-11,OUT,2,McDonald's-1,31.525240,74.349514,B,gmaps:McDonald's (Main Blvd Gulberg),
+RT-11,OUT,3,Siddique Trade Center,31.529488,74.353325,B,gmaps:Siddique Trade Center,
+RT-11,OUT,4,McDonald's-2,31.525240,74.349514,C,same McDonald's as stop 2,return leg of the Gulberg loop; other side of the road
+RT-11,OUT,5,Main Market-2,31.522561,74.347616,A,gmaps:Main market bus stop,
+RT-11,OUT,6,Mini Market,31.520756,74.351737,B,gmaps:Mini Market Gulberg,
+RT-11,OUT,7,Hafeez Centre,31.515381,74.343144,B,gmaps:Hafeez Center,
+RT-11,OUT,8,Liberty Chowk,31.510921,74.341562,B,gmaps:Liberty Chowk,
+RT-11,OUT,9,Centre Point,31.506982,74.336388,A,gmaps:Centre Point Bus Stop,
+RT-11,OUT,10,Barkat Market,31.501243,74.320502,A,gmaps:Barkat Market (RT11) / Speedo Bus Stop Barkat Market,
+RT-11,OUT,11,Campus Pul,31.503675,74.312661,A,gmaps:Campus Pull (RT11),
+RT-11,OUT,12,Punjab University New Campus,31.505605,74.309317,A,gmaps:Bus Stop at PU Campus,
+RT-11,OUT,13,Shaikh Zayed Hospital,31.507053,74.307681,B,gmaps:Shaikh Zaid Hospital,
+RT-11,OUT,14,Bhekewal Morr,31.509113,74.302865,A,gmaps:Bhekewal Morr (RT11),
+RT-11,OUT,15,Pilot School,31.510946,74.300749,B,gmaps:Pilot School,
+RT-11,OUT,16,Farooq Hospital,31.512699,74.299585,B,gmaps:Farooq Hospital,
+RT-11,OUT,17,Gulshan-e-Iqbal,31.516000,74.295500,C,estimate between Farooq Hospital and Dubai Chowk,Gulshan-e-Iqbal Park pin 31.516423 74.289582
+RT-11,OUT,18,Dubai Chowk,31.519077,74.291631,A,gmaps:Dubai Chowk Bus Stop,
+RT-11,OUT,19,Flat Stop,31.521800,74.290000,C,estimate between Dubai Chowk and Kali Kothi,
+RT-11,OUT,20,Kali Kothi Stop,31.524375,74.288249,A,gmaps:Kali Kothi Stop / Kaali Kothi Bus Stop,
+RT-11,OUT,21,Scheme Morr,31.525239,74.283578,B,gmaps:Scheme Mor,
+RT-11,OUT,22,Grand Battery Stop,31.528087,74.284963,A,gmaps:Grand Battery Stop,
+RT-11,OUT,23,Chowk Yateem Khana,31.532419,74.285903,A,gmaps:Chowk Yateem Khana (RT11),
+RT-11,OUT,24,City Bus Stand,31.533862,74.282577,A,gmaps:City Bus Stand (RT11),
+RT-11,OUT,25,Shezan Factory,31.535000,74.279000,C,estimate on Bund Rd between City Bus Stand and Niazi Adda,"gmaps ""opposite Shezan Factory"" pin 31.532263 74.274453 looks off-road"
+RT-11,OUT,26,Niazi Adda,31.536135,74.275620,B,gmaps:Niazi ada,
+RT-11,OUT,27,Bilal Daewoo,31.537504,74.270946,A,gmaps:Bilal Daewoo (RT11),
+RT-11,OUT,28,Babu Sabu,31.538548,74.266452,A,gmaps:Babu Sabu (RT11) / Speedo Bus Stop Babu Sahbu,
+RT-11,IN,1,Babu Sabu,31.538416,74.266963,A,gmaps:Babu Sabu (RT11) / Speedo Bus Stop Babu Sahbu,
+RT-11,IN,2,Bilal Daewoo,31.537047,74.271640,A,gmaps:Bilal Daewoo (RT11),
+RT-11,IN,3,Niazi Adda,31.536135,74.275620,B,gmaps:Niazi ada,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-11,IN,4,Shezan Factory,31.535000,74.279000,C,estimate on Bund Rd between City Bus Stand and Niazi Adda,"same point as OUT; opposite-side stop may be ~20-50 m across. gmaps ""opposite Shezan Factory"" pin 31.532263 74.274453 looks off-road"
+RT-11,IN,5,City Bus Stand,31.533743,74.282429,A,gmaps:City Bus Stand (RT11),
+RT-11,IN,6,Chowk Yateem Khana,31.532419,74.285903,A,gmaps:Chowk Yateem Khana (RT11),same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-11,IN,7,Grand Battery Stop,31.528200,74.284722,A,gmaps:Grand Battery Stop,
+RT-11,IN,8,Scheme Morr,31.525239,74.283578,B,gmaps:Scheme Mor,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-11,IN,9,Kali Kothi Stop,31.524031,74.287736,A,gmaps:Kali Kothi Stop / Kaali Kothi Bus Stop,
+RT-11,IN,10,Flat Stop,31.521800,74.290000,C,estimate between Dubai Chowk and Kali Kothi,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-11,IN,11,Dubai Chowk,31.519077,74.291631,A,gmaps:Dubai Chowk Bus Stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-11,IN,12,Gulshan-e-Iqbal,31.516000,74.295500,C,estimate between Farooq Hospital and Dubai Chowk,same point as OUT; opposite-side stop may be ~20-50 m across. Gulshan-e-Iqbal Park pin 31.516423 74.289582
+RT-11,IN,13,Farooq Hospital,31.512699,74.299585,B,gmaps:Farooq Hospital,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-11,IN,14,Pilot School,31.510168,74.301018,B,gmaps:Pilot School,
+RT-11,IN,15,Bhekewal Morr,31.509541,74.303074,A,gmaps:Bhekewal Morr (RT11),
+RT-11,IN,16,Shaikh Zayed Hospital,31.507053,74.307681,B,gmaps:Shaikh Zaid Hospital,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-11,IN,17,Punjab University New Campus,31.505605,74.309317,A,gmaps:Bus Stop at PU Campus,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-11,IN,18,Campus Pul,31.504391,74.311011,A,gmaps:Campus Pull (RT11),
+RT-11,IN,19,Barkat Market,31.500940,74.320657,A,gmaps:Barkat Market (RT11) / Speedo Bus Stop Barkat Market,
+RT-11,IN,20,Centre Point,31.506938,74.337102,A,gmaps:Centre Point Bus Stop,
+RT-11,IN,21,Liberty Chowk,31.511064,74.340273,B,gmaps:Liberty Chowk,
+RT-11,IN,22,Hafeez Centre,31.515975,74.344067,B,gmaps:Hafeez Center,
+RT-11,IN,23,Mini Market,31.520756,74.351737,B,gmaps:Mini Market Gulberg,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-11,IN,24,Main Market-2,31.522561,74.347616,A,gmaps:Main market bus stop,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-11,IN,25,McDonald's-2,31.525240,74.349514,C,same McDonald's as stop 2,same point as OUT; opposite-side stop may be ~20-50 m across. return leg of the Gulberg loop; other side of the road
+RT-11,IN,26,Siddique Trade Center,31.529488,74.353325,B,gmaps:Siddique Trade Center,same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-11,IN,27,McDonald's-1,31.525240,74.349514,B,gmaps:McDonald's (Main Blvd Gulberg),same point as OUT; opposite-side stop may be ~20-50 m across.
+RT-11,IN,28,Main Market Gulberg,31.524573,74.346129,B,gmaps:Main Market Gulberg,

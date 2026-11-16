@@ -1,5 +1,5 @@
 # Speedo (PMA Lahore Feeder Routes) — official poster data
-Source: PMA posters (pma.masstransit Instagram) shared by Muneeb 2026-11-16. Stop order as printed, outbound direction. Coordinates still to be found (Google Maps).
+Source: PMA posters (pma.masstransit Instagram) shared by Muneeb 2026-11-16. Stop order as printed, outbound direction. Coordinates found 2026-11-16 (Google Maps, incl. PMA-tagged "(RTxx)" stop markers) -> `speedo_stops_all.csv` (both directions: OUT = poster order, IN = return trip; confidence A/B/C). Road paths -> `road_speedo.json` (OSRM car routing through the stops, simplified ~4 m). Road notes + stops to confirm -> `road_paths_and_unsure.txt`. All 10 routes are live in index.html as S03…S19 (+ hidden …R return lines).
 
 | Route | From → To | Hours | Stops (poster) | Notes |
 |---|---|---|---|---|
