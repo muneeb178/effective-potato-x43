@@ -1167,7 +1167,7 @@ function renderLines(){
 const SPEEDO=["03","04","05","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","23","24","25","27","28"];
 function busGrid(){const ev=Object.values(LINES).filter(L=>L.id!=="OL"&&L.id!=="MB"&&!L.hidden&&!L.speedo);
   return `<div class="lsec">Electric buses<span class="sub">Rs 20</span></div><div class="lgrid">${ev.map(L=>`<button class="lnum" data-line="${L.id}">${L.short==="EV3"?"EV-03":L.short}</button>`).join("")}</div>
-  <div class="lsec">Speedo<span class="sub">Rs 25 · grey routes coming soon</span></div><div class="lgrid">${SPEEDO.map(n=>LINES["S"+n]?`<button class="lnum" data-line="S${n}" style="border-color:${LINES["S"+n].color}">${n}</button>`:`<button class="lnum off" data-soon="${n}">${n}</button>`).join("")}</div><div style="height:24px"></div>`;}
+  <div class="lsec">Speedo<span class="sub">Rs 25 · grey routes coming soon</span></div><div class="lgrid">${SPEEDO.map(n=>LINES["S"+n]?`<button class="lnum" data-line="S${n}">${n}</button>`:`<button class="lnum off" data-soon="${n}">${n}</button>`).join("")}</div><div style="height:24px"></div>`;}
 renderLines();
 $("lines").onclick=e=>{const nb=e.target.closest(".lnum");if(nb){if(nb.dataset.line)openLine(nb.dataset.line);else toast("Speedo route "+nb.dataset.soon+" is coming soon");return;}const t=e.target.closest(".ltog");if(!t)return;const c=t.closest(".lcard"),b=c.querySelector(".lbody");
   const open=!c.classList.contains("open");if(open)c.classList.add("open");foldRows(b,open,null,()=>{if(!open)c.classList.remove("open");});};
