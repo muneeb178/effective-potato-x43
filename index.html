@@ -1091,11 +1091,11 @@ const atRoot=()=>curScreen()==="s-home"&&!$("tabtrack").classList.contains("t2")
 let lnMap=null,lnLay=null,lnState={id:null,rev:false};
 function lnStops(){const Ln=LINES[lnState.id];if(Ln.id==="EV3"&&lnState.rev)return LINES.EV3R.stops;return lnState.rev?[...Ln.stops].reverse():Ln.stops;}
 function lnGeom(){return LINES[lnState.id].geom;}
-let lnUp=false,lnY=0;const lnLim=()=>{const H=$("s-line").clientHeight;return{H,top:Math.round(H*.2),low:Math.round(H*.5)};};
+let lnUp=false,lnY=0;const lnLim=()=>{const H=$("s-line").clientHeight;return{H,top:Math.round(H*.34),low:Math.round(H*.56)};};
 function lnSet(y,anim){const sh=$("lnsheet");sh.classList.toggle("anim",!!anim);lnY=y;sh.style.transform=`translate3d(0,${y}px,0)`;}
 function lnSize(){const {H,top,low}=lnLim();$("lnsheet").style.height=(H-top)+"px";lnSet(lnUp?top:low,false);return H;}
 function lnFit(anim){if(!lnMap)return;const {H}=lnLim();const b=L.latLngBounds(lnGeom());lnMap.invalidateSize(false);
-  lnMap.flyToBounds(b,{paddingTopLeft:[28,80],paddingBottomRight:[28,H-lnY+24],duration:anim?.5:0.01,easeLinearity:.35});}
+  lnMap.flyToBounds(b,{paddingTopLeft:[28,64],paddingBottomRight:[28,H-lnY+24],duration:anim?.5:0.01,easeLinearity:.35});}
 function lnRender(){const Ln=LINES[lnState.id],st=lnStops();
   $("s-line").style.setProperty("--lc",Ln.color);
   $("ln-mode").innerHTML=modeSvg(Ln.id);$("ln-num").textContent=Ln.short==="EV3"?"EV-03":Ln.short;$("ln-op").textContent=Ln.kind.startsWith("PTC")?"PTC":"PMA";
