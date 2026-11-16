@@ -314,6 +314,32 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 .toast{position:absolute;left:50%;bottom:110px;transform:translate(-50%,20px);background:#f2f4f5;color:#121417;padding:11px 16px;border-radius:12px;font-size:14px;font-weight:600;max-width:86%;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:2000}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){.hsscroll,.toast,.lbody{transition:none}.screen{animation:none!important}}
+
+/* Lines tab: route-number buttons for bus routes (Jakdojade "Schedules" style) */
+.lsec{margin:18px 16px 6px;font-weight:700;font-size:16px}.lsec .sub{font-weight:500;margin-left:6px}
+.lgrid{display:flex;flex-wrap:wrap;gap:12px 14px;padding:4px 16px 8px}
+.lnum{min-width:58px;height:46px;padding:0 14px;border:1.5px solid #3b4046;border-radius:10px;font-weight:700;font-size:18px;display:grid;place-items:center;color:#fff;background:transparent}
+.lnum.off{color:#5c636b;border-color:#2c3035}
+/* single line page: full map + pull-up sheet (native scroll) */
+#s-line{background:#000}
+#lnmap{position:absolute;inset:0}
+.lnback{position:absolute;left:14px;top:calc(env(safe-area-inset-top) + 12px);z-index:30;background:#16181bdd;width:48px;height:48px}
+.lnscroll{position:absolute;inset:0;z-index:20;overflow-y:auto;scroll-snap-type:y proximity;overscroll-behavior:contain;scrollbar-width:none;pointer-events:none}
+.lnscroll::-webkit-scrollbar{display:none}
+.lnspace{scroll-snap-align:start}
+.lnsheet{pointer-events:auto;background:var(--panel,#191b1e);border-radius:22px 22px 0 0;min-height:100%;scroll-snap-align:start;scroll-margin-top:22vh;box-shadow:0 -6px 18px #0008;padding-bottom:40px}
+.lnsheet .grab{width:42px;height:5px;border-radius:9px;background:#3a3f45;margin:9px auto 14px}
+.lnhead{display:flex;align-items:center;gap:10px;padding:0 18px}.lnhead .op{margin-left:auto;color:var(--muted);font-size:14px}
+.lnhead .bnum{background:#fff;color:#111;border-radius:8px;padding:2px 9px;font-weight:800;font-size:19px}
+.lndir{display:flex;align-items:center;gap:10px;padding:18px 18px 14px;border-bottom:1px solid var(--line)}
+.lndir .to{font-weight:800;font-size:22px;text-transform:uppercase;flex:1;min-width:0;line-height:1.15}
+.lndir .sw{width:44px;height:44px;border-radius:999px;background:var(--surface-2);display:grid;place-items:center;flex:none}
+.lnstops{padding:6px 0 0}
+.lnst{display:flex;align-items:center;gap:16px;height:52px;padding:0 18px;position:relative;font-size:16px}
+.lnst::before{content:"";position:absolute;left:28px;top:0;bottom:0;width:3px;background:var(--lc)}
+.lnst:first-child::before{top:50%}.lnst:last-child::before{bottom:50%}
+.lnst i{width:16px;height:16px;border-radius:50%;border:3px solid var(--lc);background:var(--panel,#191b1e);position:relative;z-index:1;flex:none;margin-left:3px}
+.lnst .tb{font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px}
 </style>
 </head>
 <body>
@@ -429,6 +455,17 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 </section>
 
 <!-- MAP (network + pick a point) -->
+<section class="screen" id="s-line">
+  <div id="lnmap"></div>
+  <button class="iconbtn round lnback" id="ln-back" aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
+  <div class="lnscroll" id="lnscroll"><div class="lnspace" id="lnspace"></div><div class="lnsheet" id="lnsheet">
+    <div class="grab"></div>
+    <div class="lnhead"><span id="ln-mode" style="color:#e6e9ec"></span><span class="bnum" id="ln-num"></span><span class="op" id="ln-op"></span></div>
+    <div class="lndir"><span>→</span><span class="to" id="ln-to"></span><button class="sw" id="ln-swap" aria-label="Other direction"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M8 4v16M4 8l4-4 4 4M16 20V4M12 16l4 4 4-4"/></svg></button></div>
+    <div class="adband slim" style="margin-top:10px"><div class="lbl">AD</div><div class="adbox">Ad space · 320 × 100</div></div>
+    <div class="lnstops" id="lnstops"></div>
+  </div></div>
+</section>
 <section class="screen" id="s-map">
   <div class="hdr">
     <button class="iconbtn" id="map-back" aria-label="Back"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"><path d="M20 12H5M11 5l-7 7 7 7"/></svg></button>
@@ -1000,15 +1037,19 @@ $("locate").onclick=()=>locateMe((p,msg)=>{if(!p){toast(msg);return;}state.lastP
 // ---------------------------------------------------------------- LINES SCREEN
 function renderLines(){
   const chev='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>';
-  $("lines").innerHTML=Object.values(LINES).filter(L=>!L.hidden).sort((a,b)=>(a.tentative?1:0)-(b.tentative?1:0)).map(L=>`<div class="lcard" style="--lc:${L.color}">
+  $("lines").innerHTML=Object.values(LINES).filter(L=>L.id==="OL"||L.id==="MB").map(L=>`<div class="lcard" style="--lc:${L.color}">
     <div class="lhead"><span class="mode" style="color:#e6e9ec">${modeSvg(L.id)}<span class="badge ${L.cls}">${L.short}</span></span><div style="min-width:0"><div class="nm">${L.name}</div>
       <div class="sub" style="margin-top:2px">${L.ends||(L.stops[0].name+" ↔ "+L.stops[L.stops.length-1].name)}${L.tentative?` · ${L.kind.startsWith("PTC")?"PTC":"PMA"} · stops being verified`:""}</div>
       <div class="sub" style="margin-top:2px"><span class="nw">Every ~${L.headway} min</span> · <span class="nw">${fmt(L.open)}–${fmt(L.close)}</span> · <span class="nw">${L.fare?"Rs "+L.fare+" flat":L.id==="MB"?"Rs 30 flat":"Rs 25–45 by distance"}</span> · <span class="nw">${L.cumKm[L.stops.length-1].toFixed(1)} km</span></div></div></div>
     <button class="ltog"><span>${L.stops.length} stops</span>${chev}</button>
     <div class="lbody"><div>${L.stops.map(st=>`<div class="lst"><span class="km tnum">${L.cumKm[st.i].toFixed(1)} km</span><span class="rail"><i></i></span><span class="x"><span>${st.name}</span>${st.under?'<span class="sub" style="margin:0">underground</span>':""}${(L.id==="OL"&&st.name==="Anarkali")||(L.id==="MB"&&st.name==="MAO College")?'<span class="badge '+(L.id==="OL"?"mb":"ol")+'" style="font-size:10px;padding:1px 5px">'+(L.id==="OL"?"MB":"OL")+'</span>':""}</span></div>`).join("")}<div style="height:8px"></div></div></div>
-  </div>`).join("");}
+  </div>`).join("")+busGrid();}
+const SPEEDO=["03","05","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","23","24","25","27","28"];
+function busGrid(){const ev=Object.values(LINES).filter(L=>L.id!=="OL"&&L.id!=="MB"&&!L.hidden);
+  return `<div class="lsec">Electric buses<span class="sub">Rs 20</span></div><div class="lgrid">${ev.map(L=>`<button class="lnum" data-line="${L.id}">${L.short==="EV3"?"EV-03":L.short}</button>`).join("")}</div>
+  <div class="lsec">Speedo<span class="sub">coming soon</span></div><div class="lgrid">${SPEEDO.map(n=>`<button class="lnum off" data-soon="${n}">${n}</button>`).join("")}</div><div style="height:24px"></div>`;}
 renderLines();
-$("lines").onclick=e=>{const t=e.target.closest(".ltog");if(!t)return;const c=t.closest(".lcard"),b=c.querySelector(".lbody");
+$("lines").onclick=e=>{const nb=e.target.closest(".lnum");if(nb){if(nb.dataset.line)openLine(nb.dataset.line);else toast("Speedo route "+nb.dataset.soon+" is coming soon");return;}const t=e.target.closest(".ltog");if(!t)return;const c=t.closest(".lcard"),b=c.querySelector(".lbody");
   const open=!c.classList.contains("open");if(open)c.classList.add("open");foldRows(b,open,null,()=>{if(!open)c.classList.remove("open");});};
 function foldRows(el,open,tog,done){ // Jakdojade-style: the stop list fades/squeezes as ONE block while the content below glides (transform+opacity only)
   const box=el.closest(".tscroll,#lines")||el.parentElement,E="cubic-bezier(.3,.75,.25,1)",D=420;
@@ -1038,10 +1079,37 @@ $("tab-trip").onclick=()=>setTab("trip");
 // ---------------------------------------------------------------- BACK: buttons, phone back gesture / browser back, and edge swipe
 const curScreen=()=>document.querySelector(".screen.on").id;
 const atRoot=()=>curScreen()==="s-home"&&!$("tabtrack").classList.contains("t2");
+
+// ---------------------------------------------------------------- LINE PAGE: map + pull-up stop list; sheet up = map zooms out to fit, sheet down = zooms in
+let lnMap=null,lnLay=null,lnState={id:null,rev:false};
+function lnStops(){const L=LINES[lnState.id];if(L.id==="EV3"&&lnState.rev)return LINES.EV3R.stops;return lnState.rev?[...L.stops].reverse():L.stops;}
+function lnGeom(){const L=LINES[lnState.id];return L.geom;}
+function lnSize(){const H=$("s-line").clientHeight;$("lnspace").style.height=Math.round(H*.52)+"px";return H;}
+function lnFit(anim){if(!lnMap)return;const H=$("s-line").clientHeight,sc=$("lnscroll"),top=Math.max(70,$("lnspace").offsetHeight-sc.scrollTop);
+  const b=L.latLngBounds(lnGeom());lnMap.invalidateSize(false);lnMap.flyToBounds(b,{paddingTopLeft:[28,90],paddingBottomRight:[28,H-top+24],duration:anim?.55:0.01,easeLinearity:.35});}
+function lnRender(){const L=LINES[lnState.id],st=lnStops();
+  $("s-line").style.setProperty("--lc",L.color);
+  $("ln-mode").innerHTML=modeSvg(L.id);$("ln-num").textContent=L.short==="EV3"?"EV-03":L.short;$("ln-op").textContent=L.kind.startsWith("PTC")?"PTC":"PMA";
+  $("ln-to").textContent=st[st.length-1].name;
+  const near=s=>{for(const rl of ["MB","OL"])for(const x of LINES[rl].stops)if(walkM(s,x)<=350)return rl;return null;};
+  $("lnstops").innerHTML=st.map(s=>{const t=near(s);return `<div class="lnst"><i></i><span>${esc(s.name)}</span>${t?`<span class="tb badge ${LINES[t].cls}">${LINES[t].short}</span>`:""}</div>`;}).join("");
+  lnLay.clearLayers();L.polyline(lnGeom(),{color:L.color,weight:5,opacity:1}).addTo(lnLay);
+  st.forEach((s,k)=>L.circleMarker([s.lat,s.lng],{radius:k===0||k===st.length-1?7:5,color:L.color,weight:3,fillColor:"#141619",fillOpacity:1}).bindTooltip(s.name).addTo(lnLay));}
+function openLine(id){lnState={id,rev:false};
+  show("s-line");if(window.syncBack)syncBack();
+  requestAnimationFrame(()=>{lnSize();if(!lnMap){lnMap=makeMap("lnmap");lnLay=L.layerGroup().addTo(lnMap);}
+    $("lnscroll").scrollTop=0;lnRender();lnFit(false);setTimeout(()=>lnFit(false),420);});}
+$("ln-swap").onclick=()=>{lnState.rev=!lnState.rev;lnRender();};
+$("ln-back").onclick=()=>goBack();
+(function(){const sc=$("lnscroll");let t=0,lastTop=null;
+  const settle=()=>{const top=Math.round($("lnspace").offsetHeight-sc.scrollTop);if(lastTop!==null&&Math.abs(top-lastTop)<30)return;lastTop=top;lnFit(true);};
+  sc.addEventListener("scroll",()=>{clearTimeout(t);t=setTimeout(settle,160);},{passive:true});
+  if("onscrollend" in window)sc.addEventListener("scrollend",()=>{clearTimeout(t);settle();});
+  addEventListener("resize",()=>{if($("s-line").classList.contains("on")){lnSize();lnFit(false);}});})();
 function backTarget(){const c=curScreen();
   if(c==="s-search"||c==="s-results")return"s-home";
   if(c==="s-detail")return $("s-detail").classList.contains("open")?null:"s-results";
-  if(c==="s-map")return state.mapMode==="pick"?"s-search":"s-home";return null;}
+  if(c==="s-map")return state.mapMode==="pick"?"s-search":"s-home";if(c==="s-line")return"s-home";return null;}
 function goBack(instant){const c=curScreen();
   if(c==="s-detail"&&$("s-detail").classList.contains("open")){setPanel(false);return;}
   if(c==="s-home"){if($("tabtrack").classList.contains("t2"))setTab("trip");syncBack();return;}
