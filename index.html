@@ -294,8 +294,11 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 
 /* maps */
 .mapwrap{position:relative;flex:1;overflow:hidden;background:#2a3242}
+.mapctl button:active,.mapctl button.press{transform:scale(.9);background:#2a2f35}
+.mapctl button.busy svg{animation:locpulse 1s ease-in-out infinite}
+@keyframes locpulse{50%{opacity:.35}}
 .mapctl{position:absolute;left:14px;bottom:calc(18px + env(safe-area-inset-bottom));display:grid;gap:12px}
-.mapctl button{width:42px;height:42px;border-radius:50%;background:#1d2024;display:grid;place-items:center;box-shadow:0 2px 12px #0008}
+.mapctl button{width:48px;height:48px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,background .2s;border-radius:50%;background:#1d2024;display:grid;place-items:center;box-shadow:0 2px 12px #0008}
 .legend{position:absolute;right:12px;top:12px;background:#000b;border-radius:10px;padding:8px 10px;font-size:12px;display:grid;gap:4px}
 .legend span{display:flex;align-items:center;gap:6px}
 .legend i{display:inline-block;width:16px;height:4px;border-radius:2px}
@@ -755,7 +758,7 @@ function activate(w){state.picking=w;$("sf-from").classList.toggle("act",w==="fr
   inp.addEventListener("input",()=>onlineSearch(inp.value));
   inp.addEventListener("keydown",e=>{if(e.key==="Enter"){const b=$("opts").querySelector(".opt");if(b)b.click();}});});
 function maybeLocate(){ // silently refresh position for distances, only if already allowed
-  try{navigator.permissions&&navigator.permissions.query({name:"geolocation"}).then(r=>{if(r.state==="granted")navigator.geolocation.getCurrentPosition(p=>{state.lastPos={lat:p.coords.latitude,lng:p.coords.longitude};const inp=$("q-"+state.picking);onlineSearch(inp===document.activeElement&&inp.value!==(state[state.picking]?.name||"")?inp.value:"");},()=>{},{maximumAge:60000,timeout:8000});}).catch(()=>{});}catch(e){}}
+  try{navigator.permissions&&navigator.permissions.query({name:"geolocation"}).then(r=>{if(r.state==="granted")setTimeout(startWatch,0);if(r.state==="granted")navigator.geolocation.getCurrentPosition(p=>{state.lastPos={lat:p.coords.latitude,lng:p.coords.longitude};const inp=$("q-"+state.picking);onlineSearch(inp===document.activeElement&&inp.value!==(state[state.picking]?.name||"")?inp.value:"");},()=>{},{maximumAge:60000,timeout:8000});}).catch(()=>{});}catch(e){}}
 function openSearch(w){$("q-from").value=state.from?.name||"";$("q-to").value=state.to?.name||"";show("s-search",false,true);activate(w);
   const i=$("q-"+w);i.focus({preventScroll:true});i.select();$("phone").scrollLeft=0;$("opts").classList.remove("fade");void $("opts").offsetWidth;$("opts").classList.add("fade");maybeLocate();}
 function choose(p){const w=state.picking;setPoint(w,p);$("q-"+w).value=p.name;
@@ -955,8 +958,8 @@ function topAd(on){const b=$("dbody"),now=Date.now();if(on===!b.classList.contai
 $("det-back").onclick=()=>goBack();
 $("d-alarm").onclick=()=>toast("Departure reminders are coming soon.");
 $("d-fare").onclick=()=>toast(state.trip&&state.trip.fare?"Buy a token or use your Metro card at the station. Metrobus Rs 30 flat, Orange Line Rs 25–45 by distance.":"No ticket needed. It's a short walk.");
-$("d-nav").onclick=()=>{setPanel(false);locateMe((p,msg)=>{if(!p){toast(msg);return;}if(duser)duser.remove();duser=L.circleMarker(ll(p),{radius:9,color:"#fff",weight:3,fillColor:"#1f9ee0",fillOpacity:1}).addTo(dmap);dmap.setView(ll(p),16);});};
-$("dlocate").onclick=$("d-nav").onclick;
+const dLoc=btn=>{setPanel(false);locateFast(btn,(p,msg,move)=>{if(!p){toast(msg);return;}if(duser)duser.setLatLng(ll(p));else duser=L.circleMarker(ll(p),{radius:9,color:"#fff",weight:3,fillColor:"#1f9ee0",fillOpacity:1}).addTo(dmap);if(move)dmap.flyTo(ll(p),Math.max(dmap.getZoom(),16),{duration:.45});});};
+$("d-nav").onclick=()=>dLoc(null);fastBtn($("dlocate"),()=>dLoc($("dlocate")));
 
 // ---------------------------------------------------------------- MAPS (Leaflet + OpenStreetMap)
 let lmap=null,layer=null,userDot=null,dmap=null,dlayer=null,duser=null;
@@ -1080,9 +1083,24 @@ function locateMe(cb){
   if(!navigator.geolocation){cb(null,"This browser can't share your location.");return;}
   navigator.geolocation.getCurrentPosition(pos=>cb({lat:pos.coords.latitude,lng:pos.coords.longitude,name:"My location"}),
     err=>cb(null,err.code===1?"Location is blocked. Allow it in your browser settings, or select on the map.":"Couldn't get your location. Try again, or select on the map."),{enableHighAccuracy:true,timeout:12000});}
-$("locate").onclick=()=>locateMe((p,msg)=>{if(!p){toast(msg);return;}state.lastPos={lat:p.lat,lng:p.lng};
-  if(userDot)userDot.remove();userDot=L.circleMarker(ll(p),{radius:9,color:"#fff",weight:3,fillColor:"#1f9ee0",fillOpacity:1}).addTo(lmap);lmap.setView(ll(p),16);
-  if(state.mapMode==="pick"){state.pickPt=p;drawInto(layer,"pick");$("pick-ok").disabled=false;$("pick-txt").textContent="My location";}});
+// fast locate: answer at once from a recent fix (or the phone's quick network fix), then refine with GPS; the button reacts on touch, not after the click delay
+let lastFix=null,locWatch=null;
+function startWatch(){if(locWatch!==null||!navigator.geolocation)return;try{locWatch=navigator.geolocation.watchPosition(p=>{lastFix={lat:p.coords.latitude,lng:p.coords.longitude,name:"My location",t:Date.now(),acc:p.coords.accuracy};},()=>{},{enableHighAccuracy:true,maximumAge:5000,timeout:20000});}catch(e){}}
+function locateFast(btn,cb){if(!navigator.geolocation){cb(null,"This browser can't share your location.");return;}
+  let done=false,got=false;const fin=()=>{btn&&btn.classList.remove("busy");};btn&&btn.classList.add("busy");
+  if(lastFix&&Date.now()-lastFix.t<60000){got=true;cb(lastFix,null,true);}
+  navigator.geolocation.getCurrentPosition(p=>{if(got)return;got=true;cb({lat:p.coords.latitude,lng:p.coords.longitude,name:"My location"},null,true);},()=>{},{enableHighAccuracy:false,maximumAge:120000,timeout:4000});
+  navigator.geolocation.getCurrentPosition(p=>{done=true;fin();const f={lat:p.coords.latitude,lng:p.coords.longitude,name:"My location"};lastFix={...f,t:Date.now()};cb(f,null,!got);got=true;startWatch();},
+    err=>{done=true;fin();if(!got)cb(null,err.code===1?"Location is blocked. Allow it in your browser settings, or select on the map.":"Couldn't get your location. Try again, or select on the map.");},{enableHighAccuracy:true,maximumAge:0,timeout:12000});}
+function fastBtn(el,fn){if(!el)return;let t=0;el.onclick=null;
+  el.addEventListener("pointerdown",e=>{e.stopPropagation();el.classList.add("press");},{passive:true});
+  el.addEventListener("pointerup",e=>{e.stopPropagation();el.classList.remove("press");if(Date.now()-t<400)return;t=Date.now();fn();});
+  el.addEventListener("pointercancel",()=>el.classList.remove("press"));el.addEventListener("click",e=>{e.stopPropagation();e.preventDefault();});
+  if(window.L&&L.DomEvent){L.DomEvent.disableClickPropagation(el);}}
+fastBtn($("locate"),()=>locateFast($("locate"),(p,msg,move)=>{if(!p){toast(msg);return;}state.lastPos={lat:p.lat,lng:p.lng};
+  if(userDot)userDot.setLatLng(ll(p));else userDot=L.circleMarker(ll(p),{radius:9,color:"#fff",weight:3,fillColor:"#1f9ee0",fillOpacity:1}).addTo(lmap);
+  if(move)lmap.flyTo(ll(p),Math.max(lmap.getZoom(),16),{duration:.45});
+  if(state.mapMode==="pick"){state.pickPt=p;drawInto(layer,"pick");$("pick-ok").disabled=false;$("pick-txt").textContent="My location";}}));
 
 // ---------------------------------------------------------------- LINES SCREEN
 function renderLines(){
