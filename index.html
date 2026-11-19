@@ -171,7 +171,7 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 .sf.act{background:var(--surface-2);min-height:50px}
 .sf.act input{transform:scale(1.15);width:87%}
 #s-search .fields{contain:layout}
-.sf .loc{transition:opacity .2s}
+.sf .loc{transition:opacity .2s,transform .12s;position:relative;z-index:2;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.sf .loc.press{transform:scale(.88)}.sf .loc.busy svg{animation:locpulse 1s ease-in-out infinite}
 .sf .loc{display:grid;opacity:0;pointer-events:none}.sf.act .loc{opacity:1;pointer-events:auto}
 #opts{background:#000;margin-top:10px}
 #opts.fade{animation:ofade .18s ease-out}
@@ -772,8 +772,12 @@ $("opts").onclick=e=>{const b=e.target.closest(".opt");if(!b)return;
   const x=b.dataset.src==="o"?onlineHits[+b.dataset.i]:b.dataset.src==="r"?recentList[+b.dataset.i]:ALL[+b.dataset.i];
   if(e.target.closest(".fill")){const inp=$("q-"+state.picking);inp.value=x.name.replace(/ station$/,"");inp.focus();onlineSearch(inp.value);return;}
   choose({name:x.name.replace(/ station$/,""),lat:x.lat,lng:x.lng});};
-$("loc-btn").onclick=$("loc-btn2").onclick=e=>{state.picking=e.currentTarget.id==="loc-btn"?"from":"to";toast("Finding you…");
-  locateMe((p,msg)=>{if(!p){toast(msg);return;}state.lastPos={lat:p.lat,lng:p.lng};choose(p);});};
+// "use my location" inside a field: act on touch-down, never let the tap reach the text box (that opened the iOS Paste/AutoFill menu instead)
+for(const id of ["loc-btn","loc-btn2"]){const b=$(id);b.onclick=e=>{e.preventDefault();e.stopPropagation();};
+  b.addEventListener("pointerdown",e=>{e.preventDefault();e.stopPropagation();b.classList.add("press");
+    state.picking=id==="loc-btn"?"from":"to";const inp=$(id==="loc-btn"?"q-from":"q-to");inp.blur();
+    let first=true;locateFast(b,(p,msg)=>{b.classList.remove("press");if(!p){toast(msg);return;}state.lastPos={lat:p.lat,lng:p.lng};if(first){first=false;choose(p);}});},{passive:false});
+  b.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});}
 $("selmap").onclick=()=>openMap("pick");
 
 // ---------------------------------------------------------------- HISTORY SHEET
