@@ -1046,12 +1046,13 @@ function drawInto(lay,mode){
   lay.clearLayers();
   const trip=mode==="trip"?state.trip:null;const dim=trip?0.28:1;
   const feeder=id=>id!=="MB"&&id!=="OL"; // street buses: thin, dimmed, small stops, so the map stays readable as routes are added
-  for(const Ln of Object.values(LINES)){if(Ln.hidden)continue;const f=feeder(Ln.id);L.polyline(Ln.geom,{color:Ln.color,weight:f?3:4,opacity:dim}).addTo(lay);}
+  const shown=Ln=>!Ln.hidden||(Ln.twin&&!LINES[Ln.twin].hidden); // a return direction is drawn alongside its line
+  for(const Ln of Object.values(LINES)){if(!shown(Ln))continue;const f=feeder(Ln.id);L.polyline(Ln.geom,{color:Ln.color,weight:f?3:4,opacity:dim}).addTo(lay);}
   if(trip)for(const l of trip.legs){
     if(l.type==="ride")L.polyline(trackBetween(l.line,l.from,l.to),{color:LINES[l.line].color,weight:feeder(l.line)?5:7,opacity:1,lineCap:"round",lineJoin:"round"}).addTo(lay);
     else if(l.m>=40){const line=L.polyline([ll(l.from),ll(l.to)],{color:"#c8ced4",weight:6,dashArray:"1 11",lineCap:"round"}).addTo(lay);walkPath(l.from,l.to).then(w=>line.setLatLngs(w.pts));}
   }
-  for(const s of STATIONS){if(LINES[s.line].hidden&&!(trip&&trip.rides.some(r=>r.line===s.line)))continue;if(LINES[s.line].tentative&&trip&&!trip.rides.some(r=>r.stops.includes(s)))continue;const on=trip&&trip.rides.some(r=>r.stops.includes(s));const vis=!trip||on;const end=trip&&trip.rides.some(r=>r.from===s||r.to===s);
+  for(const s of STATIONS){if(!shown(LINES[s.line])&&!(trip&&trip.rides.some(r=>r.line===s.line)))continue;if(LINES[s.line].tentative&&trip&&!trip.rides.some(r=>r.stops.includes(s)))continue;const on=trip&&trip.rides.some(r=>r.stops.includes(s));const vis=!trip||on;const end=trip&&trip.rides.some(r=>r.from===s||r.to===s);
     const f=feeder(s.line);
     const pj=LINES[s.line].proj&&LINES[s.line].proj[s.i],onT=pj&&Math.sqrt(pj.d)*111000<200?pj.pt:ll(s); // draw the stop ON its own line, never beside it
     const m=L.circleMarker(onT,f?{radius:end?6:on?3.5:2.5,color:LINES[s.line].color,weight:end?3:1.5,fillColor:end?"#fff":"#141619",fillOpacity:1,opacity:vis?1:dim}:{radius:end?8:on?6:5,color:LINES[s.line].color,weight:end?4:3,fillColor:end?"#fff":"#141619",fillOpacity:1,opacity:vis?1:dim}).addTo(lay);
@@ -1187,7 +1188,8 @@ function lnRender(){const Ln=LINES[lnState.id],st=lnStops();
   $("ln-to").textContent=st[st.length-1].name;
   const near=s=>{for(const rl of ["MB","OL"])for(const x of LINES[rl].stops)if(walkM(s,x)<=350)return rl;return null;};
   $("lnstops").innerHTML=st.map(s=>{const t=near(s);return `<div class="lnst"><i></i><span>${esc(s.name)}</span>${t?`<span class="tb badge ${LINES[t].cls}">${LINES[t].short}</span>`:""}</div>`;}).join("");
-  lnLay.clearLayers();L.polyline(lnGeom(),{color:Ln.color,weight:5,opacity:1}).addTo(lnLay);
+  lnLay.clearLayers();if(Ln.twin)L.polyline(LINES[Ln.twin].geom,{color:Ln.color,weight:3,opacity:.35,dashArray:"6 7"}).addTo(lnLay); /* other direction, faint */
+  L.polyline(lnGeom(),{color:Ln.color,weight:5,opacity:1}).addTo(lnLay);
   st.forEach((s,k)=>L.circleMarker([s.lat,s.lng],{radius:k===0||k===st.length-1?7:5,color:Ln.color,weight:3,fillColor:"#141619",fillOpacity:1}).bindTooltip(s.name).addTo(lnLay));}
 function openLine(id){lnState={id,rev:false};
   show("s-line");if(window.syncBack)syncBack();
