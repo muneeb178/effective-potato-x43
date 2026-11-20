@@ -303,6 +303,14 @@ button,button:focus,button:focus-visible,input:focus,input:focus-visible{outline
 .legend{position:absolute;right:12px;top:12px;background:#000b;border-radius:10px;padding:8px 10px;font-size:12px;display:grid;gap:4px}
 .legend span{display:flex;align-items:center;gap:6px}
 .legend i{display:inline-block;width:16px;height:4px;border-radius:2px}
+.legend .spd-btn{all:unset;display:flex;align-items:center;gap:6px;cursor:pointer;font:inherit;color:inherit}
+.legend .spd-btn b{font-weight:400;opacity:.7;margin-left:auto;padding-left:6px;transition:transform .2s}
+.legend .spd-btn[aria-expanded="true"] b{transform:rotate(180deg)}
+.spd-list{display:grid;gap:2px;margin-top:2px;max-height:46vh;overflow:auto;max-width:230px}
+.spd-list label{display:flex;align-items:center;gap:7px;padding:5px 2px;cursor:pointer;line-height:1.25}
+.spd-list input{accent-color:var(--c,#2563eb);margin:0;width:15px;height:15px;flex:none}
+.spd-list .spd-all{all:unset;cursor:pointer;color:#9fb3c8;font-size:11.5px;padding:3px 2px}
+.spd-list .nm{display:block;min-width:0}
 .pickbar{position:absolute;left:12px;right:12px;bottom:calc(18px + env(safe-area-inset-bottom));background:var(--surface);border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 4px 20px #000a}
 .pickbar[hidden]{display:none}
 .pickbar .txt{flex:1;font-size:14px;color:var(--muted)}
@@ -488,7 +496,7 @@ a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important
   </div>
   <div class="mapwrap">
     <div id="lmap"></div>
-    <div class="legend" id="legend" style="z-index:500"><span><i style="background:var(--ol)"></i>Orange Line</span><span><i style="background:var(--mb)"></i>Metrobus</span><span><i style="background:#2fd27a"></i>EV-03</span><span><i style="background:#9be05a"></i>Route 20</span><span><i style="background:#2ec4b0"></i>Route 26</span><span><i style="background:linear-gradient(90deg,#2563eb,#a21caf,#a16207,#0f766e)"></i>Speedo</span></div>
+    <div class="legend" id="legend" style="z-index:500"><span><i style="background:var(--ol)"></i>Orange Line</span><span><i style="background:var(--mb)"></i>Metrobus</span><span><i style="background:#2fd27a"></i>EV-03</span><span><i style="background:#9be05a"></i>Route 20</span><span><i style="background:#2ec4b0"></i>Route 26</span><button class="spd-btn" id="spdBtn" aria-expanded="false"><i style="background:linear-gradient(90deg,#2563eb,#a21caf,#a16207,#0f766e)"></i>Speedo <span id="spdCount"></span><b>▾</b></button><div class="spd-list" id="spdList" hidden></div></div>
     <div class="mapctl" id="mapctl" style="z-index:500"><button id="locate" aria-label="Show my location"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6" fill="#fff"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
     <div class="pickbar" id="pickbar" hidden style="z-index:500"><span class="txt" id="pick-txt">Tap the map to set the point</span><button class="go" id="pick-ok" disabled>Use this point</button></div>
   </div>
@@ -1102,12 +1110,13 @@ function drawInto(lay,mode){
   const trip=mode==="trip"?state.trip:null;const dim=trip?0.28:1;
   const feeder=id=>id!=="MB"&&id!=="OL"; // street buses: thin, dimmed, small stops, so the map stays readable as routes are added
   // Map tab: one line per route; the return direction is only drawn when you ride it, and on the route page.
-  for(const Ln of Object.values(LINES)){if(Ln.hidden)continue;const f=feeder(Ln.id);L.polyline(Ln.geom,{color:Ln.color,weight:f?3:4,opacity:dim}).addTo(lay);}
+  const spdOff=id=>!trip&&isSpd(id)&&!spdShow.has(spdBase(id)); // Map tab: only the Speedo routes picked in the legend
+  for(const Ln of Object.values(LINES)){if(Ln.hidden||spdOff(Ln.id))continue;const f=feeder(Ln.id);L.polyline(Ln.geom,{color:Ln.color,weight:f?3:4,opacity:dim}).addTo(lay);}
   if(trip)for(const l of trip.legs){
     if(l.type==="ride")L.polyline(trackBetween(l.line,l.from,l.to),{color:LINES[l.line].color,weight:feeder(l.line)?5:7,opacity:1,lineCap:"round",lineJoin:"round"}).addTo(lay);
     else if(l.m>=40){const line=L.polyline([ll(l.from),ll(l.to)],{color:"#c8ced4",weight:6,dashArray:"1 11",lineCap:"round"}).addTo(lay);walkPath(l.from,l.to).then(w=>line.setLatLngs(w.pts));}
   }
-  for(const s of STATIONS){if(LINES[s.line].hidden&&!(trip&&trip.rides.some(r=>r.line===s.line)))continue;if(LINES[s.line].tentative&&trip&&!trip.rides.some(r=>r.stops.includes(s)))continue;const on=trip&&trip.rides.some(r=>r.stops.includes(s));const vis=!trip||on;const end=trip&&trip.rides.some(r=>r.from===s||r.to===s);
+  for(const s of STATIONS){if(spdOff(s.line))continue;if(LINES[s.line].hidden&&!(trip&&trip.rides.some(r=>r.line===s.line)))continue;if(LINES[s.line].tentative&&trip&&!trip.rides.some(r=>r.stops.includes(s)))continue;const on=trip&&trip.rides.some(r=>r.stops.includes(s));const vis=!trip||on;const end=trip&&trip.rides.some(r=>r.from===s||r.to===s);
     const f=feeder(s.line);
     const pj=LINES[s.line].proj&&LINES[s.line].proj[s.i],onT=pj&&Math.sqrt(pj.d)*111000<200?pj.pt:ll(s); // draw the stop ON its own line, never beside it
     const m=L.circleMarker(onT,f?{radius:end?6:on?3.5:2.5,color:LINES[s.line].color,weight:end?3:1.5,fillColor:end?"#fff":"#141619",fillOpacity:1,opacity:vis?1:dim}:{radius:end?8:on?6:5,color:LINES[s.line].color,weight:end?4:3,fillColor:end?"#fff":"#141619",fillOpacity:1,opacity:vis?1:dim}).addTo(lay);
@@ -1307,6 +1316,23 @@ document.querySelector("#nav button").onclick=()=>setTab("trip");
 renderHist();requestAnimationFrame(()=>setHs(false));syncHome();
 setTimeout(()=>{const go=()=>{try{engStyle();initDmap();initMap();}catch(e){}};(window.requestIdleCallback||setTimeout)(go,{timeout:2500});},1200);
 window.__plan=plan;window.__LINES=LINES;window.__T=TRANSFERS;window.__state=state;
+
+// ---- Speedo picker in the map legend ----
+const isSpd=id=>/^S\d/.test(id),spdBase=id=>id.replace(/R$/,"");
+let spdShow=new Set();try{spdShow=new Set(JSON.parse(localStorage.getItem("spdShow")||"[]"));}catch(e){}
+function spdSave(){try{localStorage.setItem("spdShow",JSON.stringify([...spdShow]));}catch(e){}}
+function spdRedraw(){spdCountUpd();if(lmap&&layer&&state.mapMode!=="trip")drawInto(layer,state.mapMode||"network");}
+function spdCountUpd(){const n=[...spdShow].filter(id=>LINES[id]).length;$("spdCount").textContent=n?"("+n+")":"";}
+function spdBuild(){const box=$("spdList");const ids=Object.keys(LINES).filter(id=>isSpd(id)&&!LINES[id].hidden).sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
+  const all=ids.every(id=>spdShow.has(id));
+  box.innerHTML=`<button class="spd-all" id="spdAll">${all?"Hide all":"Show all"}</button>`+ids.map(id=>{const Ln=LINES[id],st=Ln.stops,cl=n=>n.replace(/\s*\(.*?\)/g,"").replace(/-\d+$/,"").trim(),a=cl(st[0].name),b=cl(st[st.length-1].name);
+    return `<label style="--c:${Ln.color}"><input type="checkbox" data-id="${id}" ${spdShow.has(id)?"checked":""}><span class="nm"><b style="color:${Ln.color}">FRD ${parseInt(id.slice(1))}</b> (${a} - ${b})</span></label>`;}).join("");
+  box.querySelectorAll("input").forEach(c=>c.onchange=()=>{c.checked?spdShow.add(c.dataset.id):spdShow.delete(c.dataset.id);spdSave();spdBuild();spdRedraw();});
+  $("spdAll").onclick=()=>{if(all)spdShow.clear();else ids.forEach(id=>spdShow.add(id));spdSave();spdBuild();spdRedraw();};}
+$("spdBtn").onclick=e=>{e.stopPropagation();const open=$("spdList").hidden;if(open)spdBuild();$("spdList").hidden=!open;$("spdBtn").setAttribute("aria-expanded",open);};
+$("legend").addEventListener("click",e=>e.stopPropagation());["pointerdown","touchstart","wheel","dblclick"].forEach(ev=>$("legend").addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
+spdCountUpd();
+document.addEventListener("click",()=>{if(!$("spdList").hidden){$("spdList").hidden=true;$("spdBtn").setAttribute("aria-expanded",false);}});
 </script>
 </body>
 </html>
