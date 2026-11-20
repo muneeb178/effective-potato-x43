@@ -1332,7 +1332,7 @@ function spdCountUpd(){const n=[...spdShow].filter(id=>LINES[id]).length;$("spdC
 function spdBuild(){const box=$("spdList");const ids=Object.keys(LINES).filter(id=>isSpd(id)&&!LINES[id].hidden).sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
   const all=ids.every(id=>spdShow.has(id));
   box.innerHTML=`<button class="spd-all" id="spdAll">${all?"Hide all":"Show all"}</button>`+ids.map(id=>{const Ln=LINES[id],st=Ln.stops,cl=n=>n.replace(/\s*\(.*?\)/g,"").replace(/-\d+$/,"").trim(),a=cl(st[0].name),b=cl(st[st.length-1].name);
-    return `<label style="--c:${Ln.color}"><input type="checkbox" data-id="${id}" ${spdShow.has(id)?"checked":""}><span class="nm"><b style="color:${Ln.color}">FRD ${parseInt(id.slice(1))}</b> (${a} - ${b})</span></label>`;}).join("");
+    return `<label style="--c:${Ln.color}"><input type="checkbox" data-id="${id}" ${spdShow.has(id)?"checked":""}><span class="nm"><b style="color:${Ln.color}">FRT ${parseInt(id.slice(1))}</b> (${a} - ${b})</span></label>`;}).join("");
   box.querySelectorAll("input").forEach(c=>c.onchange=()=>{c.checked?spdShow.add(c.dataset.id):spdShow.delete(c.dataset.id);spdSave();spdBuild();spdRedraw();});
   $("spdAll").onclick=()=>{if(all)spdShow.clear();else ids.forEach(id=>spdShow.add(id));spdSave();spdBuild();spdRedraw();};}
 $("spdBtn").onclick=e=>{e.stopPropagation();const open=$("spdList").hidden;if(open)spdBuild();$("spdList").hidden=!open;$("spdBtn").setAttribute("aria-expanded",open);};
