@@ -1066,7 +1066,6 @@ function drawInto(lay,mode){
   const trip=mode==="trip"?state.trip:null;const dim=trip?0.28:1;
   const feeder=id=>id!=="MB"&&id!=="OL"; // street buses: thin, dimmed, small stops, so the map stays readable as routes are added
   // Map tab: one line per route; the return direction is only drawn when you ride it, and on the route page.
-  // A stop that exists in only one direction is still shown, labelled with the direction it serves.
   for(const Ln of Object.values(LINES)){if(Ln.hidden)continue;const f=feeder(Ln.id);L.polyline(Ln.geom,{color:Ln.color,weight:f?3:4,opacity:dim}).addTo(lay);}
   if(trip)for(const l of trip.legs){
     if(l.type==="ride")L.polyline(trackBetween(l.line,l.from,l.to),{color:LINES[l.line].color,weight:feeder(l.line)?5:7,opacity:1,lineCap:"round",lineJoin:"round"}).addTo(lay);
