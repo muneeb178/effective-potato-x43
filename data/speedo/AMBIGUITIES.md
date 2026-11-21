@@ -21,6 +21,7 @@ Places where official sources disagree, or where we had to guess. The app curren
 |---|---|---|
 | FRT 21 | Aziz Pulli: PMA map shows it as a stop; Safar (PMA GTFS) has it only towards Shalamar | Westbound only (Safar) |
 | FRT 24 | Bhatti loop: Safar lists Lari Adda Gol Chakar → Texali 2 → Bhatti 2 → Bhatti → Texali → Azadi (opposite way round from Route 3) | Uses Route 3's approved loop and stop order (same corridor) |
+| FRT 24 | North end: PMA map (LFRMap11.pdf) shows a stop "Sharmo Walla" where Safar's Kala Shah Kaku terminal is (~31.719), and its KSK terminal ~1 km further north | Ends at Safar's Kala Shah Kaku point (31.7189); no Sharmo Walla stop |
 | FRT 24 | Kot Shahab-ud-Din: a Route 3 stop, not in Route 24's PMA list | Not served by Route 24 |
 | FRT 24 | Labour Colony, UET KSK, Baoli Jamada, Kala Shah Kaku: no Google markers (only Shamke matches Sham-k-Pind) | PMA GTFS positions |
 | FRT 19 | Poster lists Alla-Ud-Din Road (19) before Abid Majid Road (20) | Road order on Shami Rd northbound: Abid Majid Road first |
