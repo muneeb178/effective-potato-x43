@@ -11,6 +11,8 @@ Places where official sources disagree, or where we had to guess. The app curren
 | FRT 20 | Bhubhtian Chowk turns | **(live)** Northbound: left onto Raiwind Rd, U-turn ~400 m south. Southbound: via UoL Soca Street (as PMA GTFS path) | Direct right/left turn at the chowk |
 | FRT 20 | Adda Plot southbound | **(live)** Loop up Raiwind Rd past the two Adda Plot Gol Chakkar stops, then Jati Umra Chowk | Straight down the service road to the roundabout |
 | FRT 18 | Which way does the bus run from Bhatti to Saggian/Dosako? | **(live)** PMA website stop list: Ravi Rd → Shahdara → Sheikhupura Rd → Baigum Kot → Jaranwala Rd (Mairaj Park, Chungi, Nain Sukh) → Saggian bypass → Dosako | PMA network map: Bhatti → UVAS → Corporation Chowk → 80 Foot Rd → over the Ravi via Fatima Zahra / Hazrat Ali Rd → Sui Gas Office → Saggian Chowk → Dosako |
+| FRT 23 | Where does it start? | **(live)** Safar (PMA GTFS): Canal → Qaddafi Stadium → Kalma Chowk → Barkat Market → Campus Pull (returns end at Qaddafi Stadium) | PMA network map: starts at Campus Pull |
+| FRT 23 | Where does it end? | **(live)** Adalat Ali Shah Darbar (Safar) | PMA map line continues past Adalat Ali Shah Darbar towards Chung |
 | FRT 19 | Does the bus go into R.A Bazar? | **(live)** Turns left on Khursheed Alam Rd to the R.A Bazar (RT19) stop, turns back, then west to Nadeem Chowk | Turns straight right onto Khursheed Alam Rd, skipping the in-and-out |
 
 ## Stop order / positions
