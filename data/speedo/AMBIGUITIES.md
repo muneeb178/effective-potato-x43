@@ -17,6 +17,7 @@ Places where official sources disagree, or where we had to guess. The app curren
 
 | Route | Question | Live choice |
 |---|---|---|
+| FRT 21 | Aziz Pulli: PMA map shows it as a stop; Safar (PMA GTFS) has it only towards Shalamar | Westbound only (Safar) |
 | FRT 19 | Poster lists Alla-Ud-Din Road (19) before Abid Majid Road (20) | Road order on Shami Rd northbound: Abid Majid Road first |
 | FRT 19 | Stops 1–8 (Paragon City → Jawad Cheema Road): no Google markers | PMA map dots snapped to the road (20–50 m uncertainty) |
 | FRT 19 | Nadeem Chowk: PMA map dot ~100 m south of Khursheed Alam Rd | Moved onto the road |
